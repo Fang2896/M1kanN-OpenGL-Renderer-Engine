@@ -1,0 +1,87 @@
+<RCC>
+    <qresource prefix="/shaders">
+        <file>assets/shaders/blinn_phong.vert</file>
+        <file>assets/shaders/blinn_phong.frag</file>
+    </qresource>
+
+    <qresource prefix="/models">
+        <file>assets/models/cruiser/cruiser.bmp</file>
+        <file>assets/models/cruiser/cruiser.mtl</file>
+        <file>assets/models/cruiser/cruiser.obj</file>
+        <file>assets/models/singleObjects/armadillo.obj</file>
+        <file>assets/models/singleObjects/bunny.obj</file>
+        <file>assets/models/singleObjects/tyra.obj</file>
+        <file>assets/models/suzanne/suzanne.mtl</file>
+        <file>assets/models/suzanne/suzanne.obj</file>
+    </qresource>
+
+    <qresource prefix="/textures">
+        <file>assets/textures/pool_tiles_texture/2K-pool_tiles-ao.jpg</file>
+        <file>assets/textures/pool_tiles_texture/2K-pool_tiles-diffuse.jpg</file>
+        <file>assets/textures/pool_tiles_texture/2K-pool_tiles-displacement.jpg</file>
+        <file>assets/textures/pool_tiles_texture/2K-pool_tiles-normal.jpg</file>
+        <file>assets/textures/pool_tiles_texture/2K-pool_tiles-specular.jpg</file>
+    </qresource>
+
+    <qresource prefix="/qss">
+        <file>assets/qss/materialDark.css</file>
+        <file>assets/qss/flatwhite.css</file>
+        <file>assets/qss/lightblue.css</file>
+        <file>assets/qss/psblack.css</file>
+        <file>assets/qss/flatwhite/add_bottom.png</file>
+        <file>assets/qss/flatwhite/add_left.png</file>
+        <file>assets/qss/flatwhite/add_right.png</file>
+        <file>assets/qss/flatwhite/add_top.png</file>
+        <file>assets/qss/flatwhite/branch_close.png</file>
+        <file>assets/qss/flatwhite/branch_open.png</file>
+        <file>assets/qss/flatwhite/calendar_nextmonth.png</file>
+        <file>assets/qss/flatwhite/calendar_prevmonth.png</file>
+        <file>assets/qss/flatwhite/checkbox_checked.png</file>
+        <file>assets/qss/flatwhite/checkbox_checked_disable.png</file>
+        <file>assets/qss/flatwhite/checkbox_parcial.png</file>
+        <file>assets/qss/flatwhite/checkbox_parcial_disable.png</file>
+        <file>assets/qss/flatwhite/checkbox_unchecked.png</file>
+        <file>assets/qss/flatwhite/checkbox_unchecked_disable.png</file>
+        <file>assets/qss/flatwhite/radiobutton_checked.png</file>
+        <file>assets/qss/flatwhite/radiobutton_checked_disable.png</file>
+        <file>assets/qss/flatwhite/radiobutton_unchecked.png</file>
+        <file>assets/qss/flatwhite/radiobutton_unchecked_disable.png</file>
+        <file>assets/qss/lightblue/add_bottom.png</file>
+        <file>assets/qss/lightblue/add_left.png</file>
+        <file>assets/qss/lightblue/add_right.png</file>
+        <file>assets/qss/lightblue/add_top.png</file>
+        <file>assets/qss/lightblue/branch_close.png</file>
+        <file>assets/qss/lightblue/branch_open.png</file>
+        <file>assets/qss/lightblue/calendar_nextmonth.png</file>
+        <file>assets/qss/lightblue/calendar_prevmonth.png</file>
+        <file>assets/qss/lightblue/checkbox_checked.png</file>
+        <file>assets/qss/lightblue/checkbox_checked_disable.png</file>
+        <file>assets/qss/lightblue/checkbox_parcial.png</file>
+        <file>assets/qss/lightblue/checkbox_parcial_disable.png</file>
+        <file>assets/qss/lightblue/checkbox_unchecked.png</file>
+        <file>assets/qss/lightblue/checkbox_unchecked_disable.png</file>
+        <file>assets/qss/lightblue/radiobutton_checked.png</file>
+        <file>assets/qss/lightblue/radiobutton_checked_disable.png</file>
+        <file>assets/qss/lightblue/radiobutton_unchecked.png</file>
+        <file>assets/qss/lightblue/radiobutton_unchecked_disable.png</file>
+        <file>assets/qss/psblack/add_bottom.png</file>
+        <file>assets/qss/psblack/add_left.png</file>
+        <file>assets/qss/psblack/add_right.png</file>
+        <file>assets/qss/psblack/add_top.png</file>
+        <file>assets/qss/psblack/branch_close.png</file>
+        <file>assets/qss/psblack/branch_open.png</file>
+        <file>assets/qss/psblack/calendar_nextmonth.png</file>
+        <file>assets/qss/psblack/calendar_prevmonth.png</file>
+        <file>assets/qss/psblack/checkbox_checked.png</file>
+        <file>assets/qss/psblack/checkbox_checked_disable.png</file>
+        <file>assets/qss/psblack/checkbox_parcial.png</file>
+        <file>assets/qss/psblack/checkbox_parcial_disable.png</file>
+        <file>assets/qss/psblack/checkbox_unchecked.png</file>
+        <file>assets/qss/psblack/checkbox_unchecked_disable.png</file>
+        <file>assets/qss/psblack/radiobutton_checked.png</file>
+        <file>assets/qss/psblack/radiobutton_checked_disable.png</file>
+        <file>assets/qss/psblack/radiobutton_unchecked.png</file>
+        <file>assets/qss/psblack/radiobutton_unchecked_disable.png</file>
+    </qresource>
+
+</RCC>
