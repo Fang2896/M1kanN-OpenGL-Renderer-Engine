@@ -9,25 +9,47 @@ GLManager::GLManager(QWidget *parent, int width, int height) : QOpenGLWidget(par
     this->setGeometry(10, 20, width, height);
 }
 
-GLManager::~GLManager() {
-
-}
+GLManager::~GLManager() = default;
 
 void GLManager::initializeGL() {
-    core = QOpenGLContext::currentContext()->versionFunctions<QOpenGLFunctions_4_3_Core>();
+    checkGLVersion();
+
+    functions = QOpenGLContext::currentContext()->functions();
     m_camera = std::make_unique<Camera>(CAMERA_POSITION);
 
-    core->glEnable(GL_DEPTH_TEST);
+    functions->glEnable(GL_DEPTH_TEST);
 
-    core->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    core->glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+    functions->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    functions->glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+
+
+
 }
 
 void GLManager::resizeGL(int w, int h) {
-    core->glViewport(0, 0, w, h);
+    functions->glViewport(0, 0, w, h);
 }
 
 void GLManager::paintGL() {
 
 }
+
+
+
+
+
+
+
+void GLManager::checkGLVersion() {
+    QOpenGLContext *context = QOpenGLContext::currentContext();
+    if (context) {
+        QSurfaceFormat format = context->format();
+        int majorVersion = format.majorVersion();
+        int minorVersion = format.minorVersion();
+        qDebug() << "OpenGL Version:" << majorVersion << "." << minorVersion;
+    } else {
+        qDebug() << "OpenGL Context Empty.";
+    }
+}
+
 

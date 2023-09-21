@@ -6,8 +6,11 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-set(CMAKE_PREFIX_PATH "C:/Qt/Qt5.15.2/5.15.2/mingw81_64")
-# set(CMAKE_PREFIX_PATH "C:/Qt/Qt5.15.2/5.15.2/msvc2019")
+if(APPLE)
+    set(CMAKE_PREFIX_PATH "/Users/m1kann/Qt/5.15.2/clang_64")
+elseif(WIN32)
+    set(CMAKE_PREFIX_PATH "C:/Qt/Qt5.15.2/5.15.2/mingw81_64")
+endif()
 
 include_directories(
         src/include

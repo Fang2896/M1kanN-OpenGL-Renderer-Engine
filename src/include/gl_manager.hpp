@@ -6,7 +6,7 @@
 #define GL_MANAGER_HPP
 
 #include <QOpenGLWidget>
-#include <QOpenGLFunctions_4_3_Core>
+#include <QOpenGLFunctions>
 
 #include "camera.hpp"
 
@@ -24,10 +24,14 @@ class GLManager : public QOpenGLWidget {
     void resizeGL(int w, int h) override;
     void paintGL() override;
 
-   private:
-    QOpenGLFunctions_4_3_Core *core;
+   private: // functions
+    void checkGLVersion();
+
+   private: // variables
+    QOpenGLFunctions *functions = nullptr;
 
     std::unique_ptr<Camera> m_camera;
+
 };
 
 #endif  //GL_MANAGER_HPP
