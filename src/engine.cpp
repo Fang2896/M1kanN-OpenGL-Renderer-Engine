@@ -6,7 +6,7 @@
 
 void setGLVersion(int major, int minor) {
     QSurfaceFormat format;
-    format.setVersion(major, minor); // 设置为 OpenGL 4.5
+    format.setVersion(major, minor);
     format.setProfile(QSurfaceFormat::CoreProfile); // 使用核心配置文件
     QSurfaceFormat::setDefaultFormat(format);
 }
@@ -20,6 +20,7 @@ int main(int argc, char* argv[]) {
 //    QString styleSheet = QLatin1String(file.readAll());
 //    qApp->setStyleSheet(styleSheet);
 
+    // 设置为 OpenGL 4.3 (后面考虑加入Compute Shader系统), Mac系统则为OpenGL 4.1
     setGLVersion(4, 3);
     MainWindow w;
     w.show();

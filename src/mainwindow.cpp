@@ -3,8 +3,9 @@
 //
 
 #include "mainwindow.hpp"
+#include <QObject>
+#include <QTimer>
 #include "ui/ui_MainWindow.h"
-
 
 const int OGL_WIDTH = 800;
 const int OGL_HEIGHT = 600;
@@ -13,9 +14,16 @@ MainWindow::MainWindow(QWidget* parent)
     : QWidget(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
     glManager = new GLManager(this, OGL_WIDTH, OGL_HEIGHT);
-
     initWidget();
     initLayout();
+    connectConfigure();
+
+    timer = new QTimer(this);
+    connect(timer, &QTimer::timeout, this, &MainWindow::updateGLManager);
+    timer->start(10);
+
+    // filters install
+    this->installEventFilter(this);
 }
 
 MainWindow::~MainWindow() {
@@ -39,34 +47,34 @@ void MainWindow::initWidget() {
     configureDashTab = ui->configureDashTab;
 
     // 操作时增加：(需要new)
-    posTitleLabel = new QLabel;         posTitleLabel->setText("pos:");
-    rotationTitleLabel = new QLabel;    rotationTitleLabel->setText("rot:");
-    scaleTitleLabel = new QLabel;       scaleTitleLabel->setText("scale:");
-    directionTitleLabel = new QLabel;   directionTitleLabel->setText("direct:");
+    posTitleLabel = new QLabel("pos:");
+    rotationTitleLabel = new QLabel("rot:");
+    scaleTitleLabel = new QLabel("scale:");
+    directionTitleLabel = new QLabel("direct:");
 
-    xPosLabel = new QLabel; xPosLabel->setText("X");    xPosSpinBox = new QDoubleSpinBox;
-    yPosLabel = new QLabel; yPosLabel->setText("Y");    yPosSpinBox = new QDoubleSpinBox;
-    zPosLabel = new QLabel; zPosLabel->setText("Z");    zPosSpinBox = new QDoubleSpinBox;
+    xPosLabel = new QLabel("X");    xPosSpinBox = new QDoubleSpinBox;
+    yPosLabel = new QLabel("Y");    yPosSpinBox = new QDoubleSpinBox;
+    zPosLabel = new QLabel("Z");    zPosSpinBox = new QDoubleSpinBox;
 
     // objects
-    objXRotLabel = new QLabel;  objXRotLabel->setText("X"); objXRotSpinBox = new QDoubleSpinBox;
-    objYRotLabel = new QLabel;  objYRotLabel->setText("Y"); objYRotSpinBox = new QDoubleSpinBox;
-    objZRotLabel = new QLabel;  objZRotLabel->setText("Z"); objZRotSpinBox = new QDoubleSpinBox;
+    objXRotLabel = new QLabel("X"); objXRotSpinBox = new QDoubleSpinBox;
+    objYRotLabel = new QLabel("Y"); objYRotSpinBox = new QDoubleSpinBox;
+    objZRotLabel = new QLabel("Z"); objZRotSpinBox = new QDoubleSpinBox;
 
-    objXScaleLabel = new QLabel;    objXScaleLabel->setText("X");   objXScaleSpinBox = new QDoubleSpinBox;
-    objYScaleLabel = new QLabel;    objYScaleLabel->setText("Y");   objYScaleSpinBox = new QDoubleSpinBox;
-    objZScaleLabel = new QLabel;    objZScaleLabel->setText("Z");   objZScaleSpinBox = new QDoubleSpinBox;
+    objXScaleLabel = new QLabel("X");   objXScaleSpinBox = new QDoubleSpinBox;
+    objYScaleLabel = new QLabel("Y");   objYScaleSpinBox = new QDoubleSpinBox;
+    objZScaleLabel = new QLabel("Z");   objZScaleSpinBox = new QDoubleSpinBox;
 
     // lights
     lightTypeComboBox = new QComboBox;   // 按照comboBox的种类再次出现不同的控件
-    lightTypeLabel = new QLabel;        lightTypeLabel->setText("Light Type:");
-    lightIntensityLabel = new QLabel;   lightIntensityLabel->setText("Light Intensity:");
+    lightTypeLabel = new QLabel("Light Type:");
+    lightIntensityLabel = new QLabel("Light Intensity:");
     lightIntensitySpinBox = new QDoubleSpinBox;
 
     // direct light
-    lightXDirLabel = new QLabel;    lightXDirLabel->setText("X");   lightXDirSpinBox = new QDoubleSpinBox;
-    lightYDirLabel = new QLabel;    lightYDirLabel->setText("Y");   lightYDirSpinBox = new QDoubleSpinBox;
-    lightZDirLabel = new QLabel;    lightZDirLabel->setText("Z");   lightZDirSpinBox = new QDoubleSpinBox;
+    lightXDirLabel = new QLabel("X");   lightXDirSpinBox = new QDoubleSpinBox;
+    lightYDirLabel = new QLabel("Y");   lightYDirSpinBox = new QDoubleSpinBox;
+    lightZDirLabel = new QLabel("Z");   lightZDirSpinBox = new QDoubleSpinBox;
 
     mainMenuBar = new QMenuBar(this);
     fileMenu = new QMenu("File", this);
@@ -179,3 +187,48 @@ void MainWindow::initLayout() {
 
     this->setLayout(totalLayout);
 }
+
+void MainWindow::connectConfigure() {
+
+    // QLineEdit
+    connect(nameLineEdit, &QLineEdit::editingFinished, this, &MainWindow::handleEditingFinished);
+
+
+}
+
+void MainWindow::updateGLManager() {
+    glManager->update();
+}
+
+void MainWindow::keyPressEvent(QKeyEvent *event) {
+    glManager->handleKeyPressEvent(event);
+}
+
+void MainWindow::keyReleaseEvent(QKeyEvent *event) {
+    glManager->handleKeyReleaseEvent(event);
+}
+
+
+// slot functions
+void MainWindow::handleEditingFinished() {
+    QString currentText = nameLineEdit->text();
+
+    if (!nameLineEdit->hasFocus()) {
+        qDebug() << "LineEdit has lost focus with text:" << currentText;
+    }
+
+    // other codes...
+
+
+    nameLineEdit->clearFocus();
+}
+
+// filter functions
+bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
+    if (watched == this && event->type() == QEvent::MouseButtonPress) {
+        nameLineEdit->clearFocus();
+    }
+
+    return QWidget::eventFilter(watched, event);
+}
+

@@ -5,15 +5,13 @@
 #include "camera.hpp"
 
 
-QMatrix4x4 Camera::getViewMatrix() const
-{
+QMatrix4x4 Camera::getViewMatrix() const {
     QMatrix4x4 view;
     view.lookAt(this->position, this->position + this->front, this->up);
     return view;
 }
 
-void Camera::handleKeyboard(CAMERA_MOVE direction, GLfloat deltaTime)
-{
+void Camera::handleKeyboard(CAMERA_MOVE direction, GLfloat deltaTime) {
     GLfloat velocity = this->movementSpeed * deltaTime;
     if (direction == CAMERA_MOVE::FORWARD)
         this->position += this->front * velocity;
@@ -29,8 +27,7 @@ void Camera::handleKeyboard(CAMERA_MOVE direction, GLfloat deltaTime)
         this->position -= this->worldUp * velocity;
 }
 
-void Camera::handleMouseMovement(GLfloat xOffset, GLfloat yOffset, GLboolean constraintPitch)
-{
+void Camera::handleMouseMovement(GLfloat xOffset, GLfloat yOffset, GLboolean constraintPitch) {
     xOffset *= this->mouseSensitivity;
     yOffset *= this->mouseSensitivity;
 

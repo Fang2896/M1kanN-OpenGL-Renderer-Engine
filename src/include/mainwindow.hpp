@@ -40,14 +40,26 @@ class MainWindow : public QWidget {
     explicit MainWindow(QWidget* parent = nullptr);
     ~MainWindow() override;
 
+   protected:
+    void keyPressEvent(QKeyEvent *event) override;
+    void keyReleaseEvent(QKeyEvent *event) override;
+
    private: // functions
     void initWidget();
     void initLayout();
+    void connectConfigure();
+
+   private slots: // slots
+    void updateGLManager();
+    void handleEditingFinished();
+
+   private: // filters
+    bool eventFilter(QObject *watched, QEvent *event) override;
 
    private: // variables
     Ui::MainWindow* ui;
-
     GLManager *glManager;
+    QTimer *timer;
 
     // widgets
     QGroupBox *sceneGroupBox;

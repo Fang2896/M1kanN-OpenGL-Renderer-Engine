@@ -1,4 +1,4 @@
-#version 430 core
+#version 410 core
 
 layout(location = 0) in vec3 inPosition; // Vertex position
 layout(location = 1) in vec3 inNormal;   // Vertex normal

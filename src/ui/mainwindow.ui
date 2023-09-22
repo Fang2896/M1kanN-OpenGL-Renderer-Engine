@@ -341,7 +341,7 @@
      </font>
     </property>
     <property name="text">
-     <string>Cube 1</string>
+     <string>NULL</string>
     </property>
    </widget>
    <widget class="QGroupBox" name="transformGroupBox">
