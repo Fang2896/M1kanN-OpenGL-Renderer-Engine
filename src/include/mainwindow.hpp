@@ -40,9 +40,7 @@ class MainWindow : public QWidget {
     explicit MainWindow(QWidget* parent = nullptr);
     ~MainWindow() override;
 
-   protected:
-    void keyPressEvent(QKeyEvent *event) override;
-    void keyReleaseEvent(QKeyEvent *event) override;
+   protected:   // some override functions?
 
    private: // functions
     void initWidget();

@@ -11,19 +11,19 @@ QMatrix4x4 Camera::getViewMatrix() const {
     return view;
 }
 
-void Camera::handleKeyboard(CAMERA_MOVE direction, GLfloat deltaTime) {
+void Camera::handleKeyboard(CameraMove direction, GLfloat deltaTime) {
     GLfloat velocity = this->movementSpeed * deltaTime;
-    if (direction == CAMERA_MOVE::FORWARD)
+    if (direction == CameraMove::FORWARD)
         this->position += this->front * velocity;
-    if (direction == CAMERA_MOVE::BACKWARD)
+    if (direction == CameraMove::BACKWARD)
         this->position -= this->front * velocity;
-    if (direction == CAMERA_MOVE::LEFT)
+    if (direction == CameraMove::LEFT)
         this->position -= this->right * velocity;
-    if (direction == CAMERA_MOVE::RIGHT)
+    if (direction == CameraMove::RIGHT)
         this->position += this->right * velocity;
-    if (direction == CAMERA_MOVE::UP)
+    if (direction == CameraMove::UP)
         this->position += this->worldUp * velocity;
-    if (direction == CAMERA_MOVE::DOWN)
+    if (direction == CameraMove::DOWN)
         this->position -= this->worldUp * velocity;
 }
 

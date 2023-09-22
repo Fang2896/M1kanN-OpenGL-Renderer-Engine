@@ -5,11 +5,18 @@
 #ifndef GL_MANAGER_HPP
 #define GL_MANAGER_HPP
 
-#include <QElapsedTimer>
-#include <QOpenGLFunctions>
-#include <QOpenGLFunctions_4_3_Core>
-#include <QOpenGLExtraFunctions>
+#include <qglobal.h>
+#if defined(Q_OS_MAC)
+#include <QOpenGLFunctions_4_1_Core>  // Mac-specific version
+using GLFunctions_Core = QOpenGLFunctions_4_1_Core;
+#elif defined(Q_OS_WIN)
+#include <QOpenGLFunctions_4_3_Core>  // Windows-specific version
+using GLFunctions_Core = QOpenGLFunctions_4_3_Core;
+#endif
+
+#include <QVector3D>
 #include <QOpenGLWidget>
+#include <QElapsedTimer>
 
 #include "camera.hpp"
 #include "shape.hpp"
@@ -22,9 +29,6 @@ class GLManager : public QOpenGLWidget {
                        int height = 400);
     ~GLManager() override;
 
-    void handleKeyPressEvent(QKeyEvent *event);
-    void handleKeyReleaseEvent(QKeyEvent *event);
-
    protected:
     void initializeGL() override;
     void resizeGL(int w, int h) override;
@@ -34,20 +38,23 @@ class GLManager : public QOpenGLWidget {
     void mousePressEvent(QMouseEvent* event) override;
     void mouseReleaseEvent(QMouseEvent* event) override;
     void wheelEvent(QWheelEvent* event) override;
+    void keyPressEvent(QKeyEvent *event) override;
+    void keyReleaseEvent(QKeyEvent *event) override;
 
    private:  // functions
     void initObjects();
     void initResources();
+    void initConfigureVariables();
+    void initOpenGLSettings();
+
     void drawCoordinate();
 
     void handleInput(GLfloat dt);
     void updateRenderData();
-
     static void checkGLVersion();
-    void initConfigureVariables();
 
    private:  // key variables
-    QOpenGLFunctions_4_3_Core* glFunc = nullptr;
+    GLFunctions_Core* glFunc = nullptr;
     std::unique_ptr<Camera> m_camera;
 
     GLuint coordVAO;
@@ -58,9 +65,12 @@ class GLManager : public QOpenGLWidget {
 
    private:  // configure variables
     GLboolean isLineMode;
+    QVector3D backGroundColor;
 
    private:  // control variables
     GLboolean keys[1024];
+    GLboolean shiftDown;
+    GLfloat defaultCameraMoveSpeed;
 
     GLboolean isFirstMouse;
     GLboolean isRightMousePress;

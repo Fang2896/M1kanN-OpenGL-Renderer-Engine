@@ -36,8 +36,8 @@ void MainWindow::initWidget() {
     objectTitleLabel = ui->objectTitleLabel;
     lightAddButton = ui->lightAddButton;
     objectAddButton = ui->objectAddButton;
-    lightList = ui->lightList;
-    objectList = ui->objectList;
+    lightList = ui->lightList;      lightList->setFocusPolicy(Qt::NoFocus);
+    objectList = ui->objectList;    objectList->setFocusPolicy(Qt::NoFocus);
 
     inspectorGroupBox = ui->inspectorGroupBox;
     nameCheckBox = ui->nameCheckBox;
@@ -199,15 +199,6 @@ void MainWindow::connectConfigure() {
 void MainWindow::updateGLManager() {
     glManager->update();
 }
-
-void MainWindow::keyPressEvent(QKeyEvent *event) {
-    glManager->handleKeyPressEvent(event);
-}
-
-void MainWindow::keyReleaseEvent(QKeyEvent *event) {
-    glManager->handleKeyReleaseEvent(event);
-}
-
 
 // slot functions
 void MainWindow::handleEditingFinished() {

@@ -11,17 +11,19 @@ void setGLVersion(int major, int minor) {
     QSurfaceFormat::setDefaultFormat(format);
 }
 
+void setStyle(const QString& styleName) {
+    QFile file(":qss/assets/qss/" + styleName + ".css");
+    file.open(QFile::ReadOnly);
+    QString styleSheet = QLatin1String(file.readAll());
+    qApp->setStyleSheet(styleSheet);
+}
+
 int main(int argc, char* argv[]) {
     QApplication a(argc, argv);
 
-    // set styles
-//    QFile file(":qss/assets/qss/flatwhite.css");
-//    file.open(QFile::ReadOnly);
-//    QString styleSheet = QLatin1String(file.readAll());
-//    qApp->setStyleSheet(styleSheet);
+    setStyle("flatwhite");
+    setGLVersion(4, 3); // Mac: 4.1, Win: 4.3 (with compute shader)
 
-    // 设置为 OpenGL 4.3 (后面考虑加入Compute Shader系统), Mac系统则为OpenGL 4.1
-    setGLVersion(4, 3);
     MainWindow w;
     w.show();
     return QApplication::exec();

@@ -17,13 +17,10 @@ GLManager::~GLManager() = default;
 /********* OpenGL Functions *********/
 void GLManager::initializeGL() {
     initConfigureVariables();
-
-    checkGLVersion();
-    glFunc = QOpenGLContext::currentContext()->versionFunctions<QOpenGLFunctions_4_3_Core>();
-    glFunc->glEnable(GL_DEPTH_TEST);
+    initOpenGLSettings();
 
     // member mangers
-    m_camera = std::make_unique<Camera>(CAMERA_POSITION);
+    m_camera = std::make_unique<Camera>(CAMERA_POSITION, defaultCameraMoveSpeed);
 
     // object manager, resource manager...
     initObjects();
@@ -31,9 +28,6 @@ void GLManager::initializeGL() {
 
     // start timer
     eTimer.start();
-
-    glFunc->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glFunc->glClearColor(0,0,0,1);
 }
 
 void GLManager::resizeGL(int w, int h) {
@@ -42,7 +36,9 @@ void GLManager::resizeGL(int w, int h) {
 
 void GLManager::paintGL() {
     glFunc->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glFunc->glClearColor(1.0f, 1.0f, 1.0f, 1.0f);  // 例如：清除为黑色
+    glFunc->glClearColor(backGroundColor.x(),
+                         backGroundColor.y(),
+                         backGroundColor.z(), 1.0f);  // 例如：清除为黑色
 
     // time and position data
     GLfloat currentFrame = (GLfloat)eTimer.elapsed() / 100;
@@ -82,7 +78,7 @@ void GLManager::initResources() {
     // matrix configuration
     QMatrix4x4 model;
     model.setToIdentity();
-    model.scale(100.0f);
+    model.scale(5.0f);
     ResourceManager::getShader("coordinate").use().setMatrix4f("model", model);
 
     qDebug() << "Initializing Resources... ";
@@ -95,11 +91,11 @@ void GLManager::drawCoordinate() {
 }
 
 void GLManager::updateRenderData() {
-    // TODO: 解决兼容性问题
-//    if(this->isLineMode)
-//        glFunc->glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-//    else
-//        glFunc->glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    if(this->isLineMode)
+        glFunc->glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    else
+        glFunc->glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
     projection.setToIdentity();
     projection.perspective(m_camera->zoom, (GLfloat)width() / (GLfloat)height(), 0.1f, 200.f);
     view = m_camera->getViewMatrix();
@@ -122,6 +118,10 @@ void GLManager::checkGLVersion() {
 
 void GLManager::initConfigureVariables() {
     isLineMode = GL_FALSE;
+    backGroundColor = QVector3D(0.35f, 0.35f, 0.35f);
+
+    defaultCameraMoveSpeed = 0.2f;
+    shiftDown = GL_FALSE;
     isFirstMouse = GL_TRUE;
     isRightMousePress = GL_FALSE;
 
@@ -135,28 +135,53 @@ void GLManager::initConfigureVariables() {
     }
 }
 
+void GLManager::initOpenGLSettings() {
+    checkGLVersion();
+    glFunc = QOpenGLContext::currentContext()->versionFunctions<GLFunctions_Core>();
+    if (!glFunc) {
+        qFatal("Requires OpenGL >= 4.3");
+    }
+    glFunc->initializeOpenGLFunctions();
+    glFunc->glEnable(GL_DEPTH_TEST);
+    glFunc->glClearColor(backGroundColor.x(),
+                         backGroundColor.y(),
+                         backGroundColor.z(), 1.0f);
+    glFunc->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}
+
 /********* Event Functions *********/
-void GLManager::handleKeyPressEvent(QKeyEvent *event) {
+void GLManager::keyPressEvent(QKeyEvent *event) {
+    if(isFirstMouse)
+        return;
+
     GLuint key = event->key();
     if(key < 1024)
         this->keys[key] = GL_TRUE;
+    else if(key == Qt::Key_Shift)
+        shiftDown = GL_TRUE;
 }
 
-void GLManager::handleKeyReleaseEvent(QKeyEvent *event) {
+void GLManager::keyReleaseEvent(QKeyEvent *event) {
+    if(isFirstMouse)
+        return;
+
     GLuint key = event->key();
     if(key < 1024)
         this->keys[key] = GL_FALSE;
+    else if(key == Qt::Key_Shift)
+        shiftDown = GL_FALSE;
 }
 
 void GLManager::mouseMoveEvent(QMouseEvent *event) {
-    GLint xPos = event->pos().x();
-    GLint yPos = event->pos().y();
     if(!isRightMousePress)
         return;
 
+    GLint xPos = event->pos().x();
+    GLint yPos = event->pos().y();
     if (isFirstMouse){
+        qDebug() << "First Mouse Click : " << xPos << ", " << yPos;
         lastX = xPos;
-        lastY = xPos;
+        lastY = yPos;
         isFirstMouse = GL_FALSE;
     }
 
@@ -165,8 +190,6 @@ void GLManager::mouseMoveEvent(QMouseEvent *event) {
     lastX = xPos;
     lastY = yPos;
     m_camera->handleMouseMovement((GLfloat)xOffset, (GLfloat)yOffset);
-
-    qDebug() << "Move Mouse : " << lastX << ", " << lastY;
 }
 
 void GLManager::wheelEvent(QWheelEvent *event) {
@@ -175,8 +198,11 @@ void GLManager::wheelEvent(QWheelEvent *event) {
 }
 
 void GLManager::mousePressEvent(QMouseEvent *event) {
-    if(event->button() == Qt::RightButton)
-        isRightMousePress = GL_TRUE;
+    setFocus();
+    if(event->button() == Qt::RightButton) {
+        m_camera->movementSpeed *= 3.0f;
+        isRightMousePress = GL_TRUE;;
+    }
 }
 
 void GLManager::mouseReleaseEvent(QMouseEvent *event) {
@@ -188,16 +214,21 @@ void GLManager::mouseReleaseEvent(QMouseEvent *event) {
 
 void GLManager::handleInput(GLfloat dt) {
     if (keys[Qt::Key_W])
-        m_camera->handleKeyboard(CAMERA_MOVE::FORWARD, dt);
+        m_camera->handleKeyboard(CameraMove::FORWARD, dt);
     if (keys[Qt::Key_S])
-        m_camera->handleKeyboard(CAMERA_MOVE::BACKWARD, dt);
+        m_camera->handleKeyboard(CameraMove::BACKWARD, dt);
     if (keys[Qt::Key_A])
-        m_camera->handleKeyboard(CAMERA_MOVE::LEFT, dt);
+        m_camera->handleKeyboard(CameraMove::LEFT, dt);
     if (keys[Qt::Key_D])
-        m_camera->handleKeyboard(CAMERA_MOVE::RIGHT, dt);
+        m_camera->handleKeyboard(CameraMove::RIGHT, dt);
     if (keys[Qt::Key_E])
-        m_camera->handleKeyboard(CAMERA_MOVE::UP, dt);
+        m_camera->handleKeyboard(CameraMove::UP, dt);
     if (keys[Qt::Key_Q])
-        m_camera->handleKeyboard(CAMERA_MOVE::DOWN, dt);
+        m_camera->handleKeyboard(CameraMove::DOWN, dt);
+
+    if (shiftDown)
+        m_camera->movementSpeed = 2.5f * defaultCameraMoveSpeed;
+    else
+        m_camera->movementSpeed = defaultCameraMoveSpeed;
 }
 
