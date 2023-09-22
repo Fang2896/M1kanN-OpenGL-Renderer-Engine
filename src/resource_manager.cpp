@@ -44,18 +44,12 @@ Texture2D ResourceManager::getTexture(const QString& name){
 }
 
 void ResourceManager::clear(){
-    for (auto & map_Shader : map_Shaders)
-        delete map_Shader.second.shaderProgram;
-    for (auto & map_Texture : map_Textures)
-        delete map_Texture.second.texture;
-
     map_Shaders.clear();
     map_Textures.clear();
 }
 
 void ResourceManager::clearTextures() {
-    for (auto & map_Texture : map_Textures)
-        delete map_Texture.second.texture;
+    map_Shaders.clear();
     map_Textures.clear();
 }
 

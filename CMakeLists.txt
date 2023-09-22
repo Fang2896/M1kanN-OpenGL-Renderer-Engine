@@ -8,6 +8,7 @@ set(CMAKE_AUTOUIC ON)
 
 if(APPLE)
     set(CMAKE_PREFIX_PATH "/Users/m1kann/Qt/5.15.2/clang_64")
+    set(CMAKE_OSX_ARCHITECTURES "x86_64")
 elseif(WIN32)
     set(CMAKE_PREFIX_PATH "C:/Qt/Qt5.15.2/5.15.2/mingw81_64")
 endif()

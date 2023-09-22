@@ -11,12 +11,10 @@ Texture2D::Texture2D()
       filter_min(QOpenGLTexture::Linear), filter_max(QOpenGLTexture::Linear)
 { }
 
-Texture2D::~Texture2D() {
-
-}
+Texture2D::~Texture2D() = default;
 
 void Texture2D::generate(const QString &file) {
-    texture = new QOpenGLTexture(QOpenGLTexture::Target2D);
+    texture = std::make_shared<QOpenGLTexture>(QOpenGLTexture::Target2D);
     texture->setFormat(internal_format);
     texture->setData(QImage(file).mirrored(), QOpenGLTexture::GenerateMipMaps);
 

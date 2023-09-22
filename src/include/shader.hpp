@@ -14,9 +14,7 @@ class Shader
     friend class ResourceManager;
    public:
     Shader() = default;
-    ~Shader() {
-
-    };
+    ~Shader() = default;
 
     void compile(const QString& vertexSource, const QString& fragmentSource, const QString& geometrySource = nullptr);
 
@@ -76,7 +74,7 @@ class Shader
     }
 
    private:
-    QOpenGLShaderProgram *shaderProgram;
+    std::shared_ptr<QOpenGLShaderProgram> shaderProgram;
 };
 
 #endif  //SHADER_HPP

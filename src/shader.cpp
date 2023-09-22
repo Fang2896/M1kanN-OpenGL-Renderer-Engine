@@ -29,7 +29,7 @@ void Shader::compile(const QString& vertexSource, const QString& fragmentSource,
         }
     }
 
-    shaderProgram = new QOpenGLShaderProgram();
+    shaderProgram = std::make_shared<QOpenGLShaderProgram>();
     shaderProgram->addShader(&vertexShader);
     shaderProgram->addShader(&fragmentShader);
     if(geometrySource != nullptr)

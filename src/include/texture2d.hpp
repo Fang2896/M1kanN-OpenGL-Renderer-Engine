@@ -5,6 +5,7 @@
 #ifndef TEXTURE_2_D_HPP
 #define TEXTURE_2_D_HPP
 
+#include <memory>
 #include <QOpenGLTexture>
 
 
@@ -24,7 +25,7 @@ class Texture2D
     QOpenGLTexture::Filter filter_max;
 
    private:
-    QOpenGLTexture* texture;
+    std::shared_ptr<QOpenGLTexture> texture;
 };
 
 #endif  //TEXTURE_2_D_HPP
