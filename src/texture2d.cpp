@@ -23,8 +23,17 @@ void Texture2D::generate(const QString &file) {
 
     texture->setMinificationFilter(filter_min);
     texture->setMagnificationFilter(filter_max);
+
+    this->id = texture->textureId();
 }
 
 void Texture2D::bind() const {
     texture->bind();
+}
+
+GLuint Texture2D::getTextureID() {
+    if(!texture)
+        qFatal("Texture is NULL");
+
+    return texture->textureId();
 }

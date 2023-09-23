@@ -21,6 +21,7 @@ void GLManager::initializeGL() {
 
     // member mangers
     m_camera = std::make_unique<Camera>(CAMERA_POSITION, defaultCameraMoveSpeed);
+    m_testModel = std::make_unique<Model>("../assets/models/nanosuit/nanosuit.obj");
 
     // object manager, resource manager...
     initObjects();
@@ -50,6 +51,8 @@ void GLManager::paintGL() {
 
     ResourceManager::getShader("coordinate").use();
     drawCoordinate();
+    ResourceManager::getShader("baseModel").use();
+    m_testModel->draw(ResourceManager::getShader("baseModel").use());
 }
 
 /********* Other Functions *********/
@@ -74,12 +77,18 @@ void GLManager::initResources() {
     ResourceManager::loadShader("coordinate",
                                 ":/shaders/assets/shaders/coordinate.vert",
                                 ":/shaders/assets/shaders/coordinate.frag");
+    ResourceManager::loadShader("baseModel",
+                                ":/shaders/assets/shaders/baseModel.vert",
+                                ":/shaders/assets/shaders/baseModel.frag");
 
     // matrix configuration
     QMatrix4x4 model;
     model.setToIdentity();
     model.scale(5.0f);
     ResourceManager::getShader("coordinate").use().setMatrix4f("model", model);
+    model.setToIdentity();
+    model.scale(0.1f);
+    ResourceManager::getShader("baseModel").use().setMatrix4f("model", model);
 
     qDebug() << "Initializing Resources... ";
 }
@@ -102,6 +111,8 @@ void GLManager::updateRenderData() {
 
     ResourceManager::getShader("coordinate").use().setMatrix4f("projection", projection);
     ResourceManager::getShader("coordinate").use().setMatrix4f("view", view);
+    ResourceManager::getShader("baseModel").use().setMatrix4f("projection", projection);
+    ResourceManager::getShader("baseModel").use().setMatrix4f("view", view);
 }
 
 void GLManager::checkGLVersion() {
@@ -162,9 +173,6 @@ void GLManager::keyPressEvent(QKeyEvent *event) {
 }
 
 void GLManager::keyReleaseEvent(QKeyEvent *event) {
-    if(isFirstMouse)
-        return;
-
     GLuint key = event->key();
     if(key < 1024)
         this->keys[key] = GL_FALSE;

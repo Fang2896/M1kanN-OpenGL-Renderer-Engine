@@ -4,27 +4,9 @@
         <file>assets/shaders/blinn_phong.frag</file>
         <file>assets/shaders/coordinate.vert</file>
         <file>assets/shaders/coordinate.frag</file>
+        <file>assets/shaders/baseModel.vert</file>
+        <file>assets/shaders/baseModel.frag</file>
     </qresource>
-
-    <qresource prefix="/models">
-        <file>assets/models/cruiser/cruiser.bmp</file>
-        <file>assets/models/cruiser/cruiser.mtl</file>
-        <file>assets/models/cruiser/cruiser.obj</file>
-        <file>assets/models/singleObjects/armadillo.obj</file>
-        <file>assets/models/singleObjects/bunny.obj</file>
-        <file>assets/models/singleObjects/tyra.obj</file>
-        <file>assets/models/suzanne/suzanne.mtl</file>
-        <file>assets/models/suzanne/suzanne.obj</file>
-    </qresource>
-
-    <qresource prefix="/textures">
-        <file>assets/textures/pool_tiles_texture/2K-pool_tiles-ao.jpg</file>
-        <file>assets/textures/pool_tiles_texture/2K-pool_tiles-diffuse.jpg</file>
-        <file>assets/textures/pool_tiles_texture/2K-pool_tiles-displacement.jpg</file>
-        <file>assets/textures/pool_tiles_texture/2K-pool_tiles-normal.jpg</file>
-        <file>assets/textures/pool_tiles_texture/2K-pool_tiles-specular.jpg</file>
-    </qresource>
-
     <qresource prefix="/qss">
         <file>assets/qss/flatwhite.css</file>
         <file>assets/qss/flatwhite/add_bottom.png</file>
@@ -46,5 +28,4 @@
         <file>assets/qss/flatwhite/radiobutton_unchecked.png</file>
         <file>assets/qss/flatwhite/radiobutton_unchecked_disable.png</file>
     </qresource>
-
 </RCC>

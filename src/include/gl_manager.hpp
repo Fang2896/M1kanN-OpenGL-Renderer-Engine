@@ -5,22 +5,17 @@
 #ifndef GL_MANAGER_HPP
 #define GL_MANAGER_HPP
 
-#include <qglobal.h>
-#if defined(Q_OS_MAC)
-#include <QOpenGLFunctions_4_1_Core>  // Mac-specific version
-using GLFunctions_Core = QOpenGLFunctions_4_1_Core;
-#elif defined(Q_OS_WIN)
-#include <QOpenGLFunctions_4_3_Core>  // Windows-specific version
-using GLFunctions_Core = QOpenGLFunctions_4_3_Core;
-#endif
+
 
 #include <QVector3D>
 #include <QOpenGLWidget>
 #include <QElapsedTimer>
 
 #include "camera.hpp"
-#include "shape.hpp"
+#include "gl_configure.hpp"
 #include "resource_manager.hpp"
+#include "shape.hpp"
+#include "model.hpp"
 
 
 class GLManager : public QOpenGLWidget {
@@ -82,6 +77,9 @@ class GLManager : public QOpenGLWidget {
 
     QMatrix4x4 projection;
     QMatrix4x4 view;
+
+   private: // for test
+    std::unique_ptr<Model> m_testModel;
 };
 
 #endif  //GL_MANAGER_HPP

@@ -17,6 +17,11 @@ class Texture2D
     ~Texture2D();
     void generate(const QString& file);
     void bind() const;
+    GLuint getTextureID();
+
+    GLuint id;
+    QString type;
+    QString path;
 
     QOpenGLTexture::TextureFormat internal_format;//Format of texture object
     QOpenGLTexture::WrapMode wrap_s;
