@@ -1,4 +1,4 @@
-﻿cmake_minimum_required(VERSION 3.25)
+﻿cmake_minimum_required(VERSION 3.21)
 project(Mikann_Renderer_Engine)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -25,6 +25,10 @@ endif()
 
 include_directories(
         src/include
+        src/include/object
+        src/include/ui
+        src/include/utils
+
         3rdParty/include
 )
 

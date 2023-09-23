@@ -45,10 +45,12 @@ class Camera
         this->zoom = ZOOM;
 
         this->updateCameraData();
+
+        qDebug() << "======= Done Init Camera ========";
     }
 
 
-    QMatrix4x4 getViewMatrix() const;
+    [[nodiscard]] QMatrix4x4 getViewMatrix() const;
     void handleMouseMovement(GLfloat xOffset, GLfloat yOffset, GLboolean constraintPitch = true);
     void handleMouseScroll(GLfloat yOffset);
     void handleKeyboard(CameraMove direction, GLfloat deltaTime);

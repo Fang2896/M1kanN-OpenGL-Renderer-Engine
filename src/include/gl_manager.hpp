@@ -11,12 +11,12 @@
 #include <QOpenGLWidget>
 #include <QElapsedTimer>
 
-#include "camera.hpp"
+#include "data_structures.hpp"
 #include "gl_configure.hpp"
-#include "resource_manager.hpp"
-#include "shape.hpp"
-#include "model.hpp"
-
+#include "object/model.hpp"
+#include "object/shape.hpp"
+#include "utils/camera.hpp"
+#include "utils/resource_manager.hpp"
 
 class GLManager : public QOpenGLWidget {
    public:
@@ -37,16 +37,21 @@ class GLManager : public QOpenGLWidget {
     void keyReleaseEvent(QKeyEvent *event) override;
 
    private:  // functions
-    void initObjects();
-    void initResources();
+    void initShaders();
     void initConfigureVariables();
     void initOpenGLSettings();
 
-    void drawCoordinate();
+    // 单独绘制单个物体的函数，现在改为统一管理 -> Object基类
+     void initCoordinate();
+     void drawCoordinate();
 
     void handleInput(GLfloat dt);
     void updateRenderData();
     static void checkGLVersion();
+
+   private: // manager objects, shaders...
+    // TODO: 一起管理
+    // QVector<std::shared_ptr<Object>> objectVec;
 
    private:  // key variables
     GLFunctions_Core* glFunc = nullptr;
@@ -80,6 +85,7 @@ class GLManager : public QOpenGLWidget {
 
    private: // for test
     std::unique_ptr<Model> m_testModel;
+    std::unique_ptr<Shape> m_testCube;
 };
 
 #endif  //GL_MANAGER_HPP

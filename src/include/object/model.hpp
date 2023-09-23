@@ -8,22 +8,28 @@
 #include <QVector>
 #include <QDebug>
 
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
+#include "assimp/Importer.hpp"
+#include "assimp/postprocess.h"
+#include "assimp/scene.h"
 
 #include "mesh.hpp"
-#include "texture2d.hpp"
+#include "object.hpp"
+#include "utils/texture2d.hpp"
 
 
-class Model {
+class Model : public Object {
    public:
-    explicit Model(const char* path) { loadModel(path); }
-    void draw(const Shader& shader);
+    Model(const char* mPath, const char* shaderName);
+    explicit Model(const char* mPath);
+
+    void init(QString shaderName) override;
+    void draw() override;   // 根据内部存储的shader名字来进行draw
 
    private:
     QVector<Mesh> meshes;
-    QString directory;
+
+    QString modelPath;
+    QString modelDirectory;
 
     void loadModel(const QString &path);
     void processNode(aiNode *node, const aiScene *scene);

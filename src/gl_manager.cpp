@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by fangl on 2023/9/19.
 //
 
@@ -8,7 +8,8 @@ const QVector3D CAMERA_POSITION(0.0f, 0.5f, 3.0f);
 
 
 GLManager::GLManager(QWidget* parent, int width, int height)
-    : QOpenGLWidget(parent), coordData(ShapeData::getCoordinateVertices()) {
+    : QOpenGLWidget(parent) {
+    coordData = ShapeData::getCoordinateVertices();
     this->setGeometry(10, 20, width, height);
 }
 
@@ -18,14 +19,22 @@ GLManager::~GLManager() = default;
 void GLManager::initializeGL() {
     initConfigureVariables();
     initOpenGLSettings();
+    initShaders();    // shader
+
+    // TODO: 这里可以从coordinate改成各种绘制精灵？
+    initCoordinate();
 
     // member mangers
-    m_camera = std::make_unique<Camera>(CAMERA_POSITION, defaultCameraMoveSpeed);
-    m_testModel = std::make_unique<Model>("../assets/models/nanosuit/nanosuit.obj");
-
     // object manager, resource manager...
-    initObjects();
-    initResources();
+    m_camera = std::make_unique<Camera>(CAMERA_POSITION, defaultCameraMoveSpeed);
+
+    // Model must be initialized after shader!
+    m_testModel = std::make_unique<Model>("E:/ToyPrograms/GL/MikannRendererEngine/Mikann-Renderer-Engine/assets/models/nanosuit/nanosuit.obj");
+    // TODO: 后面要加一个可以动态改变shader的？ updateShader函数
+    m_testModel->init("defaultModelShader");
+
+    m_testCube = std::make_unique<Shape>("cube");
+    m_testCube->init("defaultShapeShader");
 
     // start timer
     eTimer.start();
@@ -36,6 +45,12 @@ void GLManager::resizeGL(int w, int h) {
 }
 
 void GLManager::paintGL() {
+    if(this->isLineMode)
+        glFunc->glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    else
+        glFunc->glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+    // 这个是可有可无？
     glFunc->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glFunc->glClearColor(backGroundColor.x(),
                          backGroundColor.y(),
@@ -49,14 +64,17 @@ void GLManager::paintGL() {
     this->handleInput(deltaTime);
     this->updateRenderData();
 
-    ResourceManager::getShader("coordinate").use();
+    ResourceManager::getShader("coordShader").use();
     drawCoordinate();
-    ResourceManager::getShader("baseModel").use();
-    m_testModel->draw(ResourceManager::getShader("baseModel").use());
+
+    ResourceManager::getShader(m_testModel->getShaderName()).use();
+    m_testModel->draw();
+    ResourceManager::getShader(m_testCube->getShaderName()).use();
+    m_testCube->draw();
 }
 
 /********* Other Functions *********/
-void GLManager::initObjects() {
+void GLManager::initCoordinate() {
     glFunc->glGenBuffers(1, &coordVBO);
     glFunc->glBindBuffer(GL_ARRAY_BUFFER, coordVBO);
     glFunc->glBufferData(GL_ARRAY_BUFFER, coordData.size() * sizeof(float), coordData.data(), GL_STATIC_DRAW);
@@ -70,33 +88,49 @@ void GLManager::initObjects() {
     glFunc->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, (GLsizei)3 * sizeof(float), (void*)nullptr);
     glFunc->glBindVertexArray(0);
 
-    qDebug() << "Initializing Objects... ";
-}
-
-void GLManager::initResources() {
-    ResourceManager::loadShader("coordinate",
-                                ":/shaders/assets/shaders/coordinate.vert",
-                                ":/shaders/assets/shaders/coordinate.frag");
-    ResourceManager::loadShader("baseModel",
-                                ":/shaders/assets/shaders/baseModel.vert",
-                                ":/shaders/assets/shaders/baseModel.frag");
-
-    // matrix configuration
-    QMatrix4x4 model;
-    model.setToIdentity();
-    model.scale(5.0f);
-    ResourceManager::getShader("coordinate").use().setMatrix4f("model", model);
-    model.setToIdentity();
-    model.scale(0.1f);
-    ResourceManager::getShader("baseModel").use().setMatrix4f("model", model);
-
-    qDebug() << "Initializing Resources... ";
+    qDebug() << "======= Done Init Coordinate ========";
 }
 
 void GLManager::drawCoordinate() {
     glFunc->glBindVertexArray(coordVAO);
     glFunc->glDrawArrays(GL_LINES, 0, (GLsizei)coordData.size() / 3);
     glFunc->glBindVertexArray(0);
+}
+
+// TODO: 以后glManager只需要遍历所有的shader，然后为他们设置MVP矩阵，和一些全局变量就行
+//  比如：光照信息，视线方向，等等，然后其他的因素，比如说transform，物体的material，就object自己内部实现就行
+//  然后还能自己设置，改变很多信息，无敌
+
+// TODO: 这里要注意，虽然shader的文件数是固定的，但是我们需要为每一个object都设置一个shader？（可能）
+//  不然就只能在draw那里，每帧都设置一遍（目前先这样实现吧）（时间换空间。而且管理多个shader感觉也好麻烦）
+void GLManager::initShaders() {
+    ResourceManager::loadShader("coordShader",
+                                ":/shaders/assets/shaders/coordShader.vert",
+                                ":/shaders/assets/shaders/coordShader.frag");
+    ResourceManager::loadShader("defaultModelShader",
+                                ":/shaders/assets/shaders/defaultModelShader.vert",
+                                ":/shaders/assets/shaders/defaultModelShader.frag");
+    ResourceManager::loadShader("defaultShapeShader",
+                                ":/shaders/assets/shaders/defaultShapeShader.vert",
+                                ":/shaders/assets/shaders/defaultShapeShader.frag");
+
+    ResourceManager::getShader("defaultShapeShader").use().setVector3f("pointLight.position", QVector3D(5,5,5));
+    ResourceManager::getShader("defaultShapeShader").use().setVector3f("pointLight.color", QVector3D(1,1,1));
+    ResourceManager::getShader("defaultShapeShader").use().setVector3f("shapeColor", QVector3D(1,1,0));
+
+    // matrix configuration
+    QMatrix4x4 model;
+    model.setToIdentity();
+    model.scale(5.0f);
+    ResourceManager::getShader("coordShader").use().setMatrix4f("model", model);
+    model.setToIdentity();
+    model.scale(0.1f);
+    ResourceManager::getShader("defaultModelShader").use().setMatrix4f("model", model);
+    model.setToIdentity();
+    model.translate(0, 0, 3);
+    ResourceManager::getShader("defaultShapeShader").use().setMatrix4f("model", model);
+
+    qDebug() << "======= Done Init Shaders ========";
 }
 
 void GLManager::updateRenderData() {
@@ -109,10 +143,15 @@ void GLManager::updateRenderData() {
     projection.perspective(m_camera->zoom, (GLfloat)width() / (GLfloat)height(), 0.1f, 200.f);
     view = m_camera->getViewMatrix();
 
-    ResourceManager::getShader("coordinate").use().setMatrix4f("projection", projection);
-    ResourceManager::getShader("coordinate").use().setMatrix4f("view", view);
-    ResourceManager::getShader("baseModel").use().setMatrix4f("projection", projection);
-    ResourceManager::getShader("baseModel").use().setMatrix4f("view", view);
+    ResourceManager::getShader("coordShader").use().setMatrix4f("projection", projection);
+    ResourceManager::getShader("coordShader").use().setMatrix4f("view", view);
+
+    ResourceManager::getShader("defaultModelShader").use().setMatrix4f("projection", projection);
+    ResourceManager::getShader("defaultModelShader").use().setMatrix4f("view", view);
+
+    ResourceManager::getShader("defaultShapeShader").use().setMatrix4f("projection", projection);
+    ResourceManager::getShader("defaultShapeShader").use().setMatrix4f("view", view);
+    ResourceManager::getShader("defaultShapeShader").use().setVector3f("viewPos", m_camera->position);
 }
 
 void GLManager::checkGLVersion() {
@@ -158,6 +197,8 @@ void GLManager::initOpenGLSettings() {
                          backGroundColor.y(),
                          backGroundColor.z(), 1.0f);
     glFunc->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    qDebug() << "======= Done Init OpenGL Settings ========";
 }
 
 /********* Event Functions *********/

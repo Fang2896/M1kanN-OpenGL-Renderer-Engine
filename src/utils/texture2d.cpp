@@ -2,8 +2,7 @@
 // Created by fangl on 2023/9/22.
 //
 
-#include "texture2d.hpp"
-
+#include "utils/texture2d.hpp"
 
 Texture2D::Texture2D()
     : texture(nullptr), internal_format(QOpenGLTexture::RGBFormat),

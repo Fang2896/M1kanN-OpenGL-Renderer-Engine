@@ -25,6 +25,7 @@ uniform Light light;
 uniform Material material;
 uniform sampler2D textureSampler;
 
+
 void main()
 {
     // Ambient

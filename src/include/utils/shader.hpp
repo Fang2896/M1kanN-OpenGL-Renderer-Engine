@@ -23,6 +23,10 @@ class Shader
         return *this;
     }
 
+    void bind() {
+        shaderProgram->bind();
+    }
+
     void setFloat(const QString& name, const GLfloat& value) const {
         GLint loc = shaderProgram->uniformLocation(name);
         shaderProgram->setUniformValue(loc, value);

@@ -2,8 +2,7 @@
 // Created by fangl on 2023/9/21.
 //
 
-#include "camera.hpp"
-
+#include "utils/camera.hpp"
 
 QMatrix4x4 Camera::getViewMatrix() const {
     QMatrix4x4 view;

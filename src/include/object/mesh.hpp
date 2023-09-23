@@ -9,16 +9,10 @@
 #include <QVector>
 #include <QVector3D>
 
-#include "shader.hpp"
-#include "texture2d.hpp"
+#include "data_structures.hpp"
 #include "gl_configure.hpp"
-
-
-struct Vertex {
-    QVector3D position;
-    QVector3D normal;
-    QVector3D texCoord;
-};
+#include "utils/shader.hpp"
+#include "utils/texture2d.hpp"
 
 class Mesh {
    public:
@@ -27,8 +21,9 @@ class Mesh {
     QVector<std::shared_ptr<Texture2D>> textures;
 
     Mesh(QVector<Vertex> vertices, QVector<unsigned int> indices, QVector<std::shared_ptr<Texture2D>> textures);
-    const GLuint& getMeshVAO();
-    void draw(const Shader& shader);
+    ~Mesh();
+
+    void draw(const QString& shaderName);
 
    private:
     void setupMesh();

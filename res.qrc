@@ -2,10 +2,12 @@
     <qresource prefix="/shaders">
         <file>assets/shaders/blinn_phong.vert</file>
         <file>assets/shaders/blinn_phong.frag</file>
-        <file>assets/shaders/coordinate.vert</file>
-        <file>assets/shaders/coordinate.frag</file>
-        <file>assets/shaders/baseModel.vert</file>
-        <file>assets/shaders/baseModel.frag</file>
+        <file>assets/shaders/coordShader.vert</file>
+        <file>assets/shaders/coordShader.frag</file>
+        <file>assets/shaders/defaultModelShader.vert</file>
+        <file>assets/shaders/defaultModelShader.frag</file>
+        <file>assets/shaders/defaultShapeShader.vert</file>
+        <file>assets/shaders/defaultShapeShader.frag</file>
     </qresource>
     <qresource prefix="/qss">
         <file>assets/qss/flatwhite.css</file>

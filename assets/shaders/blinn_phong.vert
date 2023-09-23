@@ -18,5 +18,5 @@ void main()
     norm = mat3(transpose(inverse(model))) * inNormal; // Correct way to transform normals
     texCoord = inTexCoord;
 
-    gl_Position = projection * view * vec4(fragPos, 1.0);
+    gl_Position = projection * view * vec4(worldPos, 1.0);
 }

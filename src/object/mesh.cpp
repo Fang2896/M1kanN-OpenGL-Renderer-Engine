@@ -2,26 +2,31 @@
 // Created by fangl on 2023/9/23.
 //
 
-#include "mesh.hpp"
+#include "resource_manager.hpp"
+#include "object/mesh.hpp"
+
+#include <utility>
 
 
 Mesh::Mesh(QVector<Vertex> vertices, QVector<unsigned int> indices, QVector<std::shared_ptr<Texture2D>> textures) {
-    this->vertices = vertices;
-    this->indices = indices;
-    this->textures = textures;
+    this->vertices = std::move(vertices);
+    this->indices = std::move(indices);
+    this->textures = std::move(textures);
+
+    glFunc = QOpenGLContext::currentContext()->versionFunctions<GLFunctions_Core>();
+    if(!glFunc)
+        qFatal("Require GLFunctions_Core to setUp mesh");
 
     setupMesh();
 }
 
-// 传到主渲染器里面，用于Draw
-const GLuint& Mesh::getMeshVAO() {
-    return VAO;
-}
+Mesh::~Mesh() {}
 
 // 这个shader应该在其他地方以及初始化以及compile
-void Mesh::draw(const Shader& shader) {
+void Mesh::draw(const QString& shaderName) {
     GLuint diffuseNr = 1;
     GLuint specularNr = 1;
+
     for(int i = 0; i < textures.size(); i++) {
         glFunc->glActiveTexture(GL_TEXTURE0 + i); // 在绑定之前激活相应的纹理单元
         // 获取纹理序号（diffuse_textureN 中的 N）
@@ -32,9 +37,10 @@ void Mesh::draw(const Shader& shader) {
         else if(name == "texture_specular")
             number = QString::number(specularNr++);
 
-        shader.setInteger("material." + name + number, i);
+        ResourceManager::getShader(shaderName).use().setInteger("material." + name + number, i);
         glFunc->glBindTexture(GL_TEXTURE_2D, textures[i]->id);
     }
+    // 目前仅用一个diffuse texture
     glFunc->glActiveTexture(GL_TEXTURE0);
 
     // 绘制网格
@@ -44,10 +50,6 @@ void Mesh::draw(const Shader& shader) {
 }
 
 void Mesh::setupMesh() {
-    glFunc = QOpenGLContext::currentContext()->versionFunctions<GLFunctions_Core>();
-    if(!glFunc)
-        qFatal("Require GLFunctions_Core to setUp mesh");
-
     glFunc->glGenVertexArrays(1, &VAO);
     glFunc->glGenBuffers(1, &VBO);
     glFunc->glGenBuffers(1, &EBO);

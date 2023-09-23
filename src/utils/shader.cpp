@@ -2,8 +2,7 @@
 // Created by fangl on 2023/9/22.
 //
 
-#include "shader.hpp"
-
+#include "utils/shader.hpp"
 
 void Shader::compile(const QString& vertexSource, const QString& fragmentSource, const QString& geometrySource) {
     QOpenGLShader vertexShader(QOpenGLShader::Vertex);
@@ -39,7 +38,7 @@ void Shader::compile(const QString& vertexSource, const QString& fragmentSource,
         qDebug() << "ERROR::SHADER::PROGRAM::LINKING_FAILED" << Qt::endl;
         qDebug() << shaderProgram->log() << Qt::endl;
     } else {
-        qDebug() << "Successfully Load Shader." << Qt::endl;
+        qDebug() << "Successfully Load Shader.";
     }
 }
 

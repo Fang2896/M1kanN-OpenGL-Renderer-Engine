@@ -1,8 +1,7 @@
 #include <QFile>
 #include <QApplication>
 
-#include "include/mainwindow.hpp"
-
+#include "ui/mainwindow.hpp"
 
 void setGLVersion(int major, int minor) {
     QSurfaceFormat format;

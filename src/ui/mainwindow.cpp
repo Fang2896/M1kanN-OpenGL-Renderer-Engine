@@ -2,7 +2,7 @@
 // Created by fangl on 2023/9/18.
 //
 
-#include "mainwindow.hpp"
+#include "ui/mainwindow.hpp"
 #include <QObject>
 #include <QTimer>
 #include "ui/ui_MainWindow.h"

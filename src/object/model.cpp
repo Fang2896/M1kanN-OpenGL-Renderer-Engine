@@ -2,12 +2,25 @@
 // Created by fangl on 2023/9/23.
 //
 
-#include "model.hpp"
+#include "object/model.hpp"
 
 
-void Model::draw(const Shader& shader) {
+// 不指定的话直接default吧
+Model::Model(const char* mPath, const char* shaderName)
+    : Object("model", shaderName), modelPath(mPath) {}
+
+Model::Model(const char* mPath)
+    : Object("model", "defaultModelShader"), modelPath(mPath) {}
+
+void Model::init(QString sName) {
+    this->setShaderName(sName);
+    loadModel(modelPath);
+    qDebug() << "======= Done Init Test Model ========";
+}
+
+void Model::draw() {
     for(auto & mesh : meshes)
-        mesh.draw(shader);
+        mesh.draw(getShaderName());
 }
 
 void Model::loadModel(const QString& path) {
@@ -19,8 +32,8 @@ void Model::loadModel(const QString& path) {
         return;
     }
 
-    directory = path.left(path.lastIndexOf('/'));
-    qDebug() << "Model Directory: " + directory;
+    modelDirectory = path.left(path.lastIndexOf('/'));
+    qDebug() << "Model Directory: " + modelDirectory;
     if(scene->mRootNode)
       processNode(scene->mRootNode, scene);
     else
@@ -95,7 +108,7 @@ QVector<std::shared_ptr<Texture2D>> Model::loadMaterialTextures(aiMaterial *mat,
     for(unsigned int i = 0; i < mat->GetTextureCount(type); i++) {
         aiString str;
         mat->GetTexture(type, i, &str);
-        QString qStr = directory + "/" + QString::fromUtf8(str.C_Str());
+        QString qStr = modelDirectory + "/" + QString::fromUtf8(str.C_Str());
         qDebug() << "Load texture: " + qStr;
         std::shared_ptr<Texture2D> texture = std::make_shared<Texture2D>();
         texture->generate(qStr);
