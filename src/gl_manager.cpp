@@ -23,18 +23,26 @@ void GLManager::initializeGL() {
 
     // TODO: 这里可以从coordinate改成各种绘制精灵？
     initCoordinate();
+    initShaderValue();
 
     // member mangers
     // object manager, resource manager...
     m_camera = std::make_unique<Camera>(CAMERA_POSITION, defaultCameraMoveSpeed);
 
-    // Model must be initialized after shader!
-    m_testModel = std::make_unique<Model>("E:/ToyPrograms/GL/MikannRendererEngine/Mikann-Renderer-Engine/assets/models/nanosuit/nanosuit.obj");
-    // TODO: 后面要加一个可以动态改变shader的？ updateShader函数
-    m_testModel->init("defaultModelShader");
+    objectVec.push_back(std::make_shared<Shape>("cube"));
+    objectVec[0]->init();
+    objectVec[0]->setPosition({-3, 0, 0});
+    objectVec.push_back(std::make_shared<Model>("E:/ToyPrograms/GL/MikannRendererEngine/Mikann-Renderer-Engine/assets/models/nanosuit/nanosuit.obj"));
+    objectVec[1]->init();
+    objectVec[1]->setPosition(QVector3D(3,0,0));
+    objectVec[1]->setScale(0.2f);
 
-    m_testCube = std::make_unique<Shape>("cube");
-    m_testCube->init("defaultShapeShader");
+    // Model must be initialized after shader!
+    // TODO: 后面要加一个可以动态改变shader的？ updateShader函数. 目前先暂时满足于动态改变shader值
+//    m_testModel = std::make_unique<Model>("../assets/models/nanosuit/nanosuit.obj");
+//    m_testModel->init("defaultModelShader");
+//    m_testCube = std::make_unique<Shape>("cube");
+//    m_testCube->init("defaultShapeShader");
 
     // start timer
     eTimer.start();
@@ -67,10 +75,11 @@ void GLManager::paintGL() {
     ResourceManager::getShader("coordShader").use();
     drawCoordinate();
 
-    ResourceManager::getShader(m_testModel->getShaderName()).use();
-    m_testModel->draw();
-    ResourceManager::getShader(m_testCube->getShaderName()).use();
-    m_testCube->draw();
+    drawObjects();
+//    ResourceManager::getShader(m_testModel->getShaderName()).use();
+//    m_testModel->draw();
+//    ResourceManager::getShader(m_testCube->getShaderName()).use();
+//    m_testCube->draw();
 }
 
 /********* Other Functions *********/
@@ -97,6 +106,14 @@ void GLManager::drawCoordinate() {
     glFunc->glBindVertexArray(0);
 }
 
+void GLManager::drawObjects() {
+    for(const auto& obj : objectVec) {
+        ResourceManager::getShader(obj->getShaderName()).use();
+        obj->draw();
+    }
+
+}
+
 // TODO: 以后glManager只需要遍历所有的shader，然后为他们设置MVP矩阵，和一些全局变量就行
 //  比如：光照信息，视线方向，等等，然后其他的因素，比如说transform，物体的material，就object自己内部实现就行
 //  然后还能自己设置，改变很多信息，无敌
@@ -114,23 +131,33 @@ void GLManager::initShaders() {
                                 ":/shaders/assets/shaders/defaultShapeShader.vert",
                                 ":/shaders/assets/shaders/defaultShapeShader.frag");
 
-    ResourceManager::getShader("defaultShapeShader").use().setVector3f("pointLight.position", QVector3D(5,5,5));
-    ResourceManager::getShader("defaultShapeShader").use().setVector3f("pointLight.color", QVector3D(1,1,1));
-    ResourceManager::getShader("defaultShapeShader").use().setVector3f("shapeColor", QVector3D(1,1,0));
+    qDebug() << "======= Done Init Shaders ========";
+}
 
-    // matrix configuration
+// 在物体初始化后，或者增加物体，改变这里边的参数后调用！
+void GLManager::initShaderValue() {
+    initLightInfo();    // 要在shaderInit之前
+
+    // TODO: 这里的光照信息可以抽出来
+    const Shader& tempShapeShader = ResourceManager::getShader("defaultShapeShader").use();
+    tempShapeShader.setVector3f("directLight.direction", directLight.direction);
+    tempShapeShader.setVector3f("directLight.ambientColor", directLight.ambientColor);
+    tempShapeShader.setVector3f("directLight.diffuseColor", directLight.diffuseColor);
+    tempShapeShader.setVector3f("directLight.specularColor", directLight.specularColor);
+    tempShapeShader.setFloat("directLight.intensity", directLight.intensity);
+
+    const Shader& tempModelShader = ResourceManager::getShader("defaultModelShader").use();
+    tempModelShader.setVector3f("directLight.direction", directLight.direction);
+    tempModelShader.setVector3f("directLight.ambientColor", directLight.ambientColor);
+    tempModelShader.setVector3f("directLight.diffuseColor", directLight.diffuseColor);
+    tempModelShader.setVector3f("directLight.specularColor", directLight.specularColor);
+    tempModelShader.setFloat("directLight.intensity", directLight.intensity);
+
+    // coordinate matrix configuration （因为坐标位置是不变的）
     QMatrix4x4 model;
     model.setToIdentity();
     model.scale(5.0f);
     ResourceManager::getShader("coordShader").use().setMatrix4f("model", model);
-    model.setToIdentity();
-    model.scale(0.1f);
-    ResourceManager::getShader("defaultModelShader").use().setMatrix4f("model", model);
-    model.setToIdentity();
-    model.translate(0, 0, 3);
-    ResourceManager::getShader("defaultShapeShader").use().setMatrix4f("model", model);
-
-    qDebug() << "======= Done Init Shaders ========";
 }
 
 void GLManager::updateRenderData() {
@@ -148,9 +175,15 @@ void GLManager::updateRenderData() {
 
     ResourceManager::getShader("defaultModelShader").use().setMatrix4f("projection", projection);
     ResourceManager::getShader("defaultModelShader").use().setMatrix4f("view", view);
-
     ResourceManager::getShader("defaultShapeShader").use().setMatrix4f("projection", projection);
     ResourceManager::getShader("defaultShapeShader").use().setMatrix4f("view", view);
+
+    // 为管理的objects设置model
+    for(const auto& obj : objectVec) {
+        ResourceManager::getShader(obj->getShaderName()).use().setMatrix4f("model", obj->getTransform());
+    }
+
+    ResourceManager::getShader("defaultModelShader").use().setVector3f("viewPos", m_camera->position);
     ResourceManager::getShader("defaultShapeShader").use().setVector3f("viewPos", m_camera->position);
 }
 
@@ -183,6 +216,12 @@ void GLManager::initConfigureVariables() {
     for (auto& key : keys) {
         key = GL_FALSE;
     }
+}
+
+void GLManager::initLightInfo() {
+    directLight = DirectLight();
+
+    // TODO: 灯光管理。。。
 }
 
 void GLManager::initOpenGLSettings() {

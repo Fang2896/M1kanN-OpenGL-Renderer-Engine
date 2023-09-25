@@ -2,20 +2,33 @@
 // Created by fangl on 2023/9/23.
 //
 
+#include <utility>
+
 #include "object/model.hpp"
 
 
-// 不指定的话直接default吧
-Model::Model(const char* mPath, const char* shaderName)
-    : Object("model", shaderName), modelPath(mPath) {}
-
+// TODO:不指定的话直接default吧。注意这里应该要加，如果更换shader的逻辑
 Model::Model(const char* mPath)
-    : Object("model", "defaultModelShader"), modelPath(mPath) {}
+    : Object("model", "defaultModel", "defaultModelShader"), modelPath(mPath) {}
 
-void Model::init(QString sName) {
-    this->setShaderName(sName);
+Model::Model(QString objName, const char* mPath)
+    : Object("model", std::move(objName), "defaultModelShader"), modelPath(mPath) {}
+
+void Model::init(QString shaderName) {
+    this->setShaderName(shaderName);
+    if(modelPath.isEmpty()) {
+        qFatal("Model Path Empty!");
+    }
+
     loadModel(modelPath);
     qDebug() << "======= Done Init Test Model ========";
+}
+
+void Model::init() {
+    this->setShaderName("defaultModelShader");
+    loadModel(modelPath);
+    qDebug() << "======= Done Init Model :" << getObjectName() << " Shader: "
+        << getShaderName() << " ========";
 }
 
 void Model::draw() {

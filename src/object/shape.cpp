@@ -2,14 +2,14 @@
 // Created by fangl on 2023/9/22.
 //
 
-#include <utility>
+
 
 #include "object/shape.hpp"
 
 
 Shape::Shape(QString  geometryType)
-    : Object("shape", "defaultShapeShader"),
-      geometryType(std::move(geometryType)), material(Material())
+    : Object("shape", "defaultShape", "defaultShapeShader"),
+      geometryType(std::move(geometryType)), material(ShapeMaterial())
 {
     glFunc = QOpenGLContext::currentContext()->versionFunctions<GLFunctions_Core>();
     if(!glFunc)
@@ -18,7 +18,9 @@ Shape::Shape(QString  geometryType)
 
 Shape::~Shape() = default;
 
-void Shape::init(QString shaderName) {
+void Shape::init(QString objName) {
+    setObjectName(objName);
+
     if(geometryType.toLower() == "cube") {
         initShapeData(ShapeData::getCubeVertices(), ShapeData::getCubeIndices());
     } else if (geometryType.toLower() == "plane") {
@@ -28,11 +30,27 @@ void Shape::init(QString shaderName) {
     qDebug() << "======= Done Init Test Shape ========";
 }
 
+void Shape::init() {
+    setObjectName("defaultShape");
+
+    if(geometryType.toLower() == "cube") {
+        initShapeData(ShapeData::getCubeVertices(), ShapeData::getCubeIndices());
+    } else if (geometryType.toLower() == "plane") {
+        initShapeData(ShapeData::getPlaneVertices(), ShapeData::getPlaneIndices());
+    }
+
+    qDebug() << "======= Done Init Shape: " << getObjectName() << "Shader: "
+        << getShaderName() << "========";
+}
+
 // 这里有参数的原因是，可能需要在类里面设置shader的一些参数
 void Shape::draw() {
     if(VAO == 0) {
         qFatal("Shape's VAO is NULL!");
     }
+
+    // TODO：暂且让所有shape共用shader，然后在draw上改变参数
+    updateShapeMaterial();
 
     glFunc->glBindVertexArray(VAO);
     glFunc->glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, nullptr);
@@ -53,6 +71,20 @@ void Shape::updateShapeData(const QVector<float>& posData,
     glFunc->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glFunc->glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int),
                          &indices[0], GL_STATIC_DRAW);
+}
+
+void Shape::updateShapeMaterial(ShapeMaterial mat) {
+    this->material = mat;
+    if(getShaderName().isEmpty()) {
+        qFatal("Setting Material Shader is Empty!");
+    }
+
+    const Shader& tempShader = ResourceManager::getShader(getShaderName());
+    tempShader.setFloat("material.shininess" ,mat.shininess);
+    tempShader.setVector3f("material.ambientColor" ,mat.ambientColor);
+    tempShader.setVector3f("material.diffuseColor" ,mat.diffuseColor);
+    tempShader.setVector3f("material.specularColor" ,mat.specularColor);
+    tempShader.setFloat("material.ambientOcclusion" ,mat.ambientOcclusion);
 }
 
 void Shape::initShapeData(const QVector<float>& posData, const QVector<unsigned int>& indexData) {

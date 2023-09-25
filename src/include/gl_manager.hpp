@@ -38,20 +38,22 @@ class GLManager : public QOpenGLWidget {
 
    private:  // functions
     void initShaders();
+    void initShaderValue();
     void initConfigureVariables();
+    void initLightInfo();
     void initOpenGLSettings();
 
     // 单独绘制单个物体的函数，现在改为统一管理 -> Object基类
-     void initCoordinate();
-     void drawCoordinate();
+    void initCoordinate();
+    void drawCoordinate();
+    void drawObjects();
 
     void handleInput(GLfloat dt);
     void updateRenderData();
     static void checkGLVersion();
 
    private: // manager objects, shaders...
-    // TODO: 一起管理
-    // QVector<std::shared_ptr<Object>> objectVec;
+    QVector<std::shared_ptr<Object>> objectVec;
 
    private:  // key variables
     GLFunctions_Core* glFunc = nullptr;
@@ -66,6 +68,8 @@ class GLManager : public QOpenGLWidget {
    private:  // configure variables
     GLboolean isLineMode;
     QVector3D backGroundColor;
+
+    DirectLight directLight;
 
    private:  // control variables
     GLboolean keys[1024];
@@ -84,8 +88,8 @@ class GLManager : public QOpenGLWidget {
     QMatrix4x4 view;
 
    private: // for test
-    std::unique_ptr<Model> m_testModel;
-    std::unique_ptr<Shape> m_testCube;
+    // std::unique_ptr<Model> m_testModel;
+    // std::unique_ptr<Shape> m_testCube;
 };
 
 #endif  //GL_MANAGER_HPP

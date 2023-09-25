@@ -28,7 +28,8 @@ void Mesh::draw(const QString& shaderName) {
     GLuint specularNr = 1;
 
     for(int i = 0; i < textures.size(); i++) {
-        glFunc->glActiveTexture(GL_TEXTURE0 + i); // 在绑定之前激活相应的纹理单元
+        // 在绑定之前激活相应的纹理单元
+        glFunc->glActiveTexture(GL_TEXTURE0 + i);
         // 获取纹理序号（diffuse_textureN 中的 N）
         QString number;
         QString name = textures[i]->type;
@@ -37,11 +38,10 @@ void Mesh::draw(const QString& shaderName) {
         else if(name == "texture_specular")
             number = QString::number(specularNr++);
 
+        // 这里的material是model的material，当前仅仅有贴图
         ResourceManager::getShader(shaderName).use().setInteger("material." + name + number, i);
         glFunc->glBindTexture(GL_TEXTURE_2D, textures[i]->id);
     }
-    // 目前仅用一个diffuse texture
-    glFunc->glActiveTexture(GL_TEXTURE0);
 
     // 绘制网格
     glFunc->glBindVertexArray(VAO);

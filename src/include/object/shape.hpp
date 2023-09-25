@@ -5,12 +5,15 @@
 #ifndef SHAPE_HPP
 #define SHAPE_HPP
 
+#include <utility>
+
 #include <QDebug>
 #include <QOpenGLExtraFunctions>
 #include <QOpenGLFunctions>
 #include <QVector>
 #include <QMatrix4x4>
 
+#include "resource_manager.hpp"
 #include "shape_data.hpp"
 #include "object.hpp"
 #include "gl_configure.hpp"
@@ -35,9 +38,11 @@ class Shape : public Object {
     ~Shape();
 
     void init(QString shaderName) override;
+    void init() override;
     void draw() override;
     void updateShapeData(const QVector<float>& posData,
                          const QVector<unsigned int>& indexData);
+    void updateShapeMaterial(ShapeMaterial mat = ShapeMaterial());
 
    private:
     GLFunctions_Core *glFunc;
@@ -45,7 +50,7 @@ class Shape : public Object {
     QVector<Vertex> vertices;
     QVector<unsigned int> indices;
     QString geometryType;
-    Material material;
+    ShapeMaterial material;
 
     GLuint VAO{};
     GLuint VBO{};

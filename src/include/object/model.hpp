@@ -19,10 +19,11 @@
 
 class Model : public Object {
    public:
-    Model(const char* mPath, const char* shaderName);
     explicit Model(const char* mPath);
+    Model(QString objName, const char* mPath);
 
     void init(QString shaderName) override;
+    void init() override;
     void draw() override;   // 根据内部存储的shader名字来进行draw
 
    private:

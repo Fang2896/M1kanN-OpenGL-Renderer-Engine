@@ -2,11 +2,25 @@
 // Created by fangl on 2023/9/24.
 //
 
+#include <utility>
+
 #include "object/object.hpp"
 
 
-void Object::setShaderName(const QString& sName) {
-    shaderName = sName;
+QString Object::getType() {
+    return type;
+}
+
+void Object::setObjectName(QString objName) {
+    objectName = std::move(objName);
+}
+
+QString Object::getObjectName() {
+    return objectName;
+}
+
+void Object::setShaderName(QString sName) {
+    shaderName = std::move(sName);
 }
 
 QString Object::getShaderName() {
@@ -31,6 +45,10 @@ QVector3D Object::getRotation() {
 
 void Object::setScale(const QVector3D& sca) {
     scale = sca;
+}
+
+void Object::setScale(float sca) {
+    scale = QVector3D(sca, sca, sca);
 }
 
 QVector3D Object::getScale(const QVector3D& sca) {

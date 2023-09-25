@@ -21,7 +21,13 @@ Shader ResourceManager::loadShader(const QString& name,
 }
 
 Shader ResourceManager::getShader(const QString& name){
-    return map_Shaders[name];
+    if(map_Shaders.find(name) != map_Shaders.end())
+        return map_Shaders[name];
+    else {
+        QString temp("No Shader : " + name + " Exist!");
+        qFatal(temp.toStdString().c_str());
+    }
+
 }
 
 Texture2D ResourceManager::loadTexture(const QString& name, const QString& file, GLboolean alpha){
