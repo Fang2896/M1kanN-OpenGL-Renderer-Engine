@@ -211,11 +211,11 @@ enum aiPostProcessSteps
     * the local transformation matrices of their nodes.
     *
     * If the resulting scene can be reduced to a single mesh, with a single
-    * material, no lights, and no cameras, then the output scene will contain
+    * baseMaterial, no lights, and no cameras, then the output scene will contain
     * only a root node (with no children) that references the single mesh.
     * Otherwise, the output scene will be reduced to a root node with a single
     * level of child nodes, each one referencing one mesh, and each mesh
-    * referencing one material.
+    * referencing one baseMaterial.
     *
     * In either case, for rendering, you can
     * simply render all meshes in order - you don't need to pay
@@ -223,7 +223,7 @@ enum aiPostProcessSteps
     * Animations are removed during this step.
     * This step is intended for applications without a scenegraph.
     * The step CAN cause some problems: if e.g. a mesh of the asset
-    * contains normals and another, using the same material index, does not,
+    * contains normals and another, using the same baseMaterial index, does not,
     * they will be brought together, but the first meshes's part of
     * the normal list is zeroed. However, these artifacts are rare.
     * @note The <tt>#AI_CONFIG_PP_PTV_NORMALIZE</tt> configuration property
@@ -251,7 +251,7 @@ enum aiPostProcessSteps
     // -------------------------------------------------------------------------
     /** <hr>Validates the imported scene data structure.
      * This makes sure that all indices are valid, all animations and
-     * bones are linked correctly, all material references are correct .. etc.
+     * bones are linked correctly, all baseMaterial references are correct .. etc.
      *
      * It is recommended that you capture Assimp's log output if you use this flag,
      * so you can easily find out what's wrong if a file fails the
@@ -298,15 +298,15 @@ enum aiPostProcessSteps
      * #aiProcess_PreTransformVertices and #aiProcess_OptimizeMeshes flags.
      * Both join small meshes with equal characteristics, but they can't do
      * their work if two meshes have different materials. Because several
-     * material settings are lost during Assimp's import filters,
+     * baseMaterial settings are lost during Assimp's import filters,
      * (and because many exporters don't check for redundant materials), huge
      * models often have materials which are are defined several times with
      * exactly the same settings.
      *
-     * Several material settings not contributing to the final appearance of
-     * a surface are ignored in all comparisons (e.g. the material name).
+     * Several baseMaterial settings not contributing to the final appearance of
+     * a surface are ignored in all comparisons (e.g. the baseMaterial name).
      * So, if you're passing additional information through the
-     * content pipeline (probably using *magic* material names), don't
+     * content pipeline (probably using *magic* baseMaterial names), don't
      * specify this flag. Alternatively take a look at the
      * <tt>#AI_CONFIG_PP_RRM_EXCLUDE_LIST</tt> importer property.
      */
@@ -423,7 +423,7 @@ enum aiPostProcessSteps
      * LightWave, and Modo do this for example.
      *
      * @note If this step is not requested, you'll need to process the
-     * <tt>#AI_MATKEY_MAPPING</tt> material property in order to display all assets
+     * <tt>#AI_MATKEY_MAPPING</tt> baseMaterial property in order to display all assets
      * properly.
      */
     aiProcess_GenUVCoords = 0x40000,
@@ -433,7 +433,7 @@ enum aiPostProcessSteps
      *  them into stand-alone vtexture coordinate channels.
      *
      * UV transformations are specified per-texture - see the
-     * <tt>#AI_MATKEY_UVTRANSFORM</tt> material key for more information.
+     * <tt>#AI_MATKEY_UVTRANSFORM</tt> baseMaterial key for more information.
      * This step processes all textures with
      * transformed input UV coordinates and generates a new (pre-transformed) UV channel
      * which replaces the old channel. Most applications won't support UV
@@ -453,7 +453,7 @@ enum aiPostProcessSteps
      *  Its main purpose is to workaround the fact that many export
      *  file formats don't support instanced meshes, so exporters need to
      *  duplicate meshes. This step removes the duplicates again. Please
-     *  note that Assimp does not currently support per-node material
+     *  note that Assimp does not currently support per-node baseMaterial
      *  assignment to meshes, which means that identical meshes with
      *  different materials are currently *not* joined, although this is
      *  planned for future versions.
@@ -502,7 +502,7 @@ enum aiPostProcessSteps
 
     // -------------------------------------------------------------------------
     /** <hr>This step flips all UV coordinates along the y-axis and adjusts
-     * material settings and bitangents accordingly.
+     * baseMaterial settings and bitangents accordingly.
      *
      * <b>Output UV coordinate system:</b>
      * @code

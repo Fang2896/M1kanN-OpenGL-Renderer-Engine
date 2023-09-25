@@ -615,7 +615,7 @@ enum aiMorphingMethod {
 }; //! enum aiMorphingMethod
 
 // ---------------------------------------------------------------------------
-/** @brief A mesh represents a geometry or model with a single material.
+/** @brief A mesh represents a geometry or model with a single baseMaterial.
  *
  * It usually consists of a number of vertices and a series of primitives/faces
  * referencing the vertices. In addition there might be a series of bones, each
@@ -626,7 +626,7 @@ enum aiMorphingMethod {
  * From C++-programs you can also use the comfort functions Has*() to
  * test for the presence of various data streams.
  *
- * A Mesh uses only a single material which is referenced by a material ID.
+ * A Mesh uses only a single baseMaterial which is referenced by a baseMaterial ID.
  * @note The mPositions member is usually not optional. However, vertex positions
  * *could* be missing if the #AI_SCENE_FLAGS_INCOMPLETE flag is set in
  * @code
@@ -767,11 +767,11 @@ struct aiMesh {
     C_STRUCT aiBone **mBones;
 
     /**
-     * @brief The material used by this mesh.
+     * @brief The baseMaterial used by this mesh.
      * 
-     * A mesh uses only a single material. If an imported model uses
+     * A mesh uses only a single baseMaterial. If an imported model uses
      * multiple materials, the import splits up the mesh. Use this value
-     * as index into the scene's material list.
+     * as index into the scene's baseMaterial list.
      */
     unsigned int mMaterialIndex;
 
@@ -781,7 +781,7 @@ struct aiMesh {
      *  There are mainly three uses for mesh names:
      *   - some formats name nodes and meshes independently.
      *   - importers tend to split meshes up to meet the
-     *      one-material-per-mesh requirement. Assigning
+     *      one-baseMaterial-per-mesh requirement. Assigning
      *      the same (dummy) name to each of the result meshes
      *      aids the caller at recovering the original mesh
      *      partitioning.

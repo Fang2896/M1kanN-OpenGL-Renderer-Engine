@@ -9,17 +9,18 @@
 
 Shape::Shape(QString  geometryType)
     : Object("shape", "defaultShape", "defaultShapeShader"),
-      geometryType(std::move(geometryType)), material(ShapeMaterial())
+      geometryType(std::move(geometryType)),
+      baseMaterial(ShapeMaterial())
 {
     glFunc = QOpenGLContext::currentContext()->versionFunctions<GLFunctions_Core>();
     if(!glFunc)
-        qFatal("Require GLFunctions_Core to setUp mesh");
+        qCritical("Require GLFunctions_Core to setUp mesh");
 }
 
 Shape::~Shape() = default;
 
-void Shape::init(QString objName) {
-    setObjectName(objName);
+void Shape::init(QString shaderName) {
+    setShaderName(shaderName);
 
     if(geometryType.toLower() == "cube") {
         initShapeData(ShapeData::getCubeVertices(), ShapeData::getCubeIndices());
@@ -46,21 +47,65 @@ void Shape::init() {
 // 这里有参数的原因是，可能需要在类里面设置shader的一些参数
 void Shape::draw() {
     if(VAO == 0) {
-        qFatal("Shape's VAO is NULL!");
+        qCritical("Shape's VAO is NULL!");
     }
 
     // TODO：暂且让所有shape共用shader，然后在draw上改变参数
     updateShapeMaterial();
 
+    if(diffuseTexture != nullptr) {
+        glFunc->glActiveTexture(GL_TEXTURE0);
+        ResourceManager::getShader(getShaderName()).use().setInteger(
+            "texture_diffuse", 0);
+        glFunc->glBindTexture(GL_TEXTURE_2D, diffuseTexture->id);
+    }
+
+    if(specularTexture != nullptr) {
+        glFunc->glActiveTexture(GL_TEXTURE1);
+        ResourceManager::getShader(getShaderName()).use().setInteger(
+            "specular_texture", 1);
+        glFunc->glBindTexture(GL_TEXTURE_2D, specularTexture->id);
+    }
+
     glFunc->glBindVertexArray(VAO);
-    glFunc->glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, nullptr);
+    glFunc->glDrawElements(GL_TRIANGLES, indices.size(),
+                           GL_UNSIGNED_INT, nullptr);
     glFunc->glBindVertexArray(0);
+}
+
+void Shape::updateDiffuseTexture(const QString& dTexPath) {
+    if(dTexPath.isEmpty()) {
+        qDebug("Diffuse Texture Path Empty. Delete Original Texture");
+        diffuseTexture = nullptr;
+        return;
+    }
+
+    diffuseTexture = std::make_shared<Texture2D>();
+    diffuseTexture->generate(dTexPath);
+    diffuseTexture->type = "texture_diffuse";
+    diffuseTexture->path = dTexPath;
+
+    // TODO: 这里顺便把shininess搞了
+    ResourceManager::getShader(getShaderName()).setFloat("material.shininess" ,0.2f);
+}
+
+void Shape::updateSpecularTexture(const QString& sTexPath) {
+    if(sTexPath.isEmpty()) {
+        qDebug("Diffuse Texture Path Empty. Delete Original Texture");
+        specularTexture = nullptr;
+        return;
+    }
+
+    specularTexture = std::make_shared<Texture2D>();
+    specularTexture->generate(sTexPath);
+    specularTexture->type = "texture_diffuse";
+    specularTexture->path = sTexPath;
 }
 
 void Shape::updateShapeData(const QVector<float>& posData,
                      const QVector<unsigned int>& indexData) {
     if(VAO == 0 || VBO == 0 || EBO == 0) {
-        qFatal("VAO & VBO & EBO empty!");
+        qCritical("VAO & VBO & EBO empty!");
     }
 
     glFunc->glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -74,9 +119,9 @@ void Shape::updateShapeData(const QVector<float>& posData,
 }
 
 void Shape::updateShapeMaterial(ShapeMaterial mat) {
-    this->material = mat;
+    this->baseMaterial = mat;
     if(getShaderName().isEmpty()) {
-        qFatal("Setting Material Shader is Empty!");
+        qCritical("Setting Material Shader is Empty!");
     }
 
     const Shader& tempShader = ResourceManager::getShader(getShaderName());

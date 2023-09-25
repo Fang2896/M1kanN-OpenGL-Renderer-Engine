@@ -39,8 +39,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ---------------------------------------------------------------------------
 */
 
-/** @file material.inl
- *  @brief Defines the C++ getters for the material system
+/** @file baseMaterial.inl
+ *  @brief Defines the C++ getters for the baseMaterial system
  */
 
 #pragma once
@@ -315,7 +315,7 @@ AI_FORCE_INLINE aiReturn aiMaterial::AddProperty(const int* pInput,
 
 // ---------------------------------------------------------------------------
 // The template specializations below are for backwards compatibility.
-// The recommended way to add material properties is using the non-template
+// The recommended way to add baseMaterial properties is using the non-template
 // overloads.
 // ---------------------------------------------------------------------------
 

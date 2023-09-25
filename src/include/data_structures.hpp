@@ -32,7 +32,7 @@ struct DirectLight {
 
     DirectLight()
         : direction(QVector3D(1,1,1).normalized()),
-          ambientColor({0.1f, 0.1f, 0.1f}),
+          ambientColor({0.3f, 0.3f, 0.3f}),
           diffuseColor({1.0f, 1.0f, 1.0f}),
           specularColor({0.9f, 0.9f, 0.9f}),
           intensity(1.0f) {}
@@ -100,11 +100,11 @@ struct ShapeMaterial {
           specularColor(sCol),
           ambientOcclusion(amb) {}
 
-    ShapeMaterial() : shininess(0.25f),
-          ambientColor({0.0,0.1,0.06}),
-          diffuseColor({0.0,0.50980392,	0.50980392}),
-          specularColor({0.50196078,0.50196078,	0.50196078}),
-          ambientOcclusion(0.5) {}
+    ShapeMaterial() : shininess(0.4),
+          ambientColor({1.0f, 0.5f, 0.31f}),
+          diffuseColor({ 1.0f, 0.5f, 0.31f}),
+          specularColor({0.5f, 0.5f, 0.5f}),
+          ambientOcclusion(0.25) {}
 };
 
 /*

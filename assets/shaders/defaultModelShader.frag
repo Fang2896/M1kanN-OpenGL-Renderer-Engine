@@ -46,7 +46,7 @@ in vec2 TexCoords;
 void main()
 {
     // Ambient
-    vec3 ambientColor = directLight.ambientColor * directLight.intensity; // 常数环境光颜色
+    vec3 ambientColor = 0.3f * directLight.ambientColor * directLight.intensity; // 常数环境光颜色
 
     // Diffuse
     vec3 norm = normalize(Normal);

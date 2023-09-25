@@ -507,7 +507,7 @@ struct aiMemoryInfo {
     /** Storage allocated for texture data */
     unsigned int textures;
 
-    /** Storage allocated for material data  */
+    /** Storage allocated for baseMaterial data  */
     unsigned int materials;
 
     /** Storage allocated for mesh data */

@@ -189,7 +189,7 @@ struct aiLight {
     /** Diffuse color of the light source
      *
      *  The diffuse light color is multiplied with the diffuse
-     *  material color to obtain the final color that contributes
+     *  baseMaterial color to obtain the final color that contributes
      *  to the diffuse shading term.
      */
     C_STRUCT aiColor3D mColorDiffuse;
@@ -197,7 +197,7 @@ struct aiLight {
     /** Specular color of the light source
      *
      *  The specular light color is multiplied with the specular
-     *  material color to obtain the final color that contributes
+     *  baseMaterial color to obtain the final color that contributes
      *  to the specular shading term.
      */
     C_STRUCT aiColor3D mColorSpecular;
@@ -205,7 +205,7 @@ struct aiLight {
     /** Ambient color of the light source
      *
      *  The ambient light color is multiplied with the ambient
-     *  material color to obtain the final color that contributes
+     *  baseMaterial color to obtain the final color that contributes
      *  to the ambient shading term. Most renderers will ignore
      *  this value it, is just a remaining of the fixed-function pipeline
      *  that is still supported by quite many file formats.

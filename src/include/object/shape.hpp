@@ -40,6 +40,9 @@ class Shape : public Object {
     void init(QString shaderName) override;
     void init() override;
     void draw() override;
+
+    void updateDiffuseTexture(const QString& tPath);
+    void updateSpecularTexture(const QString& tPath);
     void updateShapeData(const QVector<float>& posData,
                          const QVector<unsigned int>& indexData);
     void updateShapeMaterial(ShapeMaterial mat = ShapeMaterial());
@@ -50,7 +53,9 @@ class Shape : public Object {
     QVector<Vertex> vertices;
     QVector<unsigned int> indices;
     QString geometryType;
-    ShapeMaterial material;
+    ShapeMaterial baseMaterial;
+    std::shared_ptr<Texture2D> diffuseTexture;
+    std::shared_ptr<Texture2D> specularTexture;
 
     GLuint VAO{};
     GLuint VBO{};

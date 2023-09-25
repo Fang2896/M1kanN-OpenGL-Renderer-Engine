@@ -179,7 +179,7 @@ struct ASSIMP_API aiNode {
 /**
  * Specifies that the scene data structure that was imported is not complete.
  * This flag bypasses some internal validations and allows the import
- * of animation skeletons, material libraries or camera animation paths
+ * of animation skeletons, baseMaterial libraries or camera animation paths
  * using Assimp. Most applications won't support such data.
  */
 #define AI_SCENE_FLAGS_INCOMPLETE   0x1
@@ -195,7 +195,7 @@ struct ASSIMP_API aiNode {
  * This flag is set by the validation postprocess-step (aiPostProcess_ValidateDS)
  * if the validation is successful but some issues have been found.
  * This can for example mean that a texture that does not exist is referenced
- * by a material or that the bone weights for a vertex don't sum to 1.0 ... .
+ * by a baseMaterial or that the bone weights for a vertex don't sum to 1.0 ... .
  * In most cases you should still be able to use the import. This flag could
  * be useful for applications which don't capture Assimp's log output.
  */
@@ -266,7 +266,7 @@ struct aiScene
     * Use the indices given in the aiNode structure to access
     * this array. The array is mNumMeshes in size. If the
     * AI_SCENE_FLAGS_INCOMPLETE flag is not set there will always
-    * be at least ONE material.
+    * be at least ONE baseMaterial.
     */
     C_STRUCT aiMesh** mMeshes;
 
@@ -278,7 +278,7 @@ struct aiScene
     * Use the index given in each aiMesh structure to access this
     * array. The array is mNumMaterials in size. If the
     * AI_SCENE_FLAGS_INCOMPLETE flag is not set there will always
-    * be at least ONE material.
+    * be at least ONE baseMaterial.
     */
     C_STRUCT aiMaterial** mMaterials;
 

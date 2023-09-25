@@ -167,10 +167,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Identifiers containing whitespaces must be enclosed in *single*
  * quotation marks. For example:<tt>
  * "keep-me and_me_to anotherMaterialToBeKept \'name with whitespace\'"</tt>.
- * If a material matches on of these names, it will not be modified or
+ * If a baseMaterial matches on of these names, it will not be modified or
  * removed by the postprocessing step nor will other materials be replaced
  * by a reference to it. <br>
- * This option might be useful if you are using some magic material names
+ * This option might be useful if you are using some magic baseMaterial names
  * to pass additional semantics through the content pipeline. This ensures
  * they won't be optimized away, but a general optimization is still
  * performed for materials not contained in the list.
@@ -412,7 +412,7 @@ enum aiComponent
     /** Removes all meshes (aiScene::mMeshes). */
     aiComponent_MESHES = 0x400,
 
-    /** Removes all materials. One default material will
+    /** Removes all materials. One default baseMaterial will
      * be generated, so aiScene::mNumMaterials will be 1. */
     aiComponent_MATERIALS = 0x800,
 
@@ -932,12 +932,12 @@ enum aiComponent
 // ---------------------------------------------------------------------------
 /** @brief Ogre Importer will try to find referenced materials from this file.
  *
- * Ogre meshes reference with material names, this does not tell Assimp the file
+ * Ogre meshes reference with baseMaterial names, this does not tell Assimp the file
  * where it is located in. Assimp will try to find the source file in the following
- * order: <material-name>.material, <mesh-filename-base>.material and
- * lastly the material name defined by this config property.
+ * order: <baseMaterial-name>.baseMaterial, <mesh-filename-base>.baseMaterial and
+ * lastly the baseMaterial name defined by this config property.
  * <br>
- * Property type: String. Default value: Scene.material.
+ * Property type: String. Default value: Scene.baseMaterial.
  */
 #define AI_CONFIG_IMPORT_OGRE_MATERIAL_FILE \
     "IMPORT_OGRE_MATERIAL_FILE"
@@ -945,7 +945,7 @@ enum aiComponent
 // ---------------------------------------------------------------------------
 /** @brief Ogre Importer detect the texture usage from its filename.
  *
- * Ogre material texture units do not define texture type, the textures usage
+ * Ogre baseMaterial texture units do not define texture type, the textures usage
  * depends on the used shader or Ogre's fixed pipeline. If this config property
  * is true Assimp will try to detect the type from the textures filename postfix:
  * _n, _nrm, _nrml, _normal, _normals and _normalmap for normal map, _s, _spec,
@@ -1076,7 +1076,7 @@ enum aiComponent
 
 /** @brief Specifies whether to use the deprecated KHR_materials_pbrSpecularGlossiness extension
  * 
- * When this flag is undefined any material with specularity will use the new KHR_materials_specular
+ * When this flag is undefined any baseMaterial with specularity will use the new KHR_materials_specular
  * extension. Enabling this flag will revert to the deprecated extension. Note that exporting
  * KHR_materials_pbrSpecularGlossiness with extensions other than KHR_materials_unlit is unsupported,
  * including the basic pbrMetallicRoughness spec.

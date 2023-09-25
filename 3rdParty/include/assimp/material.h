@@ -39,8 +39,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ---------------------------------------------------------------------------
 */
 
-/** @file material.h
- *  @brief Defines the material system of the library
+/** @file baseMaterial.h
+ *  @brief Defines the baseMaterial system of the library
  */
 #pragma once
 #ifndef AI_MATERIAL_H_INC
@@ -189,7 +189,7 @@ enum aiTextureType {
     /** Dummy value.
      *
      *  No texture, but the value to be used as 'texture semantic'
-     *  (#aiMaterialProperty::mSemantic) for all material properties
+     *  (#aiMaterialProperty::mSemantic) for all baseMaterial properties
      *  *not* related to textures.
      */
     aiTextureType_NONE = 0,
@@ -239,7 +239,7 @@ enum aiTextureType {
      */
     aiTextureType_NORMALS = 6,
 
-    /** The texture defines the glossiness of the material.
+    /** The texture defines the glossiness of the baseMaterial.
      *
      *  The glossiness is in fact the exponent of the specular
      *  (phong) lighting equation. Usually there is a conversion
@@ -265,7 +265,7 @@ enum aiTextureType {
     /** Lightmap texture (aka Ambient Occlusion)
      *
      *  Both 'Lightmaps' and dedicated 'ambient occlusion maps' are
-     *  covered by this material property. The texture contains a
+     *  covered by this baseMaterial property. The texture contains a
      *  scaling value for the final color value of a pixel. Its
      *  intensity is not affected by incoming light.
     */
@@ -379,14 +379,14 @@ enum aiShadingMode {
     /** OrenNayar-Shading per pixel
      *
      *  Extension to standard Lambertian shading, taking the
-     *  roughness of the material into account
+     *  roughness of the baseMaterial into account
      */
     aiShadingMode_OrenNayar = 0x6,
 
     /** Minnaert-Shading per pixel
      *
      *  Extension to standard Lambertian shading, taking the
-     *  "darkness" of the material into account
+     *  "darkness" of the baseMaterial into account
      */
     aiShadingMode_Minnaert = 0x7,
 
@@ -469,13 +469,13 @@ enum aiTextureFlags {
  *  If you're familiar with OpenGL or D3D, these flags aren't new to you.
  *  They define *how* the final color value of a pixel is computed, basing
  *  on the previous color at that pixel and the new color value from the
- *  material.
+ *  baseMaterial.
  *  The blend formula is:
  *  @code
  *    SourceColor * SourceBlend + DestColor * DestBlend
  *  @endcode
  *  where DestColor is the previous color in the frame-buffer at this
- *  position and SourceColor is the material color before the transparency
+ *  position and SourceColor is the baseMaterial color before the transparency
  *  calculation.<br>
  *  This corresponds to the #AI_MATKEY_BLEND_FUNC property.
 */
@@ -552,7 +552,7 @@ struct aiUVTransform {
 
 //! @cond AI_DOX_INCLUDE_INTERNAL
 // ---------------------------------------------------------------------------
-/** @brief A very primitive RTTI system for the contents of material
+/** @brief A very primitive RTTI system for the contents of baseMaterial
  *  properties.
  */
 enum aiPropertyTypeInfo {
@@ -560,7 +560,7 @@ enum aiPropertyTypeInfo {
      *
      *  It is possible to use aiGetMaterialInteger[Array]() (or the C++-API
      *  aiMaterial::Get()) to query properties stored in floating-point format.
-     *  The material system performs the type conversion automatically.
+     *  The baseMaterial system performs the type conversion automatically.
     */
     aiPTI_Float = 0x1,
 
@@ -568,11 +568,11 @@ enum aiPropertyTypeInfo {
      *
      *  It is possible to use aiGetMaterialInteger[Array]() (or the C++-API
      *  aiMaterial::Get()) to query properties stored in floating-point format.
-     *  The material system performs the type conversion automatically.
+     *  The baseMaterial system performs the type conversion automatically.
     */
     aiPTI_Double = 0x2,
 
-    /** The material property is an aiString.
+    /** The baseMaterial property is an aiString.
      *
      *  Arrays of strings aren't possible, aiGetMaterialString() (or the
      *  C++-API aiMaterial::Get()) *must* be used to query a string property.
@@ -583,7 +583,7 @@ enum aiPropertyTypeInfo {
      *
      *  It is possible to use aiGetMaterialFloat[Array]() (or the C++-API
      *  aiMaterial::Get()) to query properties stored in integer format.
-     *  The material system performs the type conversion automatically.
+     *  The baseMaterial system performs the type conversion automatically.
     */
     aiPTI_Integer = 0x4,
 
@@ -600,11 +600,11 @@ enum aiPropertyTypeInfo {
 };
 
 // ---------------------------------------------------------------------------
-/** @brief Data structure for a single material property
+/** @brief Data structure for a single baseMaterial property
  *
  *  As an user, you'll probably never need to deal with this data structure.
  *  Just use the provided aiGetMaterialXXX() or aiMaterial::Get() family
- *  of functions to query material properties easily. Processing them
+ *  of functions to query baseMaterial properties easily. Processing them
  *  manually is faster, but it is not the recommended way. It isn't worth
  *  the effort. <br>
  *  Material property names follow a simple scheme:
@@ -680,11 +680,11 @@ struct aiMaterialProperty {
 #endif
 
 // ---------------------------------------------------------------------------
-/** @brief Data structure for a material
+/** @brief Data structure for a baseMaterial
 *
 *  Material data is stored using a key-value structure. A single key-value
-*  pair is called a 'material property'. C++ users should use the provided
-*  member functions of aiMaterial to process material properties, C users
+*  pair is called a 'baseMaterial property'. C++ users should use the provided
+*  member functions of aiMaterial to process baseMaterial properties, C users
 *  have to stick with the aiMaterialGetXXX family of unbound functions.
 *  The library defines a set of standard keys (AI_MATKEY_XXX).
 */
@@ -703,15 +703,15 @@ public:
 
     // -------------------------------------------------------------------
     /**
-      * @brief  Returns the name of the material.
-      * @return The name of the material.
+      * @brief  Returns the name of the baseMaterial.
+      * @return The name of the baseMaterial.
       */
     // -------------------------------------------------------------------
     aiString GetName() const;
 
     // -------------------------------------------------------------------
     /** @brief Retrieve an array of Type values with a specific key
-     *  from the material
+     *  from the baseMaterial
      *
      * @param pKey Key to search for. One of the AI_MATKEY_XXX constants.
      * @param type .. set by AI_MATKEY_XXX
@@ -733,7 +733,7 @@ public:
 
     // -------------------------------------------------------------------
     /** @brief Retrieve a Type value with a specific key
-     *  from the material
+     *  from the baseMaterial
      *
      * @param pKey Key to search for. One of the AI_MATKEY_XXX constants.
     * @param type Specifies the type of the texture to be retrieved (
@@ -772,10 +772,10 @@ public:
 
     // -------------------------------------------------------------------
     /** Helper function to get all parameters pertaining to a
-     *  particular texture slot from a material.
+     *  particular texture slot from a baseMaterial.
      *
      *  This function is provided just for convenience, you could also
-     *  read the single material properties manually.
+     *  read the single baseMaterial properties manually.
      *  @param type Specifies the type of the texture to be retrieved (
      *    e.g. diffuse, specular, height map ...)
      *  @param index Index of the texture to be retrieved. The function fails
@@ -813,7 +813,7 @@ public:
     // Setters
 
     // ------------------------------------------------------------------------------
-    /** @brief Add a property with a given key and type info to the material
+    /** @brief Add a property with a given key and type info to the baseMaterial
      *  structure
      *
      *  @param pInput Pointer to input data
@@ -831,7 +831,7 @@ public:
 
     // ------------------------------------------------------------------------------
     /** @brief Add a string property with a given key and type info to the
-     *  material structure
+     *  baseMaterial structure
      *
      *  @param pInput Input string
      *  @param pKey Key/Usage of the property (AI_MATKEY_XXX)
@@ -843,7 +843,7 @@ public:
             unsigned int index = 0);
 
     // ------------------------------------------------------------------------------
-    /** @brief Add a property with a given key to the material structure
+    /** @brief Add a property with a given key to the baseMaterial structure
      *  @param pInput Pointer to the input data
      *  @param pNumValues Number of values in the array
      *  @param pKey Key/Usage of the property (AI_MATKEY_XXX)
@@ -910,22 +910,22 @@ public:
             unsigned int index = 0);
 
     // ------------------------------------------------------------------------------
-    /** @brief Removes all properties from the material.
+    /** @brief Removes all properties from the baseMaterial.
      *
      *  The data array remains allocated so adding new properties is quite fast.  */
     void Clear();
 
     // ------------------------------------------------------------------------------
-    /** Copy the property list of a material
-     *  @param pcDest Destination material
-     *  @param pcSrc Source material
+    /** Copy the property list of a baseMaterial
+     *  @param pcDest Destination baseMaterial
+     *  @param pcSrc Source baseMaterial
      */
     static void CopyPropertyList(aiMaterial *pcDest,
             const aiMaterial *pcSrc);
 
 #endif
 
-    /** List of all material properties loaded. */
+    /** List of all baseMaterial properties loaded. */
     C_STRUCT aiMaterialProperty **mProperties;
 
     /** Number of properties in the data base */
@@ -969,7 +969,7 @@ extern "C" {
 #define AI_MATKEY_SHADER_COMPUTE "?sh.cs", 0, 0
 
 // ---------------------------------------------------------------------------
-// PBR material support
+// PBR baseMaterial support
 // --------------------
 // Properties defining PBR rendering techniques
 #define AI_MATKEY_USE_COLOR_MAP "$mat.useColorMap", 0, 0
@@ -1034,7 +1034,7 @@ extern "C" {
 // Volume
 // ------------
 // https://github.com/KhronosGroup/glTF/tree/main/extensions/2.0/Khronos/KHR_materials_volume
-// The thickness of the volume beneath the surface. If the value is 0 the material is thin-walled. Otherwise the material is a volume boundary.
+// The thickness of the volume beneath the surface. If the value is 0 the baseMaterial is thin-walled. Otherwise the baseMaterial is a volume boundary.
 #define AI_MATKEY_VOLUME_THICKNESS_FACTOR "$mat.volume.thicknessFactor", 0, 0
 // Texture that defines the thickness.
 // Multiplied by AI_MATKEY_THICKNESS_FACTOR
@@ -1464,9 +1464,9 @@ extern "C" {
 //! @endcond
 //!
 // ---------------------------------------------------------------------------
-/** @brief Retrieve a material property with a specific key from the material
+/** @brief Retrieve a baseMaterial property with a specific key from the baseMaterial
  *
- * @param pMat Pointer to the input material. May not be NULL
+ * @param pMat Pointer to the input baseMaterial. May not be NULL
  * @param pKey Key to search for. One of the AI_MATKEY_XXX constants.
  * @param type Specifies the type of the texture to be retrieved (
  *    e.g. diffuse, specular, height map ...)
@@ -1483,7 +1483,7 @@ ASSIMP_API C_ENUM aiReturn aiGetMaterialProperty(
 
 // ---------------------------------------------------------------------------
 /** @brief Retrieve an array of float values with a specific key
- *  from the material
+ *  from the baseMaterial
  *
  * Pass one of the AI_MATKEY_XXX constants for the last three parameters (the
  * example reads the #AI_MATKEY_UVTRANSFORM property of the first diffuse texture)
@@ -1497,7 +1497,7 @@ ASSIMP_API C_ENUM aiReturn aiGetMaterialProperty(
  * }
  * @endcode
  *
- * @param pMat Pointer to the input material. May not be NULL
+ * @param pMat Pointer to the input baseMaterial. May not be NULL
  * @param pKey Key to search for. One of the AI_MATKEY_XXX constants.
  * @param pOut Pointer to a buffer to receive the result.
  * @param pMax Specifies the size of the given buffer, in float's.
@@ -1516,7 +1516,7 @@ ASSIMP_API C_ENUM aiReturn aiGetMaterialFloatArray(
         unsigned int *pMax);
 
 // ---------------------------------------------------------------------------
-/** @brief Retrieve a single float property with a specific key from the material.
+/** @brief Retrieve a single float property with a specific key from the baseMaterial.
 *
 * Pass one of the AI_MATKEY_XXX constants for the last three parameters (the
 * example reads the #AI_MATKEY_SHININESS_STRENGTH property of the first diffuse texture)
@@ -1526,7 +1526,7 @@ ASSIMP_API C_ENUM aiReturn aiGetMaterialFloatArray(
 *    (float*)&specStrength);
 * @endcode
 *
-* @param pMat Pointer to the input material. May not be NULL
+* @param pMat Pointer to the input baseMaterial. May not be NULL
 * @param pKey Key to search for. One of the AI_MATKEY_XXX constants.
 * @param pOut Receives the output float.
 * @param type (see the code sample above)
@@ -1544,7 +1544,7 @@ inline aiReturn aiGetMaterialFloat(const C_STRUCT aiMaterial *pMat,
 
 // ---------------------------------------------------------------------------
 /** @brief Retrieve an array of integer values with a specific key
- *  from a material
+ *  from a baseMaterial
  *
  * See the sample for aiGetMaterialFloatArray for more information.*/
 ASSIMP_API C_ENUM aiReturn aiGetMaterialIntegerArray(const C_STRUCT aiMaterial *pMat,
@@ -1555,7 +1555,7 @@ ASSIMP_API C_ENUM aiReturn aiGetMaterialIntegerArray(const C_STRUCT aiMaterial *
         unsigned int *pMax);
 
 // ---------------------------------------------------------------------------
-/** @brief Retrieve an integer property with a specific key from a material
+/** @brief Retrieve an integer property with a specific key from a baseMaterial
  *
  * See the sample for aiGetMaterialFloat for more information.*/
 // ---------------------------------------------------------------------------
@@ -1568,7 +1568,7 @@ inline aiReturn aiGetMaterialInteger(const C_STRUCT aiMaterial *pMat,
 }
 
 // ---------------------------------------------------------------------------
-/** @brief Retrieve a color value from the material property table
+/** @brief Retrieve a color value from the baseMaterial property table
 *
 * See the sample for aiGetMaterialFloat for more information*/
 // ---------------------------------------------------------------------------
@@ -1579,7 +1579,7 @@ ASSIMP_API C_ENUM aiReturn aiGetMaterialColor(const C_STRUCT aiMaterial *pMat,
         C_STRUCT aiColor4D *pOut);
 
 // ---------------------------------------------------------------------------
-/** @brief Retrieve a aiUVTransform value from the material property table
+/** @brief Retrieve a aiUVTransform value from the baseMaterial property table
 *
 * See the sample for aiGetMaterialFloat for more information*/
 // ---------------------------------------------------------------------------
@@ -1590,7 +1590,7 @@ ASSIMP_API C_ENUM aiReturn aiGetMaterialUVTransform(const C_STRUCT aiMaterial *p
         C_STRUCT aiUVTransform *pOut);
 
 // ---------------------------------------------------------------------------
-/** @brief Retrieve a string from the material property table
+/** @brief Retrieve a string from the baseMaterial property table
 *
 * See the sample for aiGetMaterialFloat for more information.*/
 // ---------------------------------------------------------------------------
@@ -1602,7 +1602,7 @@ ASSIMP_API C_ENUM aiReturn aiGetMaterialString(const C_STRUCT aiMaterial *pMat,
 
 // ---------------------------------------------------------------------------
 /** Get the number of textures for a particular texture type.
- *  @param[in] pMat Pointer to the input material. May not be NULL
+ *  @param[in] pMat Pointer to the input baseMaterial. May not be NULL
  *  @param type Texture type to check for
  *  @return Number of textures for this type.
  *  @note A texture can be easily queried using #aiGetMaterialTexture() */
@@ -1612,13 +1612,13 @@ ASSIMP_API unsigned int aiGetMaterialTextureCount(const C_STRUCT aiMaterial *pMa
 
 // ---------------------------------------------------------------------------
 /** @brief Helper function to get all values pertaining to a particular
- *  texture slot from a material structure.
+ *  texture slot from a baseMaterial structure.
  *
  *  This function is provided just for convenience. You could also read the
  *  texture by parsing all of its properties manually. This function bundles
  *  all of them in a huge function monster.
  *
- *  @param[in] mat Pointer to the input material. May not be NULL
+ *  @param[in] mat Pointer to the input baseMaterial. May not be NULL
  *  @param[in] type Specifies the texture stack to read from (e.g. diffuse,
  *     specular, height map ...).
  *  @param[in] index Index of the texture. The function fails if the

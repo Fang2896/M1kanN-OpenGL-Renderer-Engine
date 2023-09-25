@@ -71,7 +71,7 @@ extern "C" {
 #endif
 
 /** @def AI_MAKE_EMBEDDED_TEXNAME
- *  Used to build the reserved path name used by the material system to
+ *  Used to build the reserved path name used by the baseMaterial system to
  *  reference textures that are embedded into their corresponding
  *  model files. The parameter specifies the index of the texture
  *  (zero-based, in the aiScene::mTextures array)

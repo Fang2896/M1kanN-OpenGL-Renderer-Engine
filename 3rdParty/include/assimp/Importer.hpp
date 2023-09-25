@@ -450,7 +450,7 @@ public:
      * @note This is a straightforward way to decode models from memory
      * buffers, but it doesn't handle model formats that spread their
      * data across multiple files or even directories. Examples include
-     * OBJ or MD3, which outsource parts of their material info into
+     * OBJ or MD3, which outsource parts of their baseMaterial info into
      * external scripts. If you need full functionality, provide
      * a custom IOSystem to make Assimp find these files and use
      * the regular ReadFile() API.

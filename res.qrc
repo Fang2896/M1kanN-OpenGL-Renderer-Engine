@@ -1,14 +1,20 @@
 <RCC>
     <qresource prefix="/shaders">
-        <file>assets/shaders/blinn_phong.vert</file>
-        <file>assets/shaders/blinn_phong.frag</file>
         <file>assets/shaders/coordShader.vert</file>
         <file>assets/shaders/coordShader.frag</file>
         <file>assets/shaders/defaultModelShader.vert</file>
         <file>assets/shaders/defaultModelShader.frag</file>
         <file>assets/shaders/defaultShapeShader.vert</file>
         <file>assets/shaders/defaultShapeShader.frag</file>
+        <file>assets/shaders/defaultTextureShader.vert</file>
+        <file>assets/shaders/defaultTextureShader.frag</file>
     </qresource>
+
+    <qresource prefix="/shaders">
+        <file>assets/textures/box_diffuse.png</file>
+        <file>assets/textures/box_specular.png</file>
+    </qresource>
+
     <qresource prefix="/qss">
         <file>assets/qss/flatwhite.css</file>
         <file>assets/qss/flatwhite/add_bottom.png</file>
