@@ -5,7 +5,8 @@
 #include "utils/texture2d.hpp"
 
 Texture2D::Texture2D()
-    : texture(nullptr), internal_format(QOpenGLTexture::RGBFormat),
+    : texture(nullptr), id(0), type(TextureType::UNKNOWN), path(""),
+      internal_format(QOpenGLTexture::RGBFormat),
       wrap_s(QOpenGLTexture::Repeat), wrap_t(QOpenGLTexture::Repeat),
       filter_min(QOpenGLTexture::Linear), filter_max(QOpenGLTexture::Linear)
 { }

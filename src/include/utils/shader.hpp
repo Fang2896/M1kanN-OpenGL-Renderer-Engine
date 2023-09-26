@@ -16,11 +16,15 @@ class Shader
     Shader() = default;
     ~Shader() = default;
 
-    void compile(const QString& vertexSource, const QString& fragmentSource, const QString& geometrySource = nullptr);
+    bool compile(const QString& vertexSource, const QString& fragmentSource, const QString& geometrySource = nullptr);
 
     Shader& use(){
         shaderProgram->bind();
         return *this;
+    }
+
+    void release() {
+        shaderProgram->release();
     }
 
     void bind() {

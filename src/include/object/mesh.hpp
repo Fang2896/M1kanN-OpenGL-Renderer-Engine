@@ -9,10 +9,13 @@
 #include <QVector>
 #include <QVector3D>
 
+#include <utility>
+
 #include "data_structures.hpp"
 #include "gl_configure.hpp"
 #include "utils/shader.hpp"
 #include "utils/texture2d.hpp"
+
 
 class Mesh {
    public:
@@ -20,16 +23,28 @@ class Mesh {
     QVector<unsigned int> indices;
     QVector<std::shared_ptr<Texture2D>> textures;
 
-    Mesh(QVector<Vertex> vertices, QVector<unsigned int> indices, QVector<std::shared_ptr<Texture2D>> textures);
+    Mesh(std::shared_ptr<Shader> sha,
+         QVector<Vertex> vertices,
+         QVector<unsigned int> indices,
+         QVector<std::shared_ptr<Texture2D>> textures);
     ~Mesh();
 
-    void draw(const QString& shaderName);
+    void updateData(QVector<Vertex> vertices,
+                    QVector<unsigned int> indices,
+                    QVector<std::shared_ptr<Texture2D>> textures);
+
+    // 或许可以允许不同部位用不同的shader？
+    void setShader(std::shared_ptr<Shader> sha);
+    void draw();
 
    private:
     void setupMesh();
+    void updateMesh();
 
-    GLuint VAO, VBO, EBO;
+    GLuint VAO{}, VBO{}, EBO{};
     GLFunctions_Core *glFunc;
+
+    std::shared_ptr<Shader> shader;
 };
 
 #endif  //MESH_HPP

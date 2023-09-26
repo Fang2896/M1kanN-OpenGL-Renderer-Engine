@@ -85,13 +85,14 @@ void main()
     vec3 specular;
     if(useSpecularTexture) {
         specular = directLight.specularColor * spec *
-        vec3(texture(material.texture_specular1, TexCoord));
+            vec3(texture(material.texture_specular1, TexCoord));
     } else {
         specular = directLight.specularColor * spec * material.specularColor;
     }
 
     vec3 result = (ambient + diffuse + specular) * directLight.intensity;
 
-    FragColor = vec4(norm,0);
-    //FragColor = vec4(result, 1.0);
+    // FragColor = vec4(result, 1.0);
+    FragColor = vec4(0,0,1,1);
+
 }

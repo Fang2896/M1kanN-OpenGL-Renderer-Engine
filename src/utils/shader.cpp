@@ -4,12 +4,13 @@
 
 #include "utils/shader.hpp"
 
-void Shader::compile(const QString& vertexSource, const QString& fragmentSource, const QString& geometrySource) {
+bool Shader::compile(const QString& vertexSource, const QString& fragmentSource, const QString& geometrySource) {
     QOpenGLShader vertexShader(QOpenGLShader::Vertex);
     bool success = vertexShader.compileSourceFile(vertexSource);
     if(!success){
         qDebug() << "ERROR::SHADER::VERTEX::COMPILATION_FAILED" << Qt::endl;
         qDebug() << vertexShader.log() << Qt::endl;
+        return false;
     }
     
     QOpenGLShader fragmentShader(QOpenGLShader::Fragment);
@@ -17,6 +18,7 @@ void Shader::compile(const QString& vertexSource, const QString& fragmentSource,
     if(!success){
         qDebug() << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED" << Qt::endl;
         qDebug() << fragmentShader.log() << Qt::endl;
+        return false;
     }
 
     QOpenGLShader geometryShader(QOpenGLShader::Geometry);
@@ -25,6 +27,7 @@ void Shader::compile(const QString& vertexSource, const QString& fragmentSource,
         if(!success){
             qDebug() << "ERROR::SHADER::GEOMETRY::COMPILATION_FAILED" << Qt::endl;
             qDebug() << geometryShader.log() << Qt::endl;
+            return false;
         }
     }
 
@@ -37,8 +40,9 @@ void Shader::compile(const QString& vertexSource, const QString& fragmentSource,
     if(!success){
         qDebug() << "ERROR::SHADER::PROGRAM::LINKING_FAILED" << Qt::endl;
         qDebug() << shaderProgram->log() << Qt::endl;
-    } else {
-        qDebug() << "Successfully Load Shader.";
+        return false;
     }
+
+    return true;
 }
 

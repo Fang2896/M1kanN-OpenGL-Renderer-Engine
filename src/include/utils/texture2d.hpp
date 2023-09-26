@@ -8,6 +8,8 @@
 #include <memory>
 #include <QOpenGLTexture>
 
+#include "m_type.hpp"
+
 
 class Texture2D
 {
@@ -19,8 +21,9 @@ class Texture2D
     void bind() const;
     GLuint getTextureID();
 
+    // 方便期间，直接裸露
     GLuint id;
-    QString type;
+    TextureType type;
     QString path;
 
     QOpenGLTexture::TextureFormat internal_format;//Format of texture object
@@ -32,5 +35,6 @@ class Texture2D
    private:
     std::shared_ptr<QOpenGLTexture> texture;
 };
+
 
 #endif  //TEXTURE_2_D_HPP

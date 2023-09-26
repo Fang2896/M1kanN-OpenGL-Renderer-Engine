@@ -5,7 +5,8 @@
 #ifndef SHAPEDATA_HPP
 #define SHAPEDATA_HPP
 
-#include <QVector>
+#include "data_structures.hpp"
+
 
 class ShapeData {
    public:
@@ -25,45 +26,59 @@ class ShapeData {
 
     // basic geometry
     // 1. Cube
-    static const QVector<float>& getCubeVertices() {
-        static QVector<float> cubeVertices = {
-            // Position          // Normal           // UV
-            // Front face
-            -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f,
-            0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f,  0.0f,
-            0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f,  1.0f,
-            -0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  1.0f,
+    static const QVector<Vertex>& getCubeVertices() {
+        static QVector<Vertex> cubeVertices;
 
-            // Back face
-            -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  0.0f,
-            0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f,
-            0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  1.0f,
-            -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  1.0f,
+        if(cubeVertices.isEmpty()) {
+            QVector<float> data = {
+                // Position          // Normal           // UV
+                // Front face
+                -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f,
+                0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f,  0.0f,
+                0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f,  1.0f,
+                -0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  1.0f,
 
-            // Left face
-            -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f,  0.0f,
-            -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
-            -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f,  1.0f,
-            -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
+                // Back face
+                -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  0.0f,
+                0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f,
+                0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  1.0f,
+                -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  1.0f,
 
-            // Right face
-            0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
-            0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  0.0f,
-            0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
-            0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  1.0f,
+                // Left face
+                -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f,  0.0f,
+                -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
+                -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f,  1.0f,
+                -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
 
-            // Top face
-            -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f,
-            0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  1.0f,
-            0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  0.0f,
-            -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  0.0f,
+                // Right face
+                0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
+                0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  0.0f,
+                0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
+                0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  1.0f,
 
-            // Bottom face
-            -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f,  0.0f,
-            0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f,  0.0f,
-            0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f,  1.0f,
-            -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f,  1.0f,
-       };
+                // Top face
+                -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f,
+                0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  1.0f,
+                0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  0.0f,
+                -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  0.0f,
+
+                // Bottom face
+                -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f,  0.0f,
+                0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f,  0.0f,
+                0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f,  1.0f,
+                -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f,  1.0f,
+            };
+
+            for (int i = 0; i < data.size(); i += 8) {
+                Vertex vertex;
+                vertex.position = QVector3D(data[i], data[i + 1], data[i + 2]);
+                vertex.normal = QVector3D(data[i + 3], data[i + 4], data[i + 5]);
+                vertex.texCoord = QVector2D(data[i + 6], data[i + 7]);
+
+                cubeVertices.push_back(vertex);
+            }
+        }
+
         return cubeVertices;
     }
     static const QVector<unsigned int>& getCubeIndices() {
@@ -91,9 +106,12 @@ class ShapeData {
         return cubeIndices;
     }
 
-    // 2. Plane
-    static const QVector<float>& getPlaneVertices() {
-        static QVector<float> planeVertices =
+    // 2. Quad
+    static const QVector<Vertex>& getQuadVertices() {
+        static QVector<Vertex> quadVertices;
+
+        if(quadVertices.isEmpty()) {
+            QVector<float> data =
             {
                 // positions       // normals         // textures
                 -0.5f,  0.0f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f,
@@ -101,14 +119,96 @@ class ShapeData {
                 0.5f,  0.0f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  0.0f,
                 -0.5f,  0.0f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  0.0f,
             };
-        return planeVertices;
+
+            for (int i = 0; i < data.size(); i += 8) {
+                Vertex vertex;
+                vertex.position = QVector3D(data[i], data[i + 1], data[i + 2]);
+                vertex.normal = QVector3D(data[i + 3], data[i + 4], data[i + 5]);
+                vertex.texCoord = QVector2D(data[i + 6], data[i + 7]);
+
+                quadVertices.push_back(vertex);
+            }
+        }
+
+        return quadVertices;
     }
-    static const QVector<unsigned int>& getPlaneIndices() {
-        static QVector<unsigned int> planeIndices = {
+    static const QVector<unsigned int>& getQuadIndices() {
+        static QVector<unsigned int> quadIndices = {
             0, 1, 2,
             2, 3, 0
         };
+        return quadIndices;
+    }
+
+    // 3. Plane
+    static QVector<Vertex> getPlaneVertices(int width, int height) {
+        QVector<Vertex> planeVertices{};
+        // TODO: Add Plane Vertex
+        return planeVertices;
+    }
+    static QVector<unsigned int> getPlaneIndices(int width, int height) {
+        QVector<unsigned int> planeIndices = {
+            // TODO: Add Plane Index
+        };
         return planeIndices;
+    }
+
+    // 4. Capsule
+    static const QVector<Vertex>& getCapsuleVertices() {
+        static QVector<Vertex> capsuleVertices;
+
+        if(capsuleVertices.isEmpty()) {
+            QVector<float> data = {
+                // positions       // normals         // textures
+                // TODO: Add Capsule Vertices
+            };
+
+            for (int i = 0; i < data.size(); i += 8) {
+                Vertex vertex;
+                vertex.position = QVector3D(data[i], data[i + 1], data[i + 2]);
+                vertex.normal = QVector3D(data[i + 3], data[i + 4], data[i + 5]);
+                vertex.texCoord = QVector2D(data[i + 6], data[i + 7]);
+
+                capsuleVertices.push_back(vertex);
+            }
+        }
+
+        return capsuleVertices;
+    }
+    static const QVector<unsigned int>& getCapsuleIndices() {
+        static QVector<unsigned int> capsuleIndices = {
+            // TODO: Add Capsule Index
+        };
+        return capsuleIndices;
+    }
+
+    // 5. Sphere
+    static const QVector<Vertex>& getSphereVertices() {
+        static QVector<Vertex> sphereVertices;
+
+        if(sphereVertices.isEmpty()) {
+            QVector<float> data = {
+                // positions       // normals         // textures
+                // TODO: Add Sphere Vertices
+            };
+
+            for (int i = 0; i < data.size(); i += 8) {
+                Vertex vertex;
+                vertex.position = QVector3D(data[i], data[i + 1], data[i + 2]);
+                vertex.normal = QVector3D(data[i + 3], data[i + 4], data[i + 5]);
+                vertex.texCoord = QVector2D(data[i + 6], data[i + 7]);
+
+                sphereVertices.push_back(vertex);
+            }
+        }
+
+        return sphereVertices;
+    }
+    static const QVector<unsigned int>& getSphereIndices() {
+        static QVector<unsigned int> sphereIndices = {
+            // TODO: Add Sphere Indices
+        };
+        return sphereIndices;
     }
 
     ShapeData() = delete;

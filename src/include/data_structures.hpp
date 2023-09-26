@@ -9,6 +9,9 @@
 #include <QVector3D>
 #include <QMatrix4x4>
 
+#include "m_type.hpp"
+#include "texture2d.hpp"
+
 
 struct Vertex {
     QVector3D position;
@@ -32,7 +35,7 @@ struct DirectLight {
 
     DirectLight()
         : direction(QVector3D(1,1,1).normalized()),
-          ambientColor({0.3f, 0.3f, 0.3f}),
+          ambientColor({0.4f, 0.4f, 0.4f}),
           diffuseColor({1.0f, 1.0f, 1.0f}),
           specularColor({0.9f, 0.9f, 0.9f}),
           intensity(1.0f) {}
@@ -106,6 +109,37 @@ struct ShapeMaterial {
           specularColor({0.5f, 0.5f, 0.5f}),
           ambientOcclusion(0.25) {}
 };
+
+struct Material {
+    float shininess;
+    // 后面可能会加更多？
+    std::shared_ptr<Texture2D> texture_diffuse1;
+    std::shared_ptr<Texture2D> texture_specular1;
+
+    QVector3D ambientColor;
+    QVector3D diffuseColor;
+    QVector3D specularColor;
+
+    float ambientOcclusion;
+
+    Material(float shi, QVector3D aCol, QVector3D dCol, QVector3D sCol,float amb)
+        : shininess(shi),
+          texture_diffuse1(nullptr),
+          texture_specular1(nullptr),
+          ambientColor(aCol),
+          diffuseColor(dCol),
+          specularColor(sCol),
+          ambientOcclusion(amb) {}
+
+    Material() : shininess(0.4),
+          texture_diffuse1(nullptr),
+          texture_specular1(nullptr),
+          ambientColor({1.0f, 0.5f, 0.31f}),
+          diffuseColor({ 1.0f, 0.5f, 0.31f}),
+          specularColor({0.5f, 0.5f, 0.5f}),
+          ambientOcclusion(0.25) {}
+};
+
 
 /*
 Name	Ambient	                Diffuse	                Specular	                Shininess

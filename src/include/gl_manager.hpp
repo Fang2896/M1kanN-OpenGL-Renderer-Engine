@@ -13,8 +13,11 @@
 
 #include "data_structures.hpp"
 #include "gl_configure.hpp"
-#include "object/model.hpp"
-#include "object/shape.hpp"
+
+//#include "object/model.hpp"
+//#include "object/shape.hpp"
+#include "object/game_object.hpp"
+
 #include "utils/camera.hpp"
 #include "utils/resource_manager.hpp"
 
@@ -53,7 +56,7 @@ class GLManager : public QOpenGLWidget {
     static void checkGLVersion();
 
    private: // manager objects, shaders...
-    QVector<std::shared_ptr<Object>> objectVec;
+    QVector<std::shared_ptr<GameObject>> objectVec;
 
    private:  // key variables
     GLFunctions_Core* glFunc = nullptr;

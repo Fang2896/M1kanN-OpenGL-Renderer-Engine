@@ -8,7 +8,8 @@ const QVector3D CAMERA_POSITION(0.0f, 0.5f, 3.0f);
 
 
 GLManager::GLManager(QWidget* parent, int width, int height)
-    : QOpenGLWidget(parent) {
+    : QOpenGLWidget(parent)
+{
     coordData = ShapeData::getCoordinateVertices();
     this->setGeometry(10, 20, width, height);
 }
@@ -29,32 +30,38 @@ void GLManager::initializeGL() {
     // object manager, resource manager...
     m_camera = std::make_unique<Camera>(CAMERA_POSITION, defaultCameraMoveSpeed);
 
-    objectVec.push_back(std::make_shared<Shape>("cube"));
-    objectVec[0]->init();
-    objectVec[0]->setPosition({-3, 0, 0});
+//    objectVec.push_back(std::make_shared<Shape>("plane"));
+//    objectVec[0]->init();
+//    objectVec[0]->setPosition({0, -0.3f, 0});
+//    objectVec[0]->setScale(10.0f);
+    objectVec.push_back(std::make_shared<GameObject>());    // 默认是正方形
+    objectVec[0]->setPosition({0,3,0});
+    objectVec.push_back(std::make_shared<GameObject>());    // 默认是正方形
+    objectVec[1]->loadShader(":shaders/assets/shaders/defaultShapeShader.vert",
+                             ":shaders/assets/shaders/defaultShapeShader.frag");
+    objectVec[1]->setPosition({0,-3,0});
 
-    objectVec.push_back(std::make_shared<Model>(
-        "E:/ToyPrograms/GL/MikannRendererEngine/Mikann-Renderer-Engine/assets/models/nanosuit/nanosuit.obj"));
-    objectVec[1]->init();
-    objectVec[1]->setPosition(QVector3D(3,0,0));
-    objectVec[1]->setScale(0.2f);
-
-    objectVec.push_back(std::make_shared<Shape>("cube"));
-    objectVec[2]->init("defaultTextureShader");
-    objectVec[2]->setPosition({0, 0, 3});
-    auto* tempShapePtr = dynamic_cast<Shape*>(objectVec[2].get());
-    if(tempShapePtr) {
-        // 调用 Shape 的函数
-        tempShapePtr->updateDiffuseTexture(
-            "E:/ToyPrograms/GL/MikannRendererEngine/Mikann-Renderer-Engine/assets/textures/box_diffuse.png");
-        tempShapePtr->updateSpecularTexture(
-            "E:/ToyPrograms/GL/MikannRendererEngine/Mikann-Renderer-Engine/assets/textures/box_specular.png");
-    } else {
-        qFatal("Temp Shape Ptr Empty!");
-    }
+//    objectVec.push_back(std::make_shared<Model>(
+//        "E:/ToyPrograms/GL/MikannRendererEngine/Mikann-Renderer-Engine/assets/models/nanosuit/nanosuit.obj"));
+//    objectVec[1]->init();
+//    objectVec[1]->setPosition(QVector3D(3,0,0));
+//    objectVec[1]->setScale(0.2f);
+//
+//    objectVec.push_back(std::make_shared<Shape>("cube"));
+//    objectVec[2]->init("defaultTextureShader");
+//    objectVec[2]->setPosition({0, 0, 3});
+//    auto* tempShapePtr = dynamic_cast<Shape*>(objectVec[2].get());
+//    if(tempShapePtr) {
+//        // 调用 Shape 的函数
+//        tempShapePtr->updateDiffuseTexture(
+//            "E:/ToyPrograms/GL/MikannRendererEngine/Mikann-Renderer-Engine/assets/textures/box_diffuse.png");
+//        tempShapePtr->updateSpecularTexture(
+//            "E:/ToyPrograms/GL/MikannRendererEngine/Mikann-Renderer-Engine/assets/textures/box_specular.png");
+//    } else {
+//        qFatal("Temp Shape Ptr Empty!");
+//    }
 
     // Model must be initialized after shader!
-    // TODO: 后面要加一个可以动态改变shader的？ updateShader函数. 目前先暂时满足于动态改变shader值
 //    m_testModel = std::make_unique<Model>("../assets/models/nanosuit/nanosuit.obj");
 //    m_testModel->init("defaultModelShader");
 //    m_testCube = std::make_unique<Shape>("cube");
@@ -84,12 +91,13 @@ void GLManager::paintGL() {
     GLfloat currentFrame = (GLfloat)eTimer.elapsed() / 100;
     deltaTime = currentFrame - lastFrame;
     lastFrame = currentFrame;
-    
+
     this->handleInput(deltaTime);
     this->updateRenderData();
 
-    ResourceManager::getShader("coordShader").use();
+    ResourceManager::getShader("coordShader")->use();
     drawCoordinate();
+    ResourceManager::getShader("coordShader")->release();
 
     drawObjects();
 //    ResourceManager::getShader(m_testModel->getShaderName()).use();
@@ -102,7 +110,8 @@ void GLManager::paintGL() {
 void GLManager::initCoordinate() {
     glFunc->glGenBuffers(1, &coordVBO);
     glFunc->glBindBuffer(GL_ARRAY_BUFFER, coordVBO);
-    glFunc->glBufferData(GL_ARRAY_BUFFER, coordData.size() * sizeof(float), coordData.data(), GL_STATIC_DRAW);
+    glFunc->glBufferData(GL_ARRAY_BUFFER, coordData.size() * sizeof(float),
+                         coordData.data(), GL_STATIC_DRAW);
 
     glFunc->glGenVertexArrays(1, &coordVAO);
     glFunc->glBindVertexArray(coordVAO);
@@ -110,7 +119,8 @@ void GLManager::initCoordinate() {
     glFunc->glBindBuffer(GL_ARRAY_BUFFER, coordVBO);
 
     glFunc->glEnableVertexAttribArray(0);
-    glFunc->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, (GLsizei)3 * sizeof(float), (void*)nullptr);
+    glFunc->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
+                                  (GLsizei)3 * sizeof(float), (void*)nullptr);
     glFunc->glBindVertexArray(0);
 
     qDebug() << "======= Done Init Coordinate ========";
@@ -123,67 +133,28 @@ void GLManager::drawCoordinate() {
 }
 
 void GLManager::drawObjects() {
-    for(const auto& obj : objectVec) {
-        ResourceManager::getShader(obj->getShaderName()).use();
-        obj->draw();
+    for(auto & i : objectVec) {
+        i->draw();
     }
-
 }
 
-// TODO: 以后glManager只需要遍历所有的shader，然后为他们设置MVP矩阵，和一些全局变量就行
-//  比如：光照信息，视线方向，等等，然后其他的因素，比如说transform，物体的material，就object自己内部实现就行
-//  然后还能自己设置，改变很多信息，无敌
-
-// TODO: 这里要注意，虽然shader的文件数是固定的，但是我们需要为每一个object都设置一个shader？（可能）
-//  不然就只能在draw那里，每帧都设置一遍（目前先这样实现吧）（时间换空间。而且管理多个shader感觉也好麻烦）
 void GLManager::initShaders() {
     ResourceManager::loadShader("coordShader",
                                 ":/shaders/assets/shaders/coordShader.vert",
                                 ":/shaders/assets/shaders/coordShader.frag");
-    ResourceManager::loadShader("defaultModelShader",
-                                ":/shaders/assets/shaders/defaultModelShader.vert",
-                                ":/shaders/assets/shaders/defaultModelShader.frag");
-    ResourceManager::loadShader("defaultShapeShader",
-                                ":/shaders/assets/shaders/defaultShapeShader.vert",
-                                ":/shaders/assets/shaders/defaultShapeShader.frag");
-    ResourceManager::loadShader("defaultTextureShader",
-                                ":/shaders/assets/shaders/defaultTextureShader.vert",
-                                ":/shaders/assets/shaders/defaultTextureShader.frag");
 
-    qDebug() << "======= Done Init Shaders ========";
+    qDebug() << "======= Done Init Coordinate Shaders ========";
 }
 
 // 在物体初始化后，或者增加物体，改变这里边的参数后调用！
 void GLManager::initShaderValue() {
     initLightInfo();    // 要在shaderInit之前
 
-    // TODO: 这里的光照信息可以抽出来
-    const Shader& tempShapeShader = ResourceManager::getShader("defaultShapeShader").use();
-    tempShapeShader.setVector3f("directLight.direction", directLight.direction);
-    tempShapeShader.setVector3f("directLight.ambientColor", directLight.ambientColor);
-    tempShapeShader.setVector3f("directLight.diffuseColor", directLight.diffuseColor);
-    tempShapeShader.setVector3f("directLight.specularColor", directLight.specularColor);
-    tempShapeShader.setFloat("directLight.intensity", directLight.intensity);
-
-    const Shader& tempModelShader = ResourceManager::getShader("defaultModelShader").use();
-    tempModelShader.setVector3f("directLight.direction", directLight.direction);
-    tempModelShader.setVector3f("directLight.ambientColor", directLight.ambientColor);
-    tempModelShader.setVector3f("directLight.diffuseColor", directLight.diffuseColor);
-    tempModelShader.setVector3f("directLight.specularColor", directLight.specularColor);
-    tempModelShader.setFloat("directLight.intensity", directLight.intensity);
-
-    const Shader& tempTextureShader = ResourceManager::getShader("defaultTextureShader").use();
-    tempTextureShader.setVector3f("directLight.direction", directLight.direction);
-    tempTextureShader.setVector3f("directLight.ambientColor", directLight.ambientColor);
-    tempTextureShader.setVector3f("directLight.diffuseColor", directLight.diffuseColor);
-    tempTextureShader.setVector3f("directLight.specularColor", directLight.specularColor);
-    tempTextureShader.setFloat("directLight.intensity", directLight.intensity);
-
     // coordinate matrix configuration （因为坐标位置是不变的）
     QMatrix4x4 model;
     model.setToIdentity();
     model.scale(5.0f);
-    ResourceManager::getShader("coordShader").use().setMatrix4f("model", model);
+    ResourceManager::getShader("coordShader")->use().setMatrix4f("model", model);
 }
 
 void GLManager::updateRenderData() {
@@ -196,24 +167,20 @@ void GLManager::updateRenderData() {
     projection.perspective(m_camera->zoom, (GLfloat)width() / (GLfloat)height(), 0.1f, 200.f);
     view = m_camera->getViewMatrix();
 
-    ResourceManager::getShader("coordShader").use().setMatrix4f("projection", projection);
-    ResourceManager::getShader("coordShader").use().setMatrix4f("view", view);
+    ResourceManager::updateProjViewMatrixInShader(projection, view);
+    ResourceManager::updateViewPosInShader(m_camera->position);
+    // TODO：灯光管理太烂了。等后面来优化。光没准可以定义成全局变量
+    ResourceManager::updateDirectLightInShader(directLight);
 
-    ResourceManager::getShader("defaultModelShader").use().setMatrix4f("projection", projection);
-    ResourceManager::getShader("defaultModelShader").use().setMatrix4f("view", view);
-    ResourceManager::getShader("defaultShapeShader").use().setMatrix4f("projection", projection);
-    ResourceManager::getShader("defaultShapeShader").use().setMatrix4f("view", view);
-    ResourceManager::getShader("defaultTextureShader").use().setMatrix4f("projection", projection);
-    ResourceManager::getShader("defaultTextureShader").use().setMatrix4f("view", view);
-
+    QMatrix4x4 tempM;
+    tempM.setToIdentity();
+    ResourceManager::getShader("coordShader")->use().setMatrix4f("model", tempM);
     // 为管理的objects设置model
-    for(const auto& obj : objectVec) {
-        ResourceManager::getShader(obj->getShaderName()).use().setMatrix4f("model", obj->getTransform());
+    for(auto & i : objectVec) {
+        auto& tempShader = ResourceManager::getShader(i->getShaderName())->use();
+        tempShader.setMatrix4f("model", i->getTransform());
+        tempShader.release();
     }
-
-    ResourceManager::getShader("defaultModelShader").use().setVector3f("viewPos", m_camera->position);
-    ResourceManager::getShader("defaultShapeShader").use().setVector3f("viewPos", m_camera->position);
-    ResourceManager::getShader("defaultTextureShader").use().setVector3f("viewPos", m_camera->position);
 }
 
 void GLManager::checkGLVersion() {
@@ -230,7 +197,7 @@ void GLManager::checkGLVersion() {
 
 void GLManager::initConfigureVariables() {
     isLineMode = GL_FALSE;
-    backGroundColor = QVector3D(0.35f, 0.35f, 0.35f);
+    backGroundColor = QVector3D(0.9f, 0.9f, 0.9f);
 
     defaultCameraMoveSpeed = 0.2f;
     shiftDown = GL_FALSE;

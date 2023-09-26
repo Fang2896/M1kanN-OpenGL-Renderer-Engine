@@ -8,6 +8,9 @@
         <file>assets/shaders/defaultShapeShader.frag</file>
         <file>assets/shaders/defaultTextureShader.vert</file>
         <file>assets/shaders/defaultTextureShader.frag</file>
+
+        <file>assets/shaders/defaultShader.vert</file>
+        <file>assets/shaders/defaultShader.frag</file>
     </qresource>
 
     <qresource prefix="/shaders">
