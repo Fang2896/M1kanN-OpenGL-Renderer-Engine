@@ -36,10 +36,12 @@ void GLManager::initializeGL() {
 //    objectVec[0]->setScale(10.0f);
     objectVec.push_back(std::make_shared<GameObject>());    // 默认是正方形
     objectVec[0]->setPosition({0,3,0});
-    objectVec.push_back(std::make_shared<GameObject>());    // 默认是正方形
-    objectVec[1]->loadShader(":shaders/assets/shaders/defaultShapeShader.vert",
-                             ":shaders/assets/shaders/defaultShapeShader.frag");
-    objectVec[1]->setPosition({0,-3,0});
+    objectVec[0]->loadDiffuseTexture(":textures/assets/textures/box_diffuse.png");
+    objectVec[0]->loadSpecularTexture(":textures/assets/textures/box_specular.png");
+
+    objectVec.push_back(std::make_shared<GameObject>("E:/ToyPrograms/GL/MikannRendererEngine/Mikann-Renderer-Engine/assets/models/nanosuit/nanosuit.obj"));    // 默认是正方形
+    objectVec[1]->setScale(0.2f);
+    objectVec[1]->setPosition({3.0f,0.0f,0.0f});
 
 //    objectVec.push_back(std::make_shared<Model>(
 //        "E:/ToyPrograms/GL/MikannRendererEngine/Mikann-Renderer-Engine/assets/models/nanosuit/nanosuit.obj"));
@@ -197,7 +199,7 @@ void GLManager::checkGLVersion() {
 
 void GLManager::initConfigureVariables() {
     isLineMode = GL_FALSE;
-    backGroundColor = QVector3D(0.9f, 0.9f, 0.9f);
+    backGroundColor = QVector3D(0.1f, 0.1f, 0.1f);
 
     defaultCameraMoveSpeed = 0.2f;
     shiftDown = GL_FALSE;

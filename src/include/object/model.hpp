@@ -5,18 +5,18 @@
 #ifndef MODEL_HPP
 #define MODEL_HPP
 
-#include <utility>
-
-#include <QVector>
-#include <QDebug>
-
-#include "assimp/Importer.hpp"
-#include "assimp/postprocess.h"
-#include "assimp/scene.h"
-
-#include "mesh.hpp"
-#include "object.hpp"
-#include "utils/texture2d.hpp"
+//#include <utility>
+//
+//#include <QVector>
+//#include <QDebug>
+//
+//#include "assimp/Importer.hpp"
+//#include "assimp/postprocess.h"
+//#include "assimp/scene.h"
+//
+//#include "mesh.hpp"
+//#include "object.hpp"
+//#include "utils/texture2d.hpp"
 
 
 //class Model : public Object {

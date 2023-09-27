@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by fangl on 2023/9/22.
 //
 
@@ -180,7 +180,8 @@ QVector<std::shared_ptr<Mesh>> ResourceManager::processNode(aiNode *node, const 
     }
 
     for(unsigned int i = 0; i < node->mNumChildren; i++) {
-        processNode(node->mChildren[i], scene, mDir);
+        auto childMeshes = processNode(node->mChildren[i], scene, mDir);
+        meshes.append(childMeshes);
     }
 
     return meshes;
@@ -247,6 +248,7 @@ QVector<std::shared_ptr<Texture2D>> ResourceManager::loadMaterialTextures(aiMate
         mat->GetTexture(type, i, &str);
         QString qStr = modelDirectory + "/" + QString::fromUtf8(str.C_Str());
         qDebug() << "Load texture: " + qStr;
+
         std::shared_ptr<Texture2D> texture = std::make_shared<Texture2D>();
         texture->generate(qStr);
         texture->type = stringToTextureType(typeName);

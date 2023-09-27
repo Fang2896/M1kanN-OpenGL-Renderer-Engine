@@ -16,6 +16,7 @@ class GameObject {
    public:
     GameObject();
     explicit GameObject(ObjectType type, const QString& disName = "GameObject");
+    explicit GameObject(const QString& mPath, const QString& disName = "GameObject");
     GameObject(ObjectType type, const QString& mPath, const QString& disName = "GameObject");
     ~GameObject();
 
@@ -27,6 +28,8 @@ class GameObject {
                     const QString& fragPath,
                     const QString& geoPath = nullptr);
 
+    void loadDiffuseTexture(const QString& tPath);
+    void loadSpecularTexture(const QString& tPath);
 
     void setMaterial(Material mat);
     void setDiffuseTexture(std::shared_ptr<Texture2D> tex);
@@ -48,6 +51,7 @@ class GameObject {
     void setPosition(QVector3D pos);
     void setRotation(QVector3D rot);
     void setScale(QVector3D sca);
+    void setScale(float sca);
 
     [[nodiscard]] GLuint getObjectID() const;
     static GLuint getObjectTotalNumber();

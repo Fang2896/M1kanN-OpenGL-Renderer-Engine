@@ -50,11 +50,14 @@ void Mesh::draw() {
         // 获取纹理序号（diffuse_textureN 中的 N）
         QString number;
         QString name = textureTypeToString(textures[i]->type);
-        if(name == "texture_diffuse")
+        if(name == "texture_diffuse") {
             number = QString::number(diffuseNr++);
-        else if(name == "texture_specular")
+            shader->setBool("useDiffuseTexture", true);
+        }
+        else if(name == "texture_specular") {
             number = QString::number(specularNr++);
-        else
+            shader->setBool("useSpecularTexture", true);
+        } else
             qFatal("Type of Texture is Not Support!");
 
         // 这里的material是model的material，当前仅仅有贴图

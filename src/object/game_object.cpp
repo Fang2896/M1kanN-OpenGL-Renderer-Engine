@@ -56,16 +56,32 @@ GameObject::GameObject(ObjectType type, const QString& disName)
     loadShape(type);
 }
 
-GameObject::GameObject(ObjectType type, const QString& mPath, const QString& disName)
+GameObject::GameObject(const QString& mPath, const QString& disName)
     : GameObject()
 {
+    this->type = ObjectType::Model;
     this->displayName = disName;
     this->modelPath = mPath;
 
     if(type != ObjectType::Model) {
         qDebug("==>Type is NOT Model, Now Change to Model and Load<==");
     }
+    meshes.clear();
+    loadModel(mPath);
+}
+
+GameObject::GameObject(ObjectType type, const QString& mPath, const QString& disName)
+    : GameObject()
+{
     this->type = ObjectType::Model;
+    this->displayName = disName;
+    this->modelPath = mPath;
+
+    if(type != ObjectType::Model) {
+        qDebug("==>Type is NOT Model, Now Change to Model and Load<==");
+    }
+
+    meshes.clear();
     loadModel(mPath);
 
 }
@@ -74,8 +90,8 @@ GameObject::~GameObject() {
     meshes.clear();
     // 可能要通知主界面？需要删除显示的list
 
-
 }
+
 void GameObject::draw() {
     for(auto & m : meshes) {
         m->draw();
@@ -124,6 +140,7 @@ void GameObject::loadShape(ObjectType t, int width, int height) {
 }
 
 void GameObject::loadModel(const QString& mPath) {
+    this->type = ObjectType::Model;
     this->meshes = ResourceManager::loadModel(mPath);
 
     for(auto & m : meshes) {
@@ -146,7 +163,87 @@ void GameObject::loadShader(const QString& vertPath, const QString& fragPath, co
     }
 }
 
+void GameObject::loadDiffuseTexture(const QString& tPath) {
+    if(type == ObjectType::Model) {
+        qDebug("Warning! Model Type Can't Be Loaded Diffuse Texture");
+        return;
+    }
+    if(meshes.isEmpty()) {
+        qDebug("You must assign a Mesh to loaded a diffuse texture!");
+    }
+    // 这里直接覆盖掉原来的texture
+    material.texture_diffuse1 = std::make_shared<Texture2D>();
+    material.texture_diffuse1->generate(tPath);
+    material.texture_diffuse1->type = TextureType::Diffuse;
+    material.texture_diffuse1->path = tPath;
+
+    // 清除原来的diffuse然后赋值
+    auto& tempVec = meshes[0]->textures;
+    tempVec.erase(std::remove_if(tempVec.begin(), tempVec.end(),
+                                 [](const std::shared_ptr<Texture2D> &tex) {
+                                     return tex->type == TextureType::Diffuse;
+                                 }), tempVec.end());
+
+    // 清除原来的diffuse然后赋值
+    meshes[0]->textures.append(material.texture_diffuse1);
+
+    shader->use();
+    shader->setBool("useDiffuseTexture", true);
+    shader->setBool("material.texture_diffuse1", material.texture_diffuse1->getTextureID());
+    shader->release();
+}
+
+void GameObject::loadSpecularTexture(const QString& tPath) {
+    if(type == ObjectType::Model) {
+        qDebug("Warning! Model Type Can't Be Loaded Specular Texture");
+        return;
+    }
+    if(meshes.isEmpty()) {
+        qDebug("You must assign a Mesh to loaded a specular texture!");
+    }
+    // 这里直接覆盖掉原来的texture
+    material.texture_specular1 = std::make_shared<Texture2D>();
+    material.texture_specular1->generate(tPath);
+    material.texture_specular1->type = TextureType::Specular;
+    material.texture_specular1->path = tPath;
+
+    // 清除原来的specular然后赋值
+    auto& tempVec = meshes[0]->textures;
+    tempVec.erase(std::remove_if(tempVec.begin(), tempVec.end(),
+                                 [](const std::shared_ptr<Texture2D> &tex) {
+                                     return tex->type == TextureType::Specular;
+                                 }), tempVec.end());
+    tempVec.append(material.texture_specular1);
+
+    shader->use();
+    shader->setBool("useSpecularTexture", true);
+    shader->setInteger("material.texture_specular1", material.texture_specular1->getTextureID());
+    shader->release();
+}
+
+// only for shape, not model
 void GameObject::setMaterial(Material mat) {
+    if(type == ObjectType::Model) {
+        qDebug("Model Type set material! Apply all meshes to one material");
+    }
+
+    QVector<std::shared_ptr<Texture2D>> texVec;
+    texVec.clear();
+    if(mat.texture_diffuse1 != nullptr) {
+        mat.texture_diffuse1->type = TextureType::Diffuse;
+        texVec.append(mat.texture_diffuse1);
+    }
+    if(mat.texture_specular1 != nullptr) {
+        mat.texture_specular1->type = TextureType::Specular;
+        texVec.append(mat.texture_specular1);
+    }
+
+    if(!texVec.isEmpty()) {
+        for(auto& m : meshes) {
+            m->textures = texVec;
+        }
+    }
+
     this->material = std::move(mat);
     ResourceManager::updateMaterialInShader(shaderName, material);
 }
@@ -237,6 +334,11 @@ void GameObject::setRotation(QVector3D rot) {
 
 void GameObject::setScale(QVector3D sca) {
     this->scale = sca;
+    updateTransform();
+}
+
+void GameObject::setScale(float sca) {
+    this->scale = QVector3D(sca, sca, sca);
     updateTransform();
 }
 

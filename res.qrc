@@ -13,7 +13,7 @@
         <file>assets/shaders/defaultShader.frag</file>
     </qresource>
 
-    <qresource prefix="/shaders">
+    <qresource prefix="/textures">
         <file>assets/textures/box_diffuse.png</file>
         <file>assets/textures/box_specular.png</file>
     </qresource>

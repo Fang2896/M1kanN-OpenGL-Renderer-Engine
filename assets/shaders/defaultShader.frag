@@ -92,7 +92,19 @@ void main()
 
     vec3 result = (ambient + diffuse + specular) * directLight.intensity;
 
-    // FragColor = vec4(result, 1.0);
-    FragColor = vec4(0,0,1,1);
+    // for debug
+//    if(useDiffuseTexture && useSpecularTexture) {
+//        FragColor = vec4(1,0,0, 1.0);
+//    } else if (useDiffuseTexture) {
+//        FragColor = vec4(0,1,0, 1.0);
+//    } else if (useSpecularTexture) {
+//        FragColor = vec4(0,0,1, 1.0);
+//    } else {
+//        FragColor = vec4(1,1,0, 1.0);
+//    }
+
+
+    FragColor = vec4(result, 1.0);
+
 
 }

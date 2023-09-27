@@ -92,6 +92,6 @@ void main()
 
     vec3 result = (ambient + diffuse + specular) * directLight.intensity;
 
-    FragColor = vec4(norm,0);
-    //FragColor = vec4(result, 1.0);
+    // FragColor = vec4(norm,0);
+    FragColor = vec4(result, 1.0);
 }
