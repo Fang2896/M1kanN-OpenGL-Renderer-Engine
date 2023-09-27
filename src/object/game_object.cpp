@@ -98,7 +98,8 @@ void GameObject::draw() {
     }
 }
 
-void GameObject::loadShape(ObjectType t, int width, int height) {
+void GameObject::loadShape(ObjectType t, float width, float height) {
+    // width or diameter
     this->type = t;
     meshes.clear();
     QVector<std::shared_ptr<Texture2D>> vecTextures{};
@@ -120,13 +121,13 @@ void GameObject::loadShape(ObjectType t, int width, int height) {
                                                  vecTextures));
             break;
         case ObjectType::Capsule:
-            meshes.append(std::make_shared<Mesh>(shader, ShapeData::getCapsuleVertices(),
-                                                 ShapeData::getCapsuleIndices(),
+            meshes.append(std::make_shared<Mesh>(shader, ShapeData::getCapsuleVertices(width / 2.0f, height),
+                                                 ShapeData::getCapsuleIndices(width / 2.0f, height),
                                                  vecTextures));
             break;
         case ObjectType::Sphere:
-            meshes.append(std::make_shared<Mesh>(shader, ShapeData::getSphereVertices(),
-                                                 ShapeData::getSphereIndices(),
+            meshes.append(std::make_shared<Mesh>(shader, ShapeData::getSphereVertices(width / 2.0f),
+                                                 ShapeData::getSphereIndices(width / 2.0f),
                                                  vecTextures));
             break;
         case ObjectType::Model:
@@ -164,8 +165,8 @@ void GameObject::loadShader(const QString& vertPath, const QString& fragPath, co
 }
 
 void GameObject::loadDiffuseTexture(const QString& tPath) {
-    if(type == ObjectType::Model) {
-        qDebug("Warning! Model Type Can't Be Loaded Diffuse Texture");
+    if(type == ObjectType::Model && meshes.size() > 1) {
+        qDebug("Warning! Loaded Model Type Can't Be Loaded Diffuse Texture");
         return;
     }
     if(meshes.isEmpty()) {

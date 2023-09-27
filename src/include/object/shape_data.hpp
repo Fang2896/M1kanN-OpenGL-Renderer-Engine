@@ -141,12 +141,12 @@ class ShapeData {
     }
 
     // 3. Plane
-    static QVector<Vertex> getPlaneVertices(int width, int height) {
+    static QVector<Vertex> getPlaneVertices(float width, float height) {
         QVector<Vertex> planeVertices{};
         // TODO: Add Plane Vertex
         return planeVertices;
     }
-    static QVector<unsigned int> getPlaneIndices(int width, int height) {
+    static QVector<unsigned int> getPlaneIndices(float width, float height) {
         QVector<unsigned int> planeIndices = {
             // TODO: Add Plane Index
         };
@@ -154,7 +154,7 @@ class ShapeData {
     }
 
     // 4. Capsule
-    static const QVector<Vertex>& getCapsuleVertices() {
+    static const QVector<Vertex>& getCapsuleVertices(float radius, float height) {
         static QVector<Vertex> capsuleVertices;
 
         if(capsuleVertices.isEmpty()) {
@@ -175,7 +175,7 @@ class ShapeData {
 
         return capsuleVertices;
     }
-    static const QVector<unsigned int>& getCapsuleIndices() {
+    static const QVector<unsigned int>& getCapsuleIndices(float radius, float height) {
         static QVector<unsigned int> capsuleIndices = {
             // TODO: Add Capsule Index
         };
@@ -183,7 +183,7 @@ class ShapeData {
     }
 
     // 5. Sphere
-    static const QVector<Vertex>& getSphereVertices() {
+    static const QVector<Vertex>& getSphereVertices(float radius) {
         static QVector<Vertex> sphereVertices;
 
         if(sphereVertices.isEmpty()) {
@@ -204,7 +204,7 @@ class ShapeData {
 
         return sphereVertices;
     }
-    static const QVector<unsigned int>& getSphereIndices() {
+    static const QVector<unsigned int>& getSphereIndices(float radius) {
         static QVector<unsigned int> sphereIndices = {
             // TODO: Add Sphere Indices
         };

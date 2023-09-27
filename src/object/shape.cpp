@@ -50,7 +50,6 @@
 //        qCritical("Shape's VAO is NULL!");
 //    }
 //
-//    // TODO：暂且让所有shape共用shader，然后在draw上改变参数
 //    updateShapeMaterial();
 //
 //    if(diffuseTexture != nullptr) {
@@ -85,7 +84,6 @@
 //    diffuseTexture->type = "texture_diffuse";
 //    diffuseTexture->path = dTexPath;
 //
-//    // TODO: 这里顺便把shininess搞了
 //    ResourceManager::getShader(getShaderName()).setFloat("material.shininess" ,0.2f);
 //}
 //

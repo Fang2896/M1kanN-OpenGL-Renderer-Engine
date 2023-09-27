@@ -2,12 +2,6 @@
     <qresource prefix="/shaders">
         <file>assets/shaders/coordShader.vert</file>
         <file>assets/shaders/coordShader.frag</file>
-        <file>assets/shaders/defaultModelShader.vert</file>
-        <file>assets/shaders/defaultModelShader.frag</file>
-        <file>assets/shaders/defaultShapeShader.vert</file>
-        <file>assets/shaders/defaultShapeShader.frag</file>
-        <file>assets/shaders/defaultTextureShader.vert</file>
-        <file>assets/shaders/defaultTextureShader.frag</file>
 
         <file>assets/shaders/defaultShader.vert</file>
         <file>assets/shaders/defaultShader.frag</file>
@@ -16,6 +10,9 @@
     <qresource prefix="/textures">
         <file>assets/textures/box_diffuse.png</file>
         <file>assets/textures/box_specular.png</file>
+
+        <file>assets/textures/pool_tiles_texture/2K-pool_tiles-diffuse.jpg</file>
+        <file>assets/textures/pool_tiles_texture/2K-pool_tiles-specular.jpg</file>
     </qresource>
 
     <qresource prefix="/qss">

@@ -34,14 +34,39 @@ void GLManager::initializeGL() {
 //    objectVec[0]->init();
 //    objectVec[0]->setPosition({0, -0.3f, 0});
 //    objectVec[0]->setScale(10.0f);
+    const QString modelDirectory = "E:/ToyPrograms/GL/MikannRendererEngine/Mikann-Renderer-Engine/assets/models";
+
     objectVec.push_back(std::make_shared<GameObject>());    // 默认是正方形
-    objectVec[0]->setPosition({0,3,0});
+    objectVec[0]->setPosition({0,0,0});
     objectVec[0]->loadDiffuseTexture(":textures/assets/textures/box_diffuse.png");
     objectVec[0]->loadSpecularTexture(":textures/assets/textures/box_specular.png");
+    objectVec[0]->displayName = "Wooden Cube";
 
-    objectVec.push_back(std::make_shared<GameObject>("E:/ToyPrograms/GL/MikannRendererEngine/Mikann-Renderer-Engine/assets/models/nanosuit/nanosuit.obj"));    // 默认是正方形
-    objectVec[1]->setScale(0.2f);
-    objectVec[1]->setPosition({3.0f,0.0f,0.0f});
+    objectVec.push_back(std::make_shared<GameObject>(modelDirectory + "/tiger/tiger.obj"));    // 默认是正方形
+    objectVec[1]->setPosition({-6.0f,0.0f,0.0f});
+    objectVec[1]->setScale(0.005);
+    objectVec[1]->displayName = "Tiger";
+
+    objectVec.push_back(std::make_shared<GameObject>(modelDirectory + "/buddha/buddha.obj"));    // 默认是正方形
+    objectVec[2]->setPosition({-3,0,0});
+    objectVec[2]->setScale(0.005);
+    objectVec[2]->displayName = "Buddha";
+
+    objectVec.push_back(std::make_shared<GameObject>(modelDirectory + "/bunny/bunny.obj"));    // 默认是正方形
+    objectVec[3]->displayName = "Bunny";
+    objectVec[3]->setScale(0.005);
+    objectVec[3]->setPosition({0,3,0});
+
+    objectVec.push_back(std::make_shared<GameObject>(modelDirectory + "/cat/cat.obj"));    // 默认是正方形
+    objectVec[4]->displayName = "Cat";
+    objectVec[4]->setScale(0.005f);
+    objectVec[4]->setPosition({3,0,0});
+
+    objectVec.push_back(std::make_shared<GameObject>(modelDirectory + "/nanosuit/nanosuit.obj"));    // 默认是正方形
+    objectVec[5]->displayName = "NanoSuit";
+    objectVec[5]->setScale(0.2f);
+    objectVec[5]->setPosition({6,0,0});
+
 
 //    objectVec.push_back(std::make_shared<Model>(
 //        "E:/ToyPrograms/GL/MikannRendererEngine/Mikann-Renderer-Engine/assets/models/nanosuit/nanosuit.obj"));
@@ -155,7 +180,7 @@ void GLManager::initShaderValue() {
     // coordinate matrix configuration （因为坐标位置是不变的）
     QMatrix4x4 model;
     model.setToIdentity();
-    model.scale(5.0f);
+    model.scale(10.0f);
     ResourceManager::getShader("coordShader")->use().setMatrix4f("model", model);
 }
 
@@ -219,7 +244,6 @@ void GLManager::initConfigureVariables() {
 void GLManager::initLightInfo() {
     directLight = DirectLight();
 
-    // TODO: 灯光管理。。。
 }
 
 void GLManager::initOpenGLSettings() {

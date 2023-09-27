@@ -22,7 +22,7 @@ class GameObject {
 
     void draw();
 
-    void loadShape(ObjectType t, int width=10, int height=10);   // only for non-model shape
+    void loadShape(ObjectType t, float width=1.0f, float height=2.0f);   // only for non-model shape
     void loadModel(const QString& mPath); // only for model
     void loadShader(const QString& vertPath,
                     const QString& fragPath,

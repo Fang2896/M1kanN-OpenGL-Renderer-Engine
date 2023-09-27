@@ -156,8 +156,10 @@ QVector<std::shared_ptr<Mesh>> ResourceManager::loadModel(const QString& mPath) 
     Assimp::Importer import;
     const aiScene *scene = import.ReadFile(mPath.toStdString(), aiProcess_Triangulate | aiProcess_FlipUVs);
 
-    if(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
+    if(!scene || !scene->mRootNode) {
         qCritical() << "ERROR::ASSIMP::" << import.GetErrorString() << Qt::endl;
+    } else if (scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE) {
+        qDebug() << "WARNING::ASSIMP::" << "Scene Flags Incomplete";
     }
 
     QString modelDirectory = mPath.left(mPath.lastIndexOf('/'));
@@ -188,6 +190,7 @@ QVector<std::shared_ptr<Mesh>> ResourceManager::processNode(aiNode *node, const 
 }
 
 std::shared_ptr<Mesh> ResourceManager::processMesh(aiMesh *mesh, const aiScene *scene, const QString& mDir) {
+    bool haveNormal = false;
     QVector<Vertex> vertices;
     QVector<unsigned int> indices;
     QVector<std::shared_ptr<Texture2D>> textures;
@@ -202,10 +205,16 @@ std::shared_ptr<Mesh> ResourceManager::processMesh(aiMesh *mesh, const aiScene *
         vertex.position = vector;
 
         // 处理索引
-        vector.setX(mesh->mNormals[i].x);
-        vector.setY(mesh->mNormals[i].y);
-        vector.setZ(mesh->mNormals[i].z);
-        vertex.normal = vector;
+        // TODO: 处理如果没有normal的情况
+        if(mesh->mNormals != nullptr) {
+            haveNormal = true;
+            vector.setX(mesh->mNormals[i].x);
+            vector.setY(mesh->mNormals[i].y);
+            vector.setZ(mesh->mNormals[i].z);
+            vertex.normal = vector;
+        } else {
+            vertex.normal = QVector3D(0.0f,0.0f,0.0f);
+        }
 
         if(mesh->mTextureCoords[0]) {
             QVector2D vec;
@@ -226,6 +235,7 @@ std::shared_ptr<Mesh> ResourceManager::processMesh(aiMesh *mesh, const aiScene *
     }
 
     // 处理材质
+    // TODO : 遇到atlas texture怎么办？
     if(mesh->mMaterialIndex >= 0) {
         aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
         QVector<std::shared_ptr<Texture2D>> diffuseMaps = loadMaterialTextures(material,
@@ -236,6 +246,8 @@ std::shared_ptr<Mesh> ResourceManager::processMesh(aiMesh *mesh, const aiScene *
                                                                                 aiTextureType_SPECULAR,
                                                                                 "texture_specular", mDir);
         textures.append(specularMaps);
+    } else {
+        qDebug() << "Current Model Has No Texture";
     }
 
     return std::make_shared<Mesh>(nullptr, vertices, indices, textures);
@@ -247,7 +259,7 @@ QVector<std::shared_ptr<Texture2D>> ResourceManager::loadMaterialTextures(aiMate
         aiString str;
         mat->GetTexture(type, i, &str);
         QString qStr = modelDirectory + "/" + QString::fromUtf8(str.C_Str());
-        qDebug() << "Load texture: " + qStr;
+        qDebug() << "Load " << typeName << " : " << qStr;
 
         std::shared_ptr<Texture2D> texture = std::make_shared<Texture2D>();
         texture->generate(qStr);
