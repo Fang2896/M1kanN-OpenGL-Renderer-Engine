@@ -43,7 +43,7 @@ void main()
     if(abs(vPos.x) > abs(vPos.y) && abs(vPos.x) > abs(vPos.z)) {
         FragColor = vec4(1.0, 0.0, 0.0, 1.0);
     }
-    // y -> yellow
+    // y -> green
     else if(abs(vPos.y) > abs(vPos.x) && abs(vPos.y) > abs(vPos.z)) {
         FragColor = vec4(0.0, 1.0, 0.0, 1.0);
     }

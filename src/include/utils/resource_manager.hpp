@@ -56,6 +56,8 @@ class ResourceManager
                                                                     const QString& typeName,
                                                                     const QString& mDir);
 
+    static void reCalculateNormal(QVector<Vertex> &vertices, const QVector<unsigned int>& indices);
+
 };
 
 

@@ -28,7 +28,6 @@ GameObject::GameObject()
         ShapeData::getCubeIndices(),
         vecTextures);
 
-
     meshes = QVector<std::shared_ptr<Mesh>>{cubeMesh};
 
     this->position = QVector3D(0.0f, 0.0f, 0.0f);
@@ -68,22 +67,6 @@ GameObject::GameObject(const QString& mPath, const QString& disName)
     }
     meshes.clear();
     loadModel(mPath);
-}
-
-GameObject::GameObject(ObjectType type, const QString& mPath, const QString& disName)
-    : GameObject()
-{
-    this->type = ObjectType::Model;
-    this->displayName = disName;
-    this->modelPath = mPath;
-
-    if(type != ObjectType::Model) {
-        qDebug("==>Type is NOT Model, Now Change to Model and Load<==");
-    }
-
-    meshes.clear();
-    loadModel(mPath);
-
 }
 
 GameObject::~GameObject() {

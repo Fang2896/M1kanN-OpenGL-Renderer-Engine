@@ -10,7 +10,6 @@ const QVector3D CAMERA_POSITION(0.0f, 0.5f, 3.0f);
 GLManager::GLManager(QWidget* parent, int width, int height)
     : QOpenGLWidget(parent)
 {
-    coordData = ShapeData::getCoordinateVertices();
     this->setGeometry(10, 20, width, height);
 }
 
@@ -23,76 +22,46 @@ void GLManager::initializeGL() {
     initShaders();    // shader
 
     // TODO: 这里可以从coordinate改成各种绘制精灵？
-    initCoordinate();
     initShaderValue();
 
     // member mangers
     // object manager, resource manager...
     m_camera = std::make_unique<Camera>(CAMERA_POSITION, defaultCameraMoveSpeed);
+    coordinate = std::make_unique<Coordinate>();
+    coordinate->initCoordinate();
 
-//    objectVec.push_back(std::make_shared<Shape>("plane"));
-//    objectVec[0]->init();
-//    objectVec[0]->setPosition({0, -0.3f, 0});
-//    objectVec[0]->setScale(10.0f);
-    const QString modelDirectory = "E:/ToyPrograms/GL/MikannRendererEngine/Mikann-Renderer-Engine/assets/models";
+    auto tempCubePtr = std::make_shared<GameObject>();
+    objectMap[tempCubePtr->getObjectID()] = tempCubePtr;
+    tempCubePtr->setPosition({-3,3,-3});
+    tempCubePtr->loadDiffuseTexture(":textures/assets/textures/box_diffuse.png");
+    tempCubePtr->loadSpecularTexture(":textures/assets/textures/box_specular.png");
+    tempCubePtr->displayName = "Wooden Cube";
 
-    objectVec.push_back(std::make_shared<GameObject>());    // 默认是正方形
-    objectVec[0]->setPosition({0,0,0});
-    objectVec[0]->loadDiffuseTexture(":textures/assets/textures/box_diffuse.png");
-    objectVec[0]->loadSpecularTexture(":textures/assets/textures/box_specular.png");
-    objectVec[0]->displayName = "Wooden Cube";
-
-    objectVec.push_back(std::make_shared<GameObject>(modelDirectory + "/tiger/tiger.obj"));    // 默认是正方形
-    objectVec[1]->setPosition({-6.0f,0.0f,0.0f});
-    objectVec[1]->setScale(0.005);
-    objectVec[1]->displayName = "Tiger";
-
-    objectVec.push_back(std::make_shared<GameObject>(modelDirectory + "/buddha/buddha.obj"));    // 默认是正方形
-    objectVec[2]->setPosition({-3,0,0});
-    objectVec[2]->setScale(0.005);
-    objectVec[2]->displayName = "Buddha";
-
-    objectVec.push_back(std::make_shared<GameObject>(modelDirectory + "/bunny/bunny.obj"));    // 默认是正方形
-    objectVec[3]->displayName = "Bunny";
-    objectVec[3]->setScale(0.005);
-    objectVec[3]->setPosition({0,3,0});
-
-    objectVec.push_back(std::make_shared<GameObject>(modelDirectory + "/cat/cat.obj"));    // 默认是正方形
-    objectVec[4]->displayName = "Cat";
-    objectVec[4]->setScale(0.005f);
-    objectVec[4]->setPosition({3,0,0});
-
-    objectVec.push_back(std::make_shared<GameObject>(modelDirectory + "/nanosuit/nanosuit.obj"));    // 默认是正方形
-    objectVec[5]->displayName = "NanoSuit";
-    objectVec[5]->setScale(0.2f);
-    objectVec[5]->setPosition({6,0,0});
-
-
-//    objectVec.push_back(std::make_shared<Model>(
-//        "E:/ToyPrograms/GL/MikannRendererEngine/Mikann-Renderer-Engine/assets/models/nanosuit/nanosuit.obj"));
-//    objectVec[1]->init();
-//    objectVec[1]->setPosition(QVector3D(3,0,0));
-//    objectVec[1]->setScale(0.2f);
+//    objectMap.push_back(std::make_shared<GameObject>(modelDirectory + "/tiger/tiger.obj"));    // 默认是正方形
+//    objectMap[1]->setPosition({-6.0f,0.0f,0.0f});
+//    objectMap[1]->setScale(0.005);
+//    objectMap[1]->displayName = "Tiger";
 //
-//    objectVec.push_back(std::make_shared<Shape>("cube"));
-//    objectVec[2]->init("defaultTextureShader");
-//    objectVec[2]->setPosition({0, 0, 3});
-//    auto* tempShapePtr = dynamic_cast<Shape*>(objectVec[2].get());
-//    if(tempShapePtr) {
-//        // 调用 Shape 的函数
-//        tempShapePtr->updateDiffuseTexture(
-//            "E:/ToyPrograms/GL/MikannRendererEngine/Mikann-Renderer-Engine/assets/textures/box_diffuse.png");
-//        tempShapePtr->updateSpecularTexture(
-//            "E:/ToyPrograms/GL/MikannRendererEngine/Mikann-Renderer-Engine/assets/textures/box_specular.png");
-//    } else {
-//        qFatal("Temp Shape Ptr Empty!");
-//    }
-
-    // Model must be initialized after shader!
-//    m_testModel = std::make_unique<Model>("../assets/models/nanosuit/nanosuit.obj");
-//    m_testModel->init("defaultModelShader");
-//    m_testCube = std::make_unique<Shape>("cube");
-//    m_testCube->init("defaultShapeShader");
+//    objectMap.push_back(std::make_shared<GameObject>(modelDirectory + "/buddha/buddha.obj"));    // 默认是正方形
+//    objectMap[2]->setPosition({-3,0,0});
+//    objectMap[2]->setRotation({-90,0,0});
+//    objectMap[2]->setScale(0.005);
+//    objectMap[2]->displayName = "Buddha";
+//
+//    objectMap.push_back(std::make_shared<GameObject>(modelDirectory + "/bunny/bunny.obj"));    // 默认是正方形
+//    objectMap[3]->displayName = "Bunny";
+//    objectMap[3]->setScale(0.005);
+//    objectMap[3]->setPosition({0,3,0});
+//
+//    objectMap.push_back(std::make_shared<GameObject>(modelDirectory + "/cat/cat.obj"));    // 默认是正方形
+//    objectMap[4]->displayName = "Cat";
+//    objectMap[4]->setScale(0.005f);
+//    objectMap[4]->setPosition({3,0,0});
+//
+//    objectMap.push_back(std::make_shared<GameObject>(modelDirectory + "/nanosuit/nanosuit.obj"));    // 默认是正方形
+//    objectMap[5]->displayName = "NanoSuit";
+//    objectMap[5]->setScale(0.2f);
+//    objectMap[5]->setPosition({6,0,0});
 
     // start timer
     eTimer.start();
@@ -103,17 +72,6 @@ void GLManager::resizeGL(int w, int h) {
 }
 
 void GLManager::paintGL() {
-    if(this->isLineMode)
-        glFunc->glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    else
-        glFunc->glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-    // 这个是可有可无？
-    glFunc->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glFunc->glClearColor(backGroundColor.x(),
-                         backGroundColor.y(),
-                         backGroundColor.z(), 1.0f);  // 例如：清除为黑色
-
     // time and position data
     GLfloat currentFrame = (GLfloat)eTimer.elapsed() / 100;
     deltaTime = currentFrame - lastFrame;
@@ -123,46 +81,10 @@ void GLManager::paintGL() {
     this->updateRenderData();
 
     ResourceManager::getShader("coordShader")->use();
-    drawCoordinate();
+    coordinate->drawCoordinate();
     ResourceManager::getShader("coordShader")->release();
 
     drawObjects();
-//    ResourceManager::getShader(m_testModel->getShaderName()).use();
-//    m_testModel->draw();
-//    ResourceManager::getShader(m_testCube->getShaderName()).use();
-//    m_testCube->draw();
-}
-
-/********* Other Functions *********/
-void GLManager::initCoordinate() {
-    glFunc->glGenBuffers(1, &coordVBO);
-    glFunc->glBindBuffer(GL_ARRAY_BUFFER, coordVBO);
-    glFunc->glBufferData(GL_ARRAY_BUFFER, coordData.size() * sizeof(float),
-                         coordData.data(), GL_STATIC_DRAW);
-
-    glFunc->glGenVertexArrays(1, &coordVAO);
-    glFunc->glBindVertexArray(coordVAO);
-
-    glFunc->glBindBuffer(GL_ARRAY_BUFFER, coordVBO);
-
-    glFunc->glEnableVertexAttribArray(0);
-    glFunc->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
-                                  (GLsizei)3 * sizeof(float), (void*)nullptr);
-    glFunc->glBindVertexArray(0);
-
-    qDebug() << "======= Done Init Coordinate ========";
-}
-
-void GLManager::drawCoordinate() {
-    glFunc->glBindVertexArray(coordVAO);
-    glFunc->glDrawArrays(GL_LINES, 0, (GLsizei)coordData.size() / 3);
-    glFunc->glBindVertexArray(0);
-}
-
-void GLManager::drawObjects() {
-    for(auto & i : objectVec) {
-        i->draw();
-    }
 }
 
 void GLManager::initShaders() {
@@ -190,6 +112,12 @@ void GLManager::updateRenderData() {
     else
         glFunc->glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
+    // 这个是可有可无？
+    glFunc->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glFunc->glClearColor(backGroundColor.x(),
+                         backGroundColor.y(),
+                         backGroundColor.z(), 1.0f);  // 例如：清除为黑色
+
     projection.setToIdentity();
     projection.perspective(m_camera->zoom, (GLfloat)width() / (GLfloat)height(), 0.1f, 200.f);
     view = m_camera->getViewMatrix();
@@ -203,11 +131,85 @@ void GLManager::updateRenderData() {
     tempM.setToIdentity();
     ResourceManager::getShader("coordShader")->use().setMatrix4f("model", tempM);
     // 为管理的objects设置model
-    for(auto & i : objectVec) {
-        auto& tempShader = ResourceManager::getShader(i->getShaderName())->use();
-        tempShader.setMatrix4f("model", i->getTransform());
+    for(auto & i : objectMap) {
+        auto& tempShader = ResourceManager::getShader(i.second->getShaderName())->use();
+        tempShader.setMatrix4f("model", i.second->getTransform());
         tempShader.release();
     }
+}
+
+/********* Object Manager Functions *********/
+void GLManager::drawObjects() {
+    for(auto & i : objectMap) {
+        i.second->draw();
+    }
+}
+
+// TODO: 注意这个clear，由于用的是shared_ptr，没准会导致这里删除到其他地方还在用？
+void GLManager::clearObjects() {
+    objectMap.clear();
+    qDebug() << "Clear ALL Objects";
+}
+
+int GLManager::addObject(const QString& mPath) {
+    this->makeCurrent();
+
+    if(mPath.isEmpty()) {
+        qDebug() << "Please Give Model Type a Model Path!";
+        return -1;
+    }
+
+    std::shared_ptr<GameObject> tempPtr;
+    tempPtr = std::make_shared<GameObject>(mPath);
+    GLuint tempID = tempPtr->getObjectID();
+    objectMap[tempID] = tempPtr;
+
+    qDebug() << "Add Model Object, Path: " << mPath;
+    this->doneCurrent();
+
+    return (int)tempID;
+}
+
+int GLManager::addObject(ObjectType objType) {
+    this->makeCurrent();
+    if(objType == ObjectType::Model) {
+        qDebug() << "If you want to add a model, please directly give the model path!";
+        return -1;
+    }
+
+    std::shared_ptr<GameObject> tempPtr = std::make_shared<GameObject>(objType);
+    GLuint tempID = tempPtr->getObjectID();
+    objectMap[tempID] = tempPtr;
+    qDebug() << "Add Shape Object, Shader: " << objectTypeToString(objType);
+
+    this->doneCurrent();
+
+    return (int)tempID;
+}
+
+void GLManager::deleteObject(GLuint id) {
+    this->makeCurrent();
+    if(objectMap.find(id) == objectMap.end()) {
+        qDebug() << "Not Found Object to Delete, ID: " << id;
+        return;
+    }
+
+    objectMap.erase(id);
+    qDebug() << "Delete Object, ID: " << id;
+    this->doneCurrent();
+}
+
+const std::map<GLuint, std::shared_ptr<GameObject>>& GLManager::getAllGameObjectMap() const {
+    return objectMap;
+}
+
+std::shared_ptr<GameObject> GLManager::getTargetGameObject(GLuint id) {
+    if(objectMap.find(id) == objectMap.end()) {
+        qDebug() << "Not Found Object to Get, ID: " << id;
+        return nullptr;
+    }
+
+    return objectMap[id];
 }
 
 void GLManager::checkGLVersion() {
@@ -224,7 +226,7 @@ void GLManager::checkGLVersion() {
 
 void GLManager::initConfigureVariables() {
     isLineMode = GL_FALSE;
-    backGroundColor = QVector3D(0.1f, 0.1f, 0.1f);
+    backGroundColor = QVector3D(0.8f, 0.84f, 0.8f);
 
     defaultCameraMoveSpeed = 0.2f;
     shiftDown = GL_FALSE;
@@ -253,7 +255,15 @@ void GLManager::initOpenGLSettings() {
         qFatal("Requires OpenGL >= 4.3");
     }
     glFunc->initializeOpenGLFunctions();
+
     glFunc->glEnable(GL_DEPTH_TEST);
+    glFunc->glEnable(GL_LINE_SMOOTH);
+
+    GLfloat lineWidthRange[2];
+    glFunc->glGetFloatv(GL_ALIASED_LINE_WIDTH_RANGE, lineWidthRange);
+    qDebug() << "Support Line Width Range: " << lineWidthRange[0] << "~" << lineWidthRange[1];
+    glFunc->glLineWidth(10.0f);
+
     glFunc->glClearColor(backGroundColor.x(),
                          backGroundColor.y(),
                          backGroundColor.z(), 1.0f);

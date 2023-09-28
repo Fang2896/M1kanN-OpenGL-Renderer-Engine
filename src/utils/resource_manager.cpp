@@ -205,15 +205,12 @@ std::shared_ptr<Mesh> ResourceManager::processMesh(aiMesh *mesh, const aiScene *
         vertex.position = vector;
 
         // 处理索引
-        // TODO: 处理如果没有normal的情况
         if(mesh->mNormals != nullptr) {
             haveNormal = true;
             vector.setX(mesh->mNormals[i].x);
             vector.setY(mesh->mNormals[i].y);
             vector.setZ(mesh->mNormals[i].z);
             vertex.normal = vector;
-        } else {
-            vertex.normal = QVector3D(0.0f,0.0f,0.0f);
         }
 
         if(mesh->mTextureCoords[0]) {
@@ -234,8 +231,12 @@ std::shared_ptr<Mesh> ResourceManager::processMesh(aiMesh *mesh, const aiScene *
             indices.push_back(face.mIndices[j]);
     }
 
+    // if we have no normal there
+    if(mesh->mNormals == nullptr) {
+        reCalculateNormal(vertices, indices);
+    }
+
     // 处理材质
-    // TODO : 遇到atlas texture怎么办？
     if(mesh->mMaterialIndex >= 0) {
         aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
         QVector<std::shared_ptr<Texture2D>> diffuseMaps = loadMaterialTextures(material,
@@ -269,4 +270,33 @@ QVector<std::shared_ptr<Texture2D>> ResourceManager::loadMaterialTextures(aiMate
         textures.push_back(texture);
     }
     return textures;
+}
+
+void ResourceManager::reCalculateNormal(QVector<Vertex> &vertices, const QVector<unsigned int>& indices) {
+    for(auto &v : vertices) {
+        v.normal = QVector3D(0.0f,0.0f,0.0f);
+    }
+
+    for(int i = 0; i < indices.size(); i += 3) {
+        int index1 = indices[i];
+        int index2 = indices[i+1];
+        int index3 = indices[i+2];
+
+        QVector3D p1 = vertices[index1].position;
+        QVector3D p2 = vertices[index2].position;
+        QVector3D p3 = vertices[index3].position;
+
+        QVector3D edge1 = p2 - p1;
+        QVector3D edge2 = p3 - p1;
+
+        QVector3D faceNormal = QVector3D::crossProduct(edge1, edge2);
+
+        vertices[index1].normal += faceNormal;
+        vertices[index1].normal += faceNormal;
+        vertices[index1].normal += faceNormal;
+    }
+
+    for(auto &v : vertices) {
+        v.normal.normalize();
+    }
 }

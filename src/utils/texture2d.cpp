@@ -16,7 +16,8 @@ Texture2D::~Texture2D() = default;
 void Texture2D::generate(const QString &file) {
     texture = std::make_shared<QOpenGLTexture>(QOpenGLTexture::Target2D);
     texture->setFormat(internal_format);
-    texture->setData(QImage(file).mirrored(), QOpenGLTexture::GenerateMipMaps);
+    // 注意有时候要用mirror有时候又不需要用，搞不太明白了
+    texture->setData(QImage(file), QOpenGLTexture::GenerateMipMaps);
 
     texture->setWrapMode(QOpenGLTexture::DirectionS, wrap_s);
     texture->setWrapMode(QOpenGLTexture::DirectionT, wrap_t);

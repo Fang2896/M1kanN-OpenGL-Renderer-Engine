@@ -17,7 +17,6 @@ class GameObject {
     GameObject();
     explicit GameObject(ObjectType type, const QString& disName = "GameObject");
     explicit GameObject(const QString& mPath, const QString& disName = "GameObject");
-    GameObject(ObjectType type, const QString& mPath, const QString& disName = "GameObject");
     ~GameObject();
 
     void draw();

@@ -10,20 +10,6 @@
 
 class ShapeData {
    public:
-    static QVector<float> getCoordinateVertices() {
-        static QVector<float> coordinateVertices = {
-            // x
-            0.0f, 0.0f, 0.0f,
-            1.0f, 0.0f, 0.0f,
-            // y
-            0.0f, 0.0f, 0.0f,
-            0.0f, 1.0f, 0.0f,
-            // z
-            0.0f, 0.0f, 0.0f,
-            0.0f, 0.0f, 1.0f};
-        return coordinateVertices;
-    }
-
     // basic geometry
     // 1. Cube
     static const QVector<Vertex>& getCubeVertices() {

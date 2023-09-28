@@ -49,10 +49,21 @@ class MainWindow : public QWidget {
 
    private slots: // slots
     void updateGLManager();
+
+    void onLoadGameObjectCube();
+    void onLoadGameObjectQuad();
+    void onLoadModel();
+
+    void onObjectItemSelect(QListWidgetItem *item);
+
     void handleEditingFinished();
 
    private: // filters
     bool eventFilter(QObject *watched, QEvent *event) override;
+
+   private: // configure variables
+    const QString modelDirectory = "../assets/models";
+    const QString textureDirectory = "../assets/textures";
 
    private: // variables
     Ui::MainWindow* ui;
@@ -68,15 +79,33 @@ class MainWindow : public QWidget {
     QListWidget *lightList;
     QListWidget *objectList;
 
+    // Tool Button Menu
+    QMenu *objectAddMenu;
+    QMenu *objectShapeSelectMenu;
+
+    // TODO: 后面会增加更多
+    QAction *objectLoadShapeCubeAction;
+    QAction *objectLoadShapeQuadAction;
+
+    QAction *objectLoadModelAction;
+
+    QMenu *lightAddMenu;
+    QAction *pointLightAddAction;
+    QAction *spotLightAddAction;
+
     QGroupBox *inspectorGroupBox;
     QCheckBox *nameCheckBox;
     QLineEdit *nameLineEdit;
 
     QGroupBox *transformGroupBox;
-
     QTabWidget *configureDashTab;
 
     // 操作时增加：(需要new)
+    QFrame *positionFrame;
+    QFrame *rotationFrame;
+    QFrame *scaleFrame;
+    QFrame *directionFrame;
+
     QLabel *posTitleLabel;
     QLabel *rotationTitleLabel;
     QLabel *scaleTitleLabel;
@@ -96,14 +125,14 @@ class MainWindow : public QWidget {
     QLabel *objZScaleLabel;  QDoubleSpinBox *objZScaleSpinBox;
 
     // lights
-    QLabel *lightTypeLabel;
-    QComboBox *lightTypeComboBox;   // 按照comboBox的种类再次出现不同的控件
-    QLabel *lightIntensityLabel;    QDoubleSpinBox *lightIntensitySpinBox;
+    // TODO: 增加灯光交互？
 
     // direct light
     QLabel *lightXDirLabel;  QDoubleSpinBox *lightXDirSpinBox;
     QLabel *lightYDirLabel;  QDoubleSpinBox *lightYDirSpinBox;
     QLabel *lightZDirLabel;  QDoubleSpinBox *lightZDirSpinBox;
+
+    // object和light改变，就改变frame显示状态即可
 
     QMenuBar *mainMenuBar;
     QMenu *fileMenu;

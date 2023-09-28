@@ -14,8 +14,7 @@
 #include "data_structures.hpp"
 #include "gl_configure.hpp"
 
-//#include "object/model.hpp"
-//#include "object/shape.hpp"
+#include "object/coordinate.hpp"
 #include "object/game_object.hpp"
 
 #include "utils/camera.hpp"
@@ -26,6 +25,15 @@ class GLManager : public QOpenGLWidget {
     explicit GLManager(QWidget* parent = nullptr, int width = 800,
                        int height = 400);
     ~GLManager() override;
+
+   public:  // api for MainWindow
+    void clearObjects();
+    int addObject(const QString& mPath = "");
+    int addObject(ObjectType objType);
+
+    void deleteObject(GLuint id);
+    [[nodiscard]] const std::map<GLuint, std::shared_ptr<GameObject>>& getAllGameObjectMap() const;
+    std::shared_ptr<GameObject> getTargetGameObject(GLuint id);
 
    protected:
     void initializeGL() override;
@@ -39,6 +47,11 @@ class GLManager : public QOpenGLWidget {
     void keyPressEvent(QKeyEvent *event) override;
     void keyReleaseEvent(QKeyEvent *event) override;
 
+   private: // control functions...
+    void handleInput(GLfloat dt);
+    void updateRenderData();
+    static void checkGLVersion();
+
    private:  // functions
     void initShaders();
     void initShaderValue();
@@ -46,25 +59,17 @@ class GLManager : public QOpenGLWidget {
     void initLightInfo();
     void initOpenGLSettings();
 
-    // 单独绘制单个物体的函数，现在改为统一管理 -> Object基类
-    void initCoordinate();
-    void drawCoordinate();
+   private: // object manager functions
     void drawObjects();
 
-    void handleInput(GLfloat dt);
-    void updateRenderData();
-    static void checkGLVersion();
-
-   private: // manager objects, shaders...
-    QVector<std::shared_ptr<GameObject>> objectVec;
+   private: // objects member variables
+    const QString modelDirectory = "../assets/models";
+    std::map<GLuint, std::shared_ptr<GameObject>> objectMap;
 
    private:  // key variables
     GLFunctions_Core* glFunc = nullptr;
     std::unique_ptr<Camera> m_camera;
-
-    GLuint coordVAO;
-    GLuint coordVBO;
-    QVector<float> coordData;
+    std::unique_ptr<Coordinate> coordinate;
 
     QElapsedTimer eTimer;
 

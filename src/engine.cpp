@@ -20,7 +20,7 @@ void setStyle(const QString& styleName) {
 int main(int argc, char* argv[]) {
     QApplication a(argc, argv);
 
-    setStyle("flatwhite");
+    // setStyle("flatwhite");
     setGLVersion(4, 3); // Mac: 4.1, Win: 4.3 (with compute shader)
 
     MainWindow w;
