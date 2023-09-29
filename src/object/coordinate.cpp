@@ -30,9 +30,11 @@ void Coordinate::initCoordinate() {
 }
 
 void Coordinate::drawCoordinate() {
+    glFunc->glLineWidth(10.0f);
     glFunc->glBindVertexArray(coordVAO);
     glFunc->glDrawArrays(GL_LINES, 0, (GLsizei)coordData.size() / 3);
     glFunc->glBindVertexArray(0);
+    glFunc->glLineWidth(1.0f);
 }
 
 

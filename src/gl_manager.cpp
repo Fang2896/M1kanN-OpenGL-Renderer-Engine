@@ -125,7 +125,7 @@ void GLManager::updateRenderData() {
     ResourceManager::updateProjViewMatrixInShader(projection, view);
     ResourceManager::updateViewPosInShader(m_camera->position);
     // TODO：灯光管理太烂了。等后面来优化。光没准可以定义成全局变量
-    ResourceManager::updateDirectLightInShader(directLight);
+    ResourceManager::updateDirectLightInShader(isLighting, directLight);
 
     QMatrix4x4 tempM;
     tempM.setToIdentity();
@@ -195,8 +195,12 @@ void GLManager::deleteObject(GLuint id) {
         return;
     }
 
+    auto tempObj = objectMap[id];
+    ResourceManager::map_Shaders.erase("shader_" + QString::number(id));
+    qDebug() << "Delete Object, ID: " << id << ", Name: " << tempObj->displayName;
     objectMap.erase(id);
-    qDebug() << "Delete Object, ID: " << id;
+    tempObj = nullptr;
+
     this->doneCurrent();
 }
 
@@ -213,6 +217,14 @@ std::shared_ptr<GameObject> GLManager::getTargetGameObject(GLuint id) {
     return objectMap[id];
 }
 
+void GLManager::setEnableLighting(GLboolean enableLighting) {
+    isLighting = enableLighting;
+}
+
+void GLManager::setLineMode(GLboolean enableLineMode) {
+    this->isLineMode = enableLineMode;
+}
+
 void GLManager::checkGLVersion() {
     QOpenGLContext* context = QOpenGLContext::currentContext();
     if (context) {
@@ -227,6 +239,7 @@ void GLManager::checkGLVersion() {
 
 void GLManager::initConfigureVariables() {
     isLineMode = GL_FALSE;
+    isLighting = GL_TRUE;
     backGroundColor = QVector3D(0.8f, 0.84f, 0.8f);
 
     defaultCameraMoveSpeed = 0.2f;
@@ -263,7 +276,6 @@ void GLManager::initOpenGLSettings() {
     GLfloat lineWidthRange[2];
     glFunc->glGetFloatv(GL_ALIASED_LINE_WIDTH_RANGE, lineWidthRange);
     qDebug() << "Support Line Width Range: " << lineWidthRange[0] << "~" << lineWidthRange[1];
-    glFunc->glLineWidth(10.0f);
 
     glFunc->glClearColor(backGroundColor.x(),
                          backGroundColor.y(),

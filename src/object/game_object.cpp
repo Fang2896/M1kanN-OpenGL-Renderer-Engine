@@ -10,7 +10,7 @@
 GLuint GameObject::gameObjectCounter = 0;
 
 GameObject::GameObject()
-    : displayName("GameObject"), objectID(gameObjectCounter++),
+    : display(GL_TRUE), displayName("GameObject"), objectID(gameObjectCounter++),
       type(ObjectType::Cube), modelPath(""),
       shader(), material()
 {
@@ -59,7 +59,7 @@ GameObject::GameObject(const QString& mPath, const QString& disName)
     : GameObject()
 {
     this->type = ObjectType::Model;
-    this->displayName = disName;
+    this->displayName = UtilAlgorithms::getFileNameFromPath(mPath);
     this->modelPath = mPath;
 
     if(type != ObjectType::Model) {
@@ -76,6 +76,10 @@ GameObject::~GameObject() {
 }
 
 void GameObject::draw() {
+    if(!display) {
+        return;
+    }
+
     for(auto & m : meshes) {
         m->draw();
     }

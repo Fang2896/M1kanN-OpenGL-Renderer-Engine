@@ -35,6 +35,10 @@ class GLManager : public QOpenGLWidget {
     [[nodiscard]] const std::map<GLuint, std::shared_ptr<GameObject>>& getAllGameObjectMap() const;
     std::shared_ptr<GameObject> getTargetGameObject(GLuint id);
 
+    // configure setter
+    void setEnableLighting(GLboolean enableLighting);
+    void setLineMode(GLboolean enableLineMode);
+
    protected:
     void initializeGL() override;
     void resizeGL(int w, int h) override;
@@ -75,6 +79,7 @@ class GLManager : public QOpenGLWidget {
 
    private:  // configure variables
     GLboolean isLineMode;
+    GLboolean isLighting;
     QVector3D backGroundColor;
 
     DirectLight directLight;

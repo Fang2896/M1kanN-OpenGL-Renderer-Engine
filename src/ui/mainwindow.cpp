@@ -14,6 +14,7 @@ const int OGL_HEIGHT = 600;
 MainWindow::MainWindow(QWidget* parent)
     : QWidget(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
+    currentObjectID = -1;
     glManager = new GLManager(this, OGL_WIDTH, OGL_HEIGHT);
     initWidget();
     initLayout();
@@ -31,13 +32,34 @@ MainWindow::~MainWindow() {
     delete ui;
 }
 
+// used to set widget size for now
+void MainWindow::showEvent(QShowEvent *event) {
+    QWidget::showEvent(event);
+
+    int midHeight = glDashSplitter->height();
+    int dashHeight = midHeight / 5;
+    int glHeight = midHeight - dashHeight;
+    glDashSplitter->setSizes({glHeight, dashHeight});
+
+    // 初始大小比例
+    int totalWidth = contentSplitter->width();
+    int leftAndRightWidth = totalWidth / 5; // 根据1:3:1的比例计算左和右部分的宽度
+    int midWidth = 3 * leftAndRightWidth;
+    contentSplitter->setSizes({leftAndRightWidth, midWidth, leftAndRightWidth});
+}
+
 void MainWindow::initWidget() {
+    contentSplitter = new QSplitter(Qt::Horizontal, this);
+    glDashSplitter = new QSplitter(Qt::Vertical, this);
+
     sceneGroupBox = ui->sceneGroupBox;
     lightTitleLabel = ui->lightTitleLabel;
     objectTitleLabel = ui->objectTitleLabel;
 
     objectAddButton = ui->objectAddButton;
+    objectDeleteButton = ui->objectDeleteButton;
     lightAddButton = ui->lightAddButton;
+    lightDeleteButton = ui->lightDeleteButton;
 
     lightList = ui->lightList;      lightList->setFocusPolicy(Qt::NoFocus);
     objectList = ui->objectList;    objectList->setFocusPolicy(Qt::NoFocus);
@@ -66,6 +88,11 @@ void MainWindow::initWidget() {
     transformGroupBox = ui->transformGroupBox;
 
     configureDashTab = ui->configureDashTab;
+    envTab = ui->envTab;
+    postProcessingTab = ui->postProcessingTab;
+
+    enableLightingCheckBox = ui->enableLightingCheckBox;
+    enableLineModeCheckBox = ui->enableLineModeCheckBox;
 
     // 操作时隐藏或者显示：
     positionFrame = ui->positionFrame;
@@ -108,10 +135,12 @@ void MainWindow::initLayout() {
     auto *hLightLayout = new QHBoxLayout;
     hLightLayout->addWidget(lightTitleLabel);
     hLightLayout->addWidget(lightAddButton);
+    hLightLayout->addWidget(lightDeleteButton);
 
     auto *hObjLayout = new QHBoxLayout;
     hObjLayout->addWidget(objectTitleLabel);
     hObjLayout->addWidget(objectAddButton);
+    hObjLayout->addWidget(objectDeleteButton);
 
     auto *vSceneLayout = new QVBoxLayout;
     vSceneLayout->addLayout(hLightLayout);
@@ -120,6 +149,12 @@ void MainWindow::initLayout() {
     vSceneLayout->addWidget(objectList, 2);
 
     sceneGroupBox->setLayout(vSceneLayout);
+
+    // Dash configure layout
+    auto *vDashLayout = new QVBoxLayout;
+    vDashLayout->addWidget(enableLineModeCheckBox);
+    vDashLayout->addWidget(enableLightingCheckBox);
+    envTab->setLayout(vDashLayout);
 
     // name and display Layout
     auto *hDisplayLayout = new QHBoxLayout;
@@ -197,25 +232,25 @@ void MainWindow::initLayout() {
 
     inspectorGroupBox->setLayout(vInspectorLayout);
 
-    // Mid Layout
-    auto *midLayout = new QVBoxLayout;
-    midLayout->addWidget(glManager, 2);
-    midLayout->addWidget(configureDashTab, 1);
+    // Mid Layout (use splitter)
+    glDashSplitter->addWidget(glManager);
+    glDashSplitter->addWidget(configureDashTab);
 
     // Menu Bar
     mainMenuBar->addMenu(fileMenu);
+    mainMenuBar->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     fileMenu->addAction(loadModelAction);
 
-    // Content Layout
-    auto *contentLayout = new QHBoxLayout;
-    contentLayout->addWidget(sceneGroupBox, 1);
-    contentLayout->addLayout(midLayout, 3);
-    contentLayout->addWidget(inspectorGroupBox, 1);
+    // Content Layout (use splitter)
+    // auto *contentLayout = new QHBoxLayout;
+    contentSplitter->addWidget(sceneGroupBox);
+    contentSplitter->addWidget(glDashSplitter);
+    contentSplitter->addWidget(inspectorGroupBox);
 
     // Total Layout
     auto *totalLayout = new QVBoxLayout;
     totalLayout->addWidget(mainMenuBar);
-    totalLayout->addLayout(contentLayout);
+    totalLayout->addWidget(contentSplitter);
     totalLayout->setContentsMargins(0,0,0,0);
 
     this->setLayout(totalLayout);
@@ -229,10 +264,24 @@ void MainWindow::connectConfigure() {
             this, &MainWindow::onLoadGameObjectQuad);
     connect(objectLoadModelAction, &QAction::triggered,
             this, &MainWindow::onLoadModel);
+    connect(objectDeleteButton, &QPushButton::clicked,
+            this, &MainWindow::onObjectDeleteButtonClicked);
+
+
 
     // QList
     connect(ui->objectList, &QListWidget::itemClicked,
             this, &MainWindow::onObjectItemSelect);
+
+    // Dash Configure
+    connect(enableLightingCheckBox, &QCheckBox::stateChanged,
+            this, &MainWindow::onEnableLightingCheckBox);
+    connect(enableLineModeCheckBox, &QCheckBox::stateChanged,
+            this, &MainWindow::onEnableLineModeCheckBox);
+
+    // Inspector:
+    connect(nameCheckBox, &QCheckBox::stateChanged,
+            this, &MainWindow::onDisplayCheckBox);
 
     // QSpinBox
     connect(xPosSpinBox, qOverload<double>(&QDoubleSpinBox::valueChanged),
@@ -267,7 +316,6 @@ void MainWindow::connectConfigure() {
 
 
 }
-
 
 /************ slot functions ************/
 void MainWindow::updateGLManager() {
@@ -311,10 +359,63 @@ void MainWindow::onLoadModel() {
             return;
         }
 
-        auto *item = new QListWidgetItem("Model " + QString::number(id), objectList);
+        auto temp = glManager->getTargetGameObject(id);
+        auto *item = new QListWidgetItem(temp->displayName, objectList);
         item->setData(objectDataBaseIdRole, static_cast<qulonglong>(id));  // 存储ID
         objectList->addItem(item);
     }
+}
+
+void MainWindow::onObjectDeleteButtonClicked() {
+    if(currentObjectID == -1) {
+        return;
+    }
+
+    auto tempItem = getItemById(objectList, currentObjectID);
+    int row = objectList->row(tempItem);
+    objectList->takeItem(row);
+    delete tempItem;
+    tempItem = nullptr;
+    glManager->deleteObject(currentObjectID);
+}
+
+// dash configure slot functions
+void MainWindow::onEnableLightingCheckBox(int state) {
+    bool enableLighting;
+    if (state == Qt::Checked) {
+        enableLighting = true;
+    } else {
+        enableLighting = false;
+    }
+
+    glManager->setEnableLighting(enableLighting);
+}
+
+void MainWindow::onEnableLineModeCheckBox(int state) {
+    bool enableLineMode;
+    if (state == Qt::Checked) {
+        enableLineMode = true;
+    } else {
+        enableLineMode = false;
+    }
+
+    glManager->setLineMode(enableLineMode);
+}
+
+void MainWindow::onDisplayCheckBox(int state) {
+    if(currentObjectID == -1) {
+        return;
+    }
+
+    auto tempObj = glManager->getTargetGameObject(currentObjectID);
+    bool display;
+    if (state == Qt::Checked) {
+        display = true;
+    } else {
+        display = false;
+    }
+
+    tempObj->display = display;
 }
 
 // slot functions of SpinBox
@@ -417,7 +518,15 @@ void MainWindow::onObjectItemSelect(QListWidgetItem *item) {
     if(item) {
         currentObjectID = item->data(objectDataBaseIdRole).toInt();
         int id = currentObjectID;
+        Qt::CheckState displayState;
         auto temp = glManager->getTargetGameObject(id);
+
+        if(temp->display) {
+            displayState = Qt::Checked;
+        } else {
+            displayState = Qt::Unchecked;
+        }
+        nameCheckBox->setCheckState(displayState);
 
         positionFrame->show();
         rotationFrame->show();
@@ -433,13 +542,21 @@ void MainWindow::onObjectItemSelect(QListWidgetItem *item) {
 
 void MainWindow::handleEditingFinished() {
     QString currentText = nameLineEdit->text();
-
-    if (!nameLineEdit->hasFocus()) {
-        qDebug() << "LineEdit has lost focus with text:" << currentText;
+    nameLineEdit->clearFocus();
+    if(nameLineEdit->hasFocus()) {
+        return;
     }
 
-    // other codes...
-    nameLineEdit->clearFocus();
+    if(currentObjectID != -1) {
+        qDebug() << "LineEdit has lost focus with text: " << currentText;
+        auto tempObj = glManager->getTargetGameObject(currentObjectID);
+        auto tempItem = getItemById(objectList, currentObjectID);
+        if(tempItem != nullptr && tempObj != nullptr) {
+            tempItem->setText(currentText);
+            tempObj->displayName = currentText;
+        }
+    }
+
 }
 
 // 辅助函数：
@@ -455,6 +572,17 @@ void MainWindow::setObjectTransformToSpinBox(const std::shared_ptr<GameObject>& 
     objXScaleSpinBox->setValue(sca.x());
     objYScaleSpinBox->setValue(sca.y());
     objZScaleSpinBox->setValue(sca.z());
+}
+
+QListWidgetItem* MainWindow::getItemById(QListWidget* listWidget, int id) const {
+    for(int i = 0; i < listWidget->count(); i++) {
+        QListWidgetItem* item = listWidget->item(i);
+        if(item->data(objectDataBaseIdRole).toInt() == id) {
+            return item;
+        }
+    }
+
+    return nullptr;  // 如果找不到对应ID的item则返回nullptr
 }
 
 
@@ -475,9 +603,11 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
         // 如果点击的部件不是 objectList 或其子部件，则隐藏 posFrame
         if (!objectList->isAncestorOf(clickedWidget)) {
             if(clickedWidget != focusedWidget) {
-                qDebug() << "Release Item : "
-                         << glManager->getTargetGameObject(currentObjectID)->displayName;
-                currentObjectID = -1;
+                if(currentObjectID != -1) {
+                    qDebug() << "Release Item : "
+                             << glManager->getTargetGameObject(currentObjectID)->displayName;
+                    currentObjectID = -1;
+                }
 
                 positionFrame->hide();
                 rotationFrame->hide();
@@ -492,4 +622,3 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
 
     return QWidget::eventFilter(watched, event);
 }
-

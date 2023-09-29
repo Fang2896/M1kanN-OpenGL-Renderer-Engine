@@ -46,6 +46,7 @@ uniform vec3 viewPos;
 
 uniform bool useDiffuseTexture;
 uniform bool useSpecularTexture;
+uniform bool useLight;
 
 uniform Material material;
 uniform DirectLight directLight;   // 先用一个光源吧
@@ -64,6 +65,7 @@ void main()
     // 环境光
     // 漫反射
     vec3 norm = normalize(Normal);
+
     vec3 lightDir = normalize(directLight.direction);
     float diff = max(dot(norm, lightDir), 0.0);
 
@@ -90,8 +92,12 @@ void main()
         specular = directLight.specularColor * spec * material.specularColor;
     }
 
-    vec3 result = (ambient + diffuse + specular) * directLight.intensity;
-
+    vec3 result;
+    if(useLight)
+        result = (ambient + diffuse + specular) * directLight.intensity;
+    else
+        result = ambient * directLight.intensity;
+    
     // for debug
 //    if(useDiffuseTexture && useSpecularTexture) {
 //        FragColor = vec4(1,0,0, 1.0);

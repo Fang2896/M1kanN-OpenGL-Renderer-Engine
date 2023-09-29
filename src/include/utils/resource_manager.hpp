@@ -28,7 +28,7 @@ class ResourceManager
     static void updateProjViewMatrixInShader(QMatrix4x4 proj, QMatrix4x4 vi);
     static void updateViewPosInShader(QVector3D viewP);
     static void updateMaterialInShader(const QString& sName, const Material& mat);
-    static void updateDirectLightInShader(DirectLight dl);
+    static void updateDirectLightInShader(GLboolean enableLighting ,DirectLight dl);
     static void updatePointLightInShader(PointLight pl);
     static void updateSpotLightInShader(SpotLight sl);
 

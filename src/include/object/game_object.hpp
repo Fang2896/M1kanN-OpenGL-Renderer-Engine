@@ -8,6 +8,7 @@
 #include "mesh.hpp"
 #include "shape_data.hpp"
 #include "texture2d.hpp"
+#include "util_algorithms.hpp"
 #include "resource_manager.hpp"
 #include "data_structures.hpp"
 
@@ -56,6 +57,7 @@ class GameObject {
     static GLuint getObjectTotalNumber();
 
    public:
+    GLboolean display;
     QString displayName;
 
    private:

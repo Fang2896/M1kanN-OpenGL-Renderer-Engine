@@ -58,9 +58,10 @@ void ResourceManager::updateMaterialInShader(const QString& sName, const Materia
     tempShader->release();
 }
 
-void ResourceManager::updateDirectLightInShader(DirectLight dl) {
+void ResourceManager::updateDirectLightInShader(GLboolean enableLighting,DirectLight dl) {
     for(const auto& sha : map_Shaders) {
         sha.second->use();
+        sha.second->setBool("useLight", enableLighting);
         sha.second->setVector3f("directLight.direction", dl.direction);
         sha.second->setVector3f("directLight.ambientColor", dl.ambientColor);
         sha.second->setVector3f("directLight.diffuseColor", dl.diffuseColor);

@@ -11,6 +11,7 @@
 #include <QWidget>
 #include <QLine>
 #include <QLabel>
+#include <QSplitter>
 #include <QGroupBox>
 #include <QTabWidget>
 #include <QLineEdit>
@@ -40,7 +41,8 @@ class MainWindow : public QWidget {
     explicit MainWindow(QWidget* parent = nullptr);
     ~MainWindow() override;
 
-   protected:   // some override functions?
+   protected:   // some override functions
+    void showEvent(QShowEvent *event) override;
 
    private: // functions
     void initWidget();
@@ -53,6 +55,14 @@ class MainWindow : public QWidget {
     void onLoadGameObjectCube();
     void onLoadGameObjectQuad();
     void onLoadModel();
+    void onObjectDeleteButtonClicked();
+
+    // dash configure slot functions
+    void onEnableLightingCheckBox(int state);
+    void onEnableLineModeCheckBox(int state);
+
+    // inspector:
+    void onDisplayCheckBox(int state);
 
     // spinBox:
     void onXPosSpinBoxValueChanged(double value);
@@ -73,6 +83,7 @@ class MainWindow : public QWidget {
 
    private: // 辅助函数
     void setObjectTransformToSpinBox(const std::shared_ptr<GameObject>& ptr ,QVector3D pos, QVector3D rot, QVector3D sca);
+    QListWidgetItem* getItemById(QListWidget* listWidget, int id) const;
 
    private: // filters
     bool eventFilter(QObject *watched, QEvent *event) override;
@@ -93,11 +104,16 @@ class MainWindow : public QWidget {
     int currentObjectID;
 
     // widgets
+    QSplitter *contentSplitter;
+    QSplitter *glDashSplitter;
+
     QGroupBox *sceneGroupBox;
     QLabel *lightTitleLabel;
     QLabel *objectTitleLabel;
     QToolButton *lightAddButton;
+    QPushButton *lightDeleteButton;
     QToolButton *objectAddButton;
+    QPushButton *objectDeleteButton;
     QListWidget *lightList;
     QListWidget *objectList;
 
@@ -119,8 +135,15 @@ class MainWindow : public QWidget {
     QCheckBox *nameCheckBox;
     QLineEdit *nameLineEdit;
 
-    QGroupBox *transformGroupBox;
+    // configure dash widgets
     QTabWidget *configureDashTab;
+    QWidget *envTab;
+    QWidget *postProcessingTab;
+
+    QCheckBox *enableLightingCheckBox;
+    QCheckBox *enableLineModeCheckBox;
+
+    QGroupBox *transformGroupBox;
 
     // 操作时增加：(需要new)
     QFrame *positionFrame;
@@ -147,8 +170,6 @@ class MainWindow : public QWidget {
     QLabel *objZScaleLabel;  QDoubleSpinBox *objZScaleSpinBox;
 
     // lights
-    // TODO: 增加灯光交互？
-
     // direct light
     QLabel *lightXDirLabel;  QDoubleSpinBox *lightXDirSpinBox;
     QLabel *lightYDirLabel;  QDoubleSpinBox *lightYDirSpinBox;
