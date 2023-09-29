@@ -30,12 +30,12 @@ void GLManager::initializeGL() {
     coordinate = std::make_unique<Coordinate>();
     coordinate->initCoordinate();
 
-    auto tempCubePtr = std::make_shared<GameObject>();
-    objectMap[tempCubePtr->getObjectID()] = tempCubePtr;
-    tempCubePtr->setPosition({-3,3,-3});
-    tempCubePtr->loadDiffuseTexture(":textures/assets/textures/box_diffuse.png");
-    tempCubePtr->loadSpecularTexture(":textures/assets/textures/box_specular.png");
-    tempCubePtr->displayName = "Wooden Cube";
+//    auto tempCubePtr = std::make_shared<GameObject>();
+//    objectMap[tempCubePtr->getObjectID()] = tempCubePtr;
+//    tempCubePtr->setPosition({-3,3,-3});
+//    tempCubePtr->loadDiffuseTexture(":textures/assets/textures/box_diffuse.png");
+//    tempCubePtr->loadSpecularTexture(":textures/assets/textures/box_specular.png");
+//    tempCubePtr->displayName = "Wooden Cube";
 
 //    objectMap.push_back(std::make_shared<GameObject>(modelDirectory + "/tiger/tiger.obj"));    // 默认是正方形
 //    objectMap[1]->setPosition({-6.0f,0.0f,0.0f});
@@ -145,7 +145,6 @@ void GLManager::drawObjects() {
     }
 }
 
-// TODO: 注意这个clear，由于用的是shared_ptr，没准会导致这里删除到其他地方还在用？
 void GLManager::clearObjects() {
     objectMap.clear();
     qDebug() << "Clear ALL Objects";
@@ -179,8 +178,10 @@ int GLManager::addObject(ObjectType objType) {
 
     std::shared_ptr<GameObject> tempPtr = std::make_shared<GameObject>(objType);
     GLuint tempID = tempPtr->getObjectID();
+
+    tempPtr->displayName = objectTypeToString(objType) + " " + QString::number(tempID);
     objectMap[tempID] = tempPtr;
-    qDebug() << "Add Shape Object, Shader: " << objectTypeToString(objType);
+    qDebug() << "Add Shape Object, Shader: " << tempPtr->displayName;
 
     this->doneCurrent();
 

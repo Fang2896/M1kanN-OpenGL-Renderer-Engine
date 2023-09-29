@@ -54,9 +54,25 @@ class MainWindow : public QWidget {
     void onLoadGameObjectQuad();
     void onLoadModel();
 
+    // spinBox:
+    void onXPosSpinBoxValueChanged(double value);
+    void onYPosSpinBoxValueChanged(double value);
+    void onZPosSpinBoxValueChanged(double value);
+
+    void onXRotSpinBoxValueChanged(double value);
+    void onYRotSpinBoxValueChanged(double value);
+    void onZRotSpinBoxValueChanged(double value);
+
+    void onXScaSpinBoxValueChanged(double value);
+    void onYScaSpinBoxValueChanged(double value);
+    void onZScaSpinBoxValueChanged(double value);
+
     void onObjectItemSelect(QListWidgetItem *item);
 
     void handleEditingFinished();
+
+   private: // 辅助函数
+    void setObjectTransformToSpinBox(const std::shared_ptr<GameObject>& ptr ,QVector3D pos, QVector3D rot, QVector3D sca);
 
    private: // filters
     bool eventFilter(QObject *watched, QEvent *event) override;
@@ -65,10 +81,16 @@ class MainWindow : public QWidget {
     const QString modelDirectory = "../assets/models";
     const QString textureDirectory = "../assets/textures";
 
+    const int objectDataBaseIdRole = Qt::UserRole + 1;
+    const int lightDataBaseIdRole = Qt::UserRole + 2;
+
    private: // variables
     Ui::MainWindow* ui;
     GLManager *glManager;
     QTimer *timer;
+
+    // 当前选中的object或者light的ID
+    int currentObjectID;
 
     // widgets
     QGroupBox *sceneGroupBox;

@@ -234,12 +234,40 @@ void MainWindow::connectConfigure() {
     connect(ui->objectList, &QListWidget::itemClicked,
             this, &MainWindow::onObjectItemSelect);
 
+    // QSpinBox
+    connect(xPosSpinBox, qOverload<double>(&QDoubleSpinBox::valueChanged),
+            this, &MainWindow::onXPosSpinBoxValueChanged);
+    connect(yPosSpinBox, qOverload<double>(&QDoubleSpinBox::valueChanged),
+            this, &MainWindow::onYPosSpinBoxValueChanged);
+    connect(zPosSpinBox, qOverload<double>(&QDoubleSpinBox::valueChanged),
+            this, &MainWindow::onZPosSpinBoxValueChanged);
+
+    connect(objXRotSpinBox, qOverload<double>(&QDoubleSpinBox::valueChanged),
+            this, &MainWindow::onXRotSpinBoxValueChanged);
+    connect(objYRotSpinBox, qOverload<double>(&QDoubleSpinBox::valueChanged),
+            this, &MainWindow::onYRotSpinBoxValueChanged);
+    connect(objZRotSpinBox, qOverload<double>(&QDoubleSpinBox::valueChanged),
+            this, &MainWindow::onZRotSpinBoxValueChanged);
+
+    connect(objXScaleSpinBox, qOverload<double>(&QDoubleSpinBox::valueChanged),
+            this, &MainWindow::onXScaSpinBoxValueChanged);
+
+    connect(objYScaleSpinBox, qOverload<double>(&QDoubleSpinBox::valueChanged),
+            this, &MainWindow::onYScaSpinBoxValueChanged);
+
+    connect(objZScaleSpinBox, qOverload<double>(&QDoubleSpinBox::valueChanged),
+            this, &MainWindow::onZScaSpinBoxValueChanged);
+
+    // 这里还要加一个direction，等灯光系统完成后再说吧
+
+
     // QLineEdit
     connect(nameLineEdit, &QLineEdit::editingFinished,
             this, &MainWindow::handleEditingFinished);
 
 
 }
+
 
 /************ slot functions ************/
 void MainWindow::updateGLManager() {
@@ -252,8 +280,9 @@ void MainWindow::onLoadGameObjectCube() {
         return;
     }
 
-    QString objectDisplayName = "Cube " + QString::number(id);
-    objectList->addItem(objectDisplayName);
+    auto *item = new QListWidgetItem("Cube " + QString::number(id), objectList);
+    item->setData(objectDataBaseIdRole, static_cast<qulonglong>(id));  // 存储ID
+    objectList->addItem(item);
 }
 
 void MainWindow::onLoadGameObjectQuad() {
@@ -262,8 +291,9 @@ void MainWindow::onLoadGameObjectQuad() {
         return;
     }
 
-    QString objectDisplayName = "Quad " + QString::number(id);
-    objectList->addItem(objectDisplayName);
+    auto *item = new QListWidgetItem("Quad " + QString::number(id), objectList);
+    item->setData(objectDataBaseIdRole, static_cast<qulonglong>(id));  // 存储ID
+    objectList->addItem(item);
 }
 
 void MainWindow::onLoadModel() {
@@ -281,14 +311,123 @@ void MainWindow::onLoadModel() {
             return;
         }
 
-        QString objectDisplayName = "Model " + QString::number(id);
-        objectList->addItem(objectDisplayName);
+        auto *item = new QListWidgetItem("Model " + QString::number(id), objectList);
+        item->setData(objectDataBaseIdRole, static_cast<qulonglong>(id));  // 存储ID
+        objectList->addItem(item);
     }
 }
 
+// slot functions of SpinBox
+void MainWindow::onXPosSpinBoxValueChanged(double value) {
+    if(currentObjectID == -1) {
+        return;
+    }
+    // 注意OBJ的存在性？
+    auto tempObj = glManager->getTargetGameObject(currentObjectID);
+    QVector3D tempPos = tempObj->getPosition();
+    tempPos.setX(value);
+    tempObj->setPosition(tempPos);
+}
+void MainWindow::onYPosSpinBoxValueChanged(double value) {
+    if(currentObjectID == -1) {
+        return;
+    }
+
+    auto tempObj = glManager->getTargetGameObject(currentObjectID);
+    QVector3D tempPos = tempObj->getPosition();
+    tempPos.setY(value);
+    tempObj->setPosition(tempPos);
+}
+void MainWindow::onZPosSpinBoxValueChanged(double value) {
+    if(currentObjectID == -1) {
+        return;
+    }
+
+    auto tempObj = glManager->getTargetGameObject(currentObjectID);
+    QVector3D tempPos = tempObj->getPosition();
+    tempPos.setZ(value);
+    tempObj->setPosition(tempPos);
+}
+
+void MainWindow::onXRotSpinBoxValueChanged(double value) {
+    if(currentObjectID == -1) {
+        return;
+    }
+
+    auto tempObj = glManager->getTargetGameObject(currentObjectID);
+    QVector3D tempRot = tempObj->getRotation();
+    tempRot.setX(value);
+    tempObj->setRotation(tempRot);
+}
+void MainWindow::onYRotSpinBoxValueChanged(double value) {
+    if(currentObjectID == -1) {
+        return;
+    }
+
+    auto tempObj = glManager->getTargetGameObject(currentObjectID);
+    QVector3D tempRot = tempObj->getRotation();
+    tempRot.setY(value);
+    tempObj->setRotation(tempRot);
+}
+void MainWindow::onZRotSpinBoxValueChanged(double value) {
+    if(currentObjectID == -1) {
+        return;
+    }
+
+    auto tempObj = glManager->getTargetGameObject(currentObjectID);
+    QVector3D tempRot = tempObj->getRotation();
+    tempRot.setZ(value);
+    tempObj->setRotation(tempRot);
+}
+
+void MainWindow::onXScaSpinBoxValueChanged(double value) {
+    if(currentObjectID == -1) {
+        return;
+    }
+
+    auto tempObj = glManager->getTargetGameObject(currentObjectID);
+    QVector3D tempScale = tempObj->getScale();
+    tempScale.setX(value);
+    tempObj->setScale(tempScale);
+}
+void MainWindow::onYScaSpinBoxValueChanged(double value) {
+    if(currentObjectID == -1) {
+        return;
+    }
+
+    auto tempObj = glManager->getTargetGameObject(currentObjectID);
+    QVector3D tempScale = tempObj->getScale();
+    tempScale.setY(value);
+    tempObj->setScale(tempScale);
+}
+void MainWindow::onZScaSpinBoxValueChanged(double value) {
+    if(currentObjectID == -1) {
+        return;
+    }
+
+    auto tempObj = glManager->getTargetGameObject(currentObjectID);
+    QVector3D tempScale = tempObj->getScale();
+    tempScale.setZ(value);
+    tempObj->setScale(tempScale);
+}
+
+
+// 被点击的时候，返回相应的信息，以及显示对应的控件
 void MainWindow::onObjectItemSelect(QListWidgetItem *item) {
     if(item) {
+        currentObjectID = item->data(objectDataBaseIdRole).toInt();
+        int id = currentObjectID;
+        auto temp = glManager->getTargetGameObject(id);
 
+        positionFrame->show();
+        rotationFrame->show();
+        scaleFrame->show();
+
+        setObjectTransformToSpinBox(temp, temp->getPosition(),
+                                    temp->getRotation(), temp->getScale());
+
+        qDebug() << "Select Item : " << temp->displayName;
+        nameLineEdit->setText(temp->displayName);
     }
 }
 
@@ -303,14 +442,52 @@ void MainWindow::handleEditingFinished() {
     nameLineEdit->clearFocus();
 }
 
+// 辅助函数：
+void MainWindow::setObjectTransformToSpinBox(const std::shared_ptr<GameObject>& ptr ,QVector3D pos, QVector3D rot, QVector3D sca) {
+    xPosSpinBox->setValue(pos.x());
+    yPosSpinBox->setValue(pos.y());
+    zPosSpinBox->setValue(pos.z());
+
+    objXRotSpinBox->setValue(rot.x());
+    objYRotSpinBox->setValue(rot.y());
+    objZRotSpinBox->setValue(rot.z());
+
+    objXScaleSpinBox->setValue(sca.x());
+    objYScaleSpinBox->setValue(sca.y());
+    objZScaleSpinBox->setValue(sca.z());
+}
+
+
+
 // filter functions
 bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
     if (watched == this && event->type() == QEvent::MouseButtonPress) {
-        nameLineEdit->clearFocus();
-    }
+        QWidget *focusedWidget = QApplication::focusWidget();  // 获取当前拥有焦点的部件
+        QWidget *clickedWidget = qApp->widgetAt(QCursor::pos());  // 获取鼠标点击的部件
 
-    if (watched == ui->objectList && event->type() == QEvent::FocusOut) {
-        transformGroupBox->setLayout(nullptr);
+        // 如果当前焦点在 QLineEdit 上
+        if (qobject_cast<QLineEdit*>(focusedWidget)) {
+            if (clickedWidget != focusedWidget) {
+                focusedWidget->clearFocus();  // 如果点击的不是 QLineEdit，清除焦点
+            }
+        }
+
+        // 如果点击的部件不是 objectList 或其子部件，则隐藏 posFrame
+        if (!objectList->isAncestorOf(clickedWidget)) {
+            if(clickedWidget != focusedWidget) {
+                qDebug() << "Release Item : "
+                         << glManager->getTargetGameObject(currentObjectID)->displayName;
+                currentObjectID = -1;
+
+                positionFrame->hide();
+                rotationFrame->hide();
+                scaleFrame->hide();
+                directionFrame->hide();
+
+                objectList->clearSelection();
+                objectList->clearFocus();
+            }
+        }
     }
 
     return QWidget::eventFilter(watched, event);

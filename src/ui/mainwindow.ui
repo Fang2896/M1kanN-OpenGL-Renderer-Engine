@@ -200,11 +200,6 @@
     <property name="autoScrollMargin">
      <number>16</number>
     </property>
-    <item>
-     <property name="text">
-      <string>Wooden Cube</string>
-     </property>
-    </item>
    </widget>
   </widget>
   <widget class="QTabWidget" name="configureDashTab">
@@ -458,6 +453,12 @@
         <underline>false</underline>
        </font>
       </property>
+      <property name="minimum">
+       <double>-2000.000000000000000</double>
+      </property>
+      <property name="value">
+       <double>0.000000000000000</double>
+      </property>
      </widget>
      <widget class="QDoubleSpinBox" name="zPosSpinBox">
       <property name="geometry">
@@ -483,6 +484,12 @@
         <bold>false</bold>
         <underline>false</underline>
        </font>
+      </property>
+      <property name="minimum">
+       <double>-2000.000000000000000</double>
+      </property>
+      <property name="maximum">
+       <double>2000.000000000000000</double>
       </property>
      </widget>
      <widget class="QLabel" name="xPosLabel">
@@ -556,6 +563,12 @@
         <underline>false</underline>
        </font>
       </property>
+      <property name="minimum">
+       <double>-2000.000000000000000</double>
+      </property>
+      <property name="maximum">
+       <double>2000.000000000000000</double>
+      </property>
      </widget>
     </widget>
     <widget class="QFrame" name="rotationFrame">
@@ -627,6 +640,12 @@
         <underline>false</underline>
        </font>
       </property>
+      <property name="minimum">
+       <double>-360.000000000000000</double>
+      </property>
+      <property name="maximum">
+       <double>360.000000000000000</double>
+      </property>
      </widget>
      <widget class="QLabel" name="objXRotLabel">
       <property name="geometry">
@@ -675,6 +694,12 @@
         <bold>false</bold>
         <underline>false</underline>
        </font>
+      </property>
+      <property name="minimum">
+       <double>-360.000000000000000</double>
+      </property>
+      <property name="maximum">
+       <double>360.000000000000000</double>
       </property>
      </widget>
      <widget class="QLabel" name="objYRotLabel">
@@ -747,6 +772,12 @@
         <bold>false</bold>
         <underline>false</underline>
        </font>
+      </property>
+      <property name="minimum">
+       <double>-360.000000000000000</double>
+      </property>
+      <property name="maximum">
+       <double>360.000000000000000</double>
       </property>
      </widget>
     </widget>
@@ -822,6 +853,18 @@
         <underline>false</underline>
        </font>
       </property>
+      <property name="decimals">
+       <number>6</number>
+      </property>
+      <property name="minimum">
+       <double>0.000001000000000</double>
+      </property>
+      <property name="maximum">
+       <double>100.000000000000000</double>
+      </property>
+      <property name="value">
+       <double>1.000000000000000</double>
+      </property>
      </widget>
      <widget class="QDoubleSpinBox" name="objXScaleSpinBox">
       <property name="geometry">
@@ -847,6 +890,18 @@
         <bold>false</bold>
         <underline>false</underline>
        </font>
+      </property>
+      <property name="decimals">
+       <number>6</number>
+      </property>
+      <property name="minimum">
+       <double>0.000001000000000</double>
+      </property>
+      <property name="maximum">
+       <double>100.000000000000000</double>
+      </property>
+      <property name="value">
+       <double>1.000000000000000</double>
       </property>
      </widget>
      <widget class="QLabel" name="objYScaleLabel">
@@ -919,6 +974,18 @@
         <bold>false</bold>
         <underline>false</underline>
        </font>
+      </property>
+      <property name="decimals">
+       <number>6</number>
+      </property>
+      <property name="minimum">
+       <double>0.000001000000000</double>
+      </property>
+      <property name="maximum">
+       <double>100.000000000000000</double>
+      </property>
+      <property name="value">
+       <double>1.000000000000000</double>
       </property>
      </widget>
      <widget class="QLabel" name="objXScaleLabel">
@@ -1014,6 +1081,12 @@
         <underline>false</underline>
        </font>
       </property>
+      <property name="minimum">
+       <double>-99.000000000000000</double>
+      </property>
+      <property name="value">
+       <double>1.000000000000000</double>
+      </property>
      </widget>
      <widget class="QLabel" name="lightXDirLabel">
       <property name="geometry">
@@ -1086,6 +1159,12 @@
         <underline>false</underline>
        </font>
       </property>
+      <property name="minimum">
+       <double>-99.000000000000000</double>
+      </property>
+      <property name="value">
+       <double>1.000000000000000</double>
+      </property>
      </widget>
      <widget class="QLabel" name="lightZDirLabel">
       <property name="geometry">
@@ -1134,6 +1213,12 @@
         <bold>false</bold>
         <underline>false</underline>
        </font>
+      </property>
+      <property name="minimum">
+       <double>-99.000000000000000</double>
+      </property>
+      <property name="value">
+       <double>1.000000000000000</double>
       </property>
      </widget>
     </widget>
