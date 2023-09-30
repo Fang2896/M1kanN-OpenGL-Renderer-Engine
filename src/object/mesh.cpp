@@ -13,6 +13,8 @@ Mesh::Mesh(std::shared_ptr<Shader> sha, QVector<Vertex> vertices, QVector<unsign
     this->indices = std::move(indices);
     this->textures = std::move(textures);
 
+    this->drawOutline = GL_FALSE;
+
     glFunc = QOpenGLContext::currentContext()->versionFunctions<GLFunctions_Core>();
     if(!glFunc)
         qFatal("Require GLFunctions_Core to setUp mesh");
@@ -35,6 +37,14 @@ void Mesh::setShader(std::shared_ptr<Shader> sha) {
     this->shader = std::move(sha);
 }
 
+void Mesh::setDrawOutline(GLboolean drawState) {
+    this->drawOutline = drawState;
+}
+
+void Mesh::setTransform(QMatrix4x4 trans) {
+    this->transform = trans;
+}
+
 void Mesh::draw() {
     GLuint diffuseNr = 1;
     GLuint specularNr = 1;
@@ -42,6 +52,22 @@ void Mesh::draw() {
     if(shader == nullptr) {
         qFatal("Mesh has NO shader!");
     }
+
+    /*============ outline logic ============*/
+    if(drawOutline) {
+        glFunc->glEnable(GL_STENCIL_TEST);
+        glFunc->glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+        glFunc->glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+        glFunc->glClearStencil(0);
+        glFunc->glClear(GL_STENCIL_BUFFER_BIT);
+
+        glFunc->glStencilFunc(GL_ALWAYS, 1, 0xFF);
+        glFunc->glStencilMask(0xFF);
+    } else {
+        glFunc->glStencilMask(0x00);
+        shader->setBool("enableOutline", false);
+    }
+    /*============ outline logic ============*/
 
     shader->use();
     for(int i = 0; i < textures.size(); i++) {
@@ -65,10 +91,35 @@ void Mesh::draw() {
         glFunc->glBindTexture(GL_TEXTURE_2D, textures[i]->id);
     }
 
-    // 绘制网格
+    // 1st: 绘制网格
+    shader->setBool("enableOutline", false);
     glFunc->glBindVertexArray(VAO);
     glFunc->glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, nullptr);
     glFunc->glBindVertexArray(0);
+
+    /*============ outline logic ============*/
+    // 2nd draw the outline
+    if(drawOutline) {
+        glFunc->glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+        glFunc->glStencilMask(0x00);
+        glFunc->glDisable(GL_DEPTH_TEST);
+
+        // 更新M矩阵
+        shader->setBool("enableOutline", true);
+        QMatrix4x4 outLineTrans = this->transform;
+        outLineTrans.scale(1.03f);
+        shader->setMatrix4f("model", outLineTrans);   // Model 要传进来
+
+        glFunc->glBindVertexArray(VAO);
+        glFunc->glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, nullptr);
+        glFunc->glBindVertexArray(0);
+
+        glFunc->glStencilMask(0xFF);
+        glFunc->glStencilFunc(GL_ALWAYS, 0, 0xFF);
+        glFunc->glEnable(GL_DEPTH_TEST);
+        glFunc->glDisable(GL_STENCIL_TEST);
+    }
+    /*============ outline logic ============*/
 
     shader->release();
 }

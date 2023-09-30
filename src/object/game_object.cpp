@@ -10,7 +10,7 @@
 GLuint GameObject::gameObjectCounter = 0;
 
 GameObject::GameObject()
-    : display(GL_TRUE), displayName("GameObject"), objectID(gameObjectCounter++),
+    : display(GL_TRUE), drawOutline(GL_FALSE), displayName("GameObject"), objectID(gameObjectCounter++),
       type(ObjectType::Cube), modelPath(""),
       shader(), material()
 {
@@ -37,6 +37,11 @@ GameObject::GameObject()
     this->transform.translate(position);
     this->transform.rotate(QQuaternion::fromEulerAngles(rotation));
     this->transform.scale(scale);
+
+    for(auto& m : meshes) {
+        m->setTransform(this->transform);
+    }
+
     shader->use();
     shader->setMatrix4f("model", this->transform);
     shader->release();
@@ -133,6 +138,7 @@ void GameObject::loadModel(const QString& mPath) {
 
     for(auto & m : meshes) {
         m->setShader(shader);
+        m->setTransform(transform);
     }
 
     qDebug("Load Model Finished");
@@ -152,8 +158,8 @@ void GameObject::loadShader(const QString& vertPath, const QString& fragPath, co
 }
 
 void GameObject::loadDiffuseTexture(const QString& tPath) {
-    if(type == ObjectType::Model && meshes.size() > 1) {
-        qDebug("Warning! Loaded Model Type Can't Be Loaded Diffuse Texture");
+    if(meshes.size() > 1) {
+        qDebug("Warning! Multiple Material Model Type Can't Be Loaded Specular Texture");
         return;
     }
     if(meshes.isEmpty()) {
@@ -182,8 +188,8 @@ void GameObject::loadDiffuseTexture(const QString& tPath) {
 }
 
 void GameObject::loadSpecularTexture(const QString& tPath) {
-    if(type == ObjectType::Model) {
-        qDebug("Warning! Model Type Can't Be Loaded Specular Texture");
+    if(meshes.size() > 1) {
+        qDebug("Warning! Multiple Material Model Type Can't Be Loaded Specular Texture");
         return;
     }
     if(meshes.isEmpty()) {
@@ -236,41 +242,6 @@ void GameObject::setMaterial(Material mat) {
     ResourceManager::updateMaterialInShader(shaderName, material);
 }
 
-void GameObject::setDiffuseTexture(const QString& tPath) {
-    std::shared_ptr<Texture2D> tex = std::make_shared<Texture2D>();
-    tex->generate(tPath);
-    tex->type = TextureType::Diffuse;
-    tex->path = tPath;
-
-    for(auto& m : meshes) {
-        m->textures.append(tex);
-    }
-
-    this->material.texture_diffuse1 = tex;
-    shader->use();
-    shader->setBool("useDiffuseTexture", true);
-    shader->setInteger("material.texture_diffuse1", tex->getTextureID());
-    shader->release();
-}
-
-void GameObject::setSpecularTexture(const QString& tPath) {
-    std::shared_ptr<Texture2D> tex = std::make_shared<Texture2D>();
-    tex->generate(tPath);
-    tex->type = TextureType::Specular;
-    tex->path = tPath;
-
-    // TODO: 如果是多texture多mesh，咋办？
-    for(auto& m : meshes) {
-        m->textures.append(tex);
-    }
-
-    this->material.texture_specular1 = tex;
-    shader->use();
-    shader->setBool("useSpecularTexture", true);
-    shader->setInteger("material.texture_specular1", tex->getTextureID());
-    shader->release();
-}
-
 void GameObject::setAmbientColor(QVector3D col) {
     this->material.ambientColor = col;
     shader->use();
@@ -315,6 +286,14 @@ const Material& GameObject::getMaterial() {
     return material;
 }
 
+GLboolean GameObject::getVisible() {
+    return display;
+}
+
+GLboolean GameObject::getDrawOutline() {
+    return drawOutline;
+}
+
 QMatrix4x4 GameObject::getTransform() {
     return this->transform;
 }
@@ -331,8 +310,25 @@ QVector3D GameObject::getScale() {
     return this->scale;
 }
 
+void GameObject::setVisible(GLboolean visState) {
+    this->display = visState;
+}
+
+void GameObject::setDrawOutline(GLboolean drawState) {
+    this->drawOutline = drawState;
+    for(auto &m : meshes) {
+        m->setTransform(transform);
+        m->setDrawOutline(drawState);
+    }
+}
+
 void GameObject::setTransform(QMatrix4x4 trans) {
     this->transform = trans;
+
+    for(auto& m : meshes) {
+        m->setTransform(transform);
+    }
+
     shader->use();
     shader->setMatrix4f("model", trans);
     shader->release();
@@ -362,6 +358,10 @@ void GameObject::updateTransform() {
     transform.translate(position);
     transform.rotate(QQuaternion::fromEulerAngles(rotation));
     transform.scale(scale);
+
+    for(auto& m : meshes) {
+        m->setTransform(transform);
+    }
 
     shader->use();
     shader->setMatrix4f("model", transform);

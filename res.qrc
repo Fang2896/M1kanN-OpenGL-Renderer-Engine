@@ -1,7 +1,9 @@
 <RCC>
     <qresource prefix="/shaders">
-        <file>assets/shaders/coordShader.vert</file>
+        <file>assets/shaders/baseShader.vert</file>
+
         <file>assets/shaders/coordShader.frag</file>
+        <file>assets/shaders/outlineShader.frag</file>
 
         <file>assets/shaders/defaultShader.vert</file>
         <file>assets/shaders/defaultShader.frag</file>

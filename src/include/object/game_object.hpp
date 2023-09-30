@@ -32,8 +32,6 @@ class GameObject {
     void loadSpecularTexture(const QString& tPath);
 
     void setMaterial(Material mat);
-    void setDiffuseTexture(const QString& tPath);
-    void setSpecularTexture(const QString& tPath);
     void setAmbientColor(QVector3D col);
     void setDiffuseColor(QVector3D col);
     void setSpecularColor(QVector3D col);
@@ -44,10 +42,16 @@ class GameObject {
     int getMeshCount();
     const Material& getMaterial();
 
+    GLboolean getVisible();
+    GLboolean getDrawOutline();
+
     QMatrix4x4 getTransform();
     QVector3D getPosition();
     QVector3D getRotation();
     QVector3D getScale();
+
+    void setVisible(GLboolean visState);
+    void setDrawOutline(GLboolean drawState);
 
     void setTransform(QMatrix4x4 trans);
     void setPosition(QVector3D pos);
@@ -59,7 +63,6 @@ class GameObject {
     static GLuint getObjectTotalNumber();
 
    public:
-    GLboolean display;
     QString displayName;
 
    private:
@@ -68,6 +71,10 @@ class GameObject {
    private:
     static GLuint gameObjectCounter;
     GLuint objectID;
+
+    // draw configure
+    GLboolean display;
+    GLboolean drawOutline;
 
     // basic info
     ObjectType type;

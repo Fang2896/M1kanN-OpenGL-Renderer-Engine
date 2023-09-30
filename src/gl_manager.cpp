@@ -4,8 +4,8 @@
 
 #include "gl_manager.hpp"
 
-const QVector3D CAMERA_POSITION(0.0f, 0.5f, 3.0f);
 
+const QVector3D CAMERA_POSITION(0.0f, 0.5f, 3.0f);
 
 GLManager::GLManager(QWidget* parent, int width, int height)
     : QOpenGLWidget(parent)
@@ -29,39 +29,6 @@ void GLManager::initializeGL() {
     m_camera = std::make_unique<Camera>(CAMERA_POSITION, defaultCameraMoveSpeed);
     coordinate = std::make_unique<Coordinate>();
     coordinate->initCoordinate();
-
-//    auto tempCubePtr = std::make_shared<GameObject>();
-//    objectMap[tempCubePtr->getObjectID()] = tempCubePtr;
-//    tempCubePtr->setPosition({-3,3,-3});
-//    tempCubePtr->loadDiffuseTexture(":textures/assets/textures/box_diffuse.png");
-//    tempCubePtr->loadSpecularTexture(":textures/assets/textures/box_specular.png");
-//    tempCubePtr->displayName = "Wooden Cube";
-
-//    objectMap.push_back(std::make_shared<GameObject>(modelDirectory + "/tiger/tiger.obj"));    // 默认是正方形
-//    objectMap[1]->setPosition({-6.0f,0.0f,0.0f});
-//    objectMap[1]->setScale(0.005);
-//    objectMap[1]->displayName = "Tiger";
-//
-//    objectMap.push_back(std::make_shared<GameObject>(modelDirectory + "/buddha/buddha.obj"));    // 默认是正方形
-//    objectMap[2]->setPosition({-3,0,0});
-//    objectMap[2]->setRotation({-90,0,0});
-//    objectMap[2]->setScale(0.005);
-//    objectMap[2]->displayName = "Buddha";
-//
-//    objectMap.push_back(std::make_shared<GameObject>(modelDirectory + "/bunny/bunny.obj"));    // 默认是正方形
-//    objectMap[3]->displayName = "Bunny";
-//    objectMap[3]->setScale(0.005);
-//    objectMap[3]->setPosition({0,3,0});
-//
-//    objectMap.push_back(std::make_shared<GameObject>(modelDirectory + "/cat/cat.obj"));    // 默认是正方形
-//    objectMap[4]->displayName = "Cat";
-//    objectMap[4]->setScale(0.005f);
-//    objectMap[4]->setPosition({3,0,0});
-//
-//    objectMap.push_back(std::make_shared<GameObject>(modelDirectory + "/nanosuit/nanosuit.obj"));    // 默认是正方形
-//    objectMap[5]->displayName = "NanoSuit";
-//    objectMap[5]->setScale(0.2f);
-//    objectMap[5]->setPosition({6,0,0});
 
     // start timer
     eTimer.start();
@@ -87,10 +54,14 @@ void GLManager::paintGL() {
     drawObjects();
 }
 
+// for coordinate and stencil testing
 void GLManager::initShaders() {
     ResourceManager::loadShader("coordShader",
-                                ":/shaders/assets/shaders/coordShader.vert",
+                                ":/shaders/assets/shaders/baseShader.vert",
                                 ":/shaders/assets/shaders/coordShader.frag");
+    ResourceManager::loadShader("outlineShader",
+                                ":/shaders/assets/shaders/baseShader.vert",
+                                ":/shaders/assets/shaders/outlineShader.frag");
 
     qDebug() << "======= Done Init Coordinate Shaders ========";
 }
@@ -113,7 +84,7 @@ void GLManager::updateRenderData() {
         glFunc->glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
     // 这个是可有可无？
-    glFunc->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glFunc->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     glFunc->glClearColor(backGroundColor.x(),
                          backGroundColor.y(),
                          backGroundColor.z(), 1.0f);  // 例如：清除为黑色
@@ -122,8 +93,8 @@ void GLManager::updateRenderData() {
     projection.perspective(m_camera->zoom, (GLfloat)width() / (GLfloat)height(), 0.1f, 200.f);
     view = m_camera->getViewMatrix();
 
-    ResourceManager::updateProjViewMatrixInShader(projection, view);
-    ResourceManager::updateViewPosInShader(m_camera->position);
+    ResourceManager::updateProjViewViewPosMatrixInShader(projection, view, m_camera->position);
+    ResourceManager::updateRenderConfigure(depthMode);
     // TODO：灯光管理太烂了。等后面来优化。光没准可以定义成全局变量
     ResourceManager::updateDirectLightInShader(isLighting, directLight);
 
@@ -225,6 +196,10 @@ void GLManager::setLineMode(GLboolean enableLineMode) {
     this->isLineMode = enableLineMode;
 }
 
+void GLManager::setDepthMode(GLboolean depMode) {
+    this->depthMode = depMode;
+}
+
 void GLManager::checkGLVersion() {
     QOpenGLContext* context = QOpenGLContext::currentContext();
     if (context) {
@@ -240,7 +215,9 @@ void GLManager::checkGLVersion() {
 void GLManager::initConfigureVariables() {
     isLineMode = GL_FALSE;
     isLighting = GL_TRUE;
-    backGroundColor = QVector3D(0.8f, 0.84f, 0.8f);
+    depthMode = GL_FALSE;
+
+    backGroundColor = QVector3D(0.15f, 0.15f, 0.15f);
 
     defaultCameraMoveSpeed = 0.2f;
     shiftDown = GL_FALSE;
@@ -271,16 +248,19 @@ void GLManager::initOpenGLSettings() {
     glFunc->initializeOpenGLFunctions();
 
     glFunc->glEnable(GL_DEPTH_TEST);
+    glFunc->glDepthFunc(GL_LESS);
     glFunc->glEnable(GL_LINE_SMOOTH);
+
+    // for object outline
 
     GLfloat lineWidthRange[2];
     glFunc->glGetFloatv(GL_ALIASED_LINE_WIDTH_RANGE, lineWidthRange);
     qDebug() << "Support Line Width Range: " << lineWidthRange[0] << "~" << lineWidthRange[1];
 
+    glFunc->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     glFunc->glClearColor(backGroundColor.x(),
                          backGroundColor.y(),
                          backGroundColor.z(), 1.0f);
-    glFunc->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     qDebug() << "======= Done Init OpenGL Settings ========";
 }

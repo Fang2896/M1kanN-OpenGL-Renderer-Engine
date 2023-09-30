@@ -94,6 +94,7 @@ void MainWindow::initWidget() {
 
     enableLightingCheckBox = ui->enableLightingCheckBox;
     enableLineModeCheckBox = ui->enableLineModeCheckBox;
+    enableDepthMapCheckBox = ui->enableDepthMapCheckBox;
 
     // 操作时隐藏或者显示：
     positionFrame = ui->positionFrame;
@@ -315,14 +316,18 @@ void MainWindow::connectConfigure() {
             this, &MainWindow::onObjectDeleteButtonClicked);
 
     // QList
-    connect(ui->objectList, &QListWidget::itemClicked,
+    connect(objectList, &QListWidget::itemClicked,
             this, &MainWindow::onObjectItemSelect);
+    connect(objectList, &QListWidget::currentItemChanged,
+            this, &MainWindow::handleObjectItemChanged);
 
     // Dash Configure
     connect(enableLightingCheckBox, &QCheckBox::stateChanged,
             this, &MainWindow::onEnableLightingCheckBox);
     connect(enableLineModeCheckBox, &QCheckBox::stateChanged,
             this, &MainWindow::onEnableLineModeCheckBox);
+    connect(enableDepthMapCheckBox, &QCheckBox::stateChanged,
+            this, &MainWindow::onEnableDepthModeCheckBox);
 
     // Inspector:
     connect(nameCheckBox, &QCheckBox::stateChanged,
@@ -459,6 +464,17 @@ void MainWindow::onEnableLineModeCheckBox(int state) {
     glManager->setLineMode(enableLineMode);
 }
 
+void MainWindow::onEnableDepthModeCheckBox(int state) {
+    bool depthMode;
+    if (state == Qt::Checked) {
+        depthMode = true;
+    } else {
+        depthMode = false;
+    }
+
+    glManager->setDepthMode(depthMode);
+}
+
 void MainWindow::onDisplayCheckBox(int state) {
     if(currentObjectID == -1) {
         return;
@@ -472,7 +488,7 @@ void MainWindow::onDisplayCheckBox(int state) {
         display = false;
     }
 
-    tempObj->display = display;
+    tempObj->setVisible(display);
 }
 
 // slot functions of SpinBox
@@ -590,8 +606,8 @@ void MainWindow::onAmbientColorButtonClicked() {
         auto tempObj = glManager->getTargetGameObject(currentObjectID);
         qDebug() << "User selected Ambient color:" << color;
         Material tempMat = tempObj->getMaterial();
-        tempMat.ambientColor = QVector3D(color.redF(), color.greenF(), color.blueF());
-        tempObj->setMaterial(tempMat);
+        QVector3D ambientColor = QVector3D(color.redF(), color.greenF(), color.blueF());
+        tempObj->setAmbientColor(ambientColor);
 
         QString ambientStyle = QString("background-color: rgb(%1,%2,%3);").arg(color.red()).arg(color.green()).arg(color.blue());
         matAmbientChooseButton->setStyleSheet(ambientStyle);
@@ -610,8 +626,8 @@ void MainWindow::onDiffuseColorButtonClicked() {
         auto tempObj = glManager->getTargetGameObject(currentObjectID);
         qDebug() << "User selected Diffuse color:" << color;
         Material tempMat = tempObj->getMaterial();
-        tempMat.diffuseColor = QVector3D(color.redF(), color.greenF(), color.blueF());
-        tempObj->setMaterial(tempMat);
+        QVector3D diffuseColor = QVector3D(color.redF(), color.greenF(), color.blueF());
+        tempObj->setDiffuseColor(diffuseColor);
 
         QString diffuseStyle = QString("background-color: rgb(%1,%2,%3);").arg(color.red()).arg(color.green()).arg(color.blue());
         matDiffuseChooseButton->setStyleSheet(diffuseStyle);
@@ -630,8 +646,8 @@ void MainWindow::onSpecularColorButtonClicked() {
         auto tempObj = glManager->getTargetGameObject(currentObjectID);
         qDebug() << "User selected Specular color:" << color;
         Material tempMat = tempObj->getMaterial();
-        tempMat.specularColor = QVector3D(color.redF(), color.greenF(), color.blueF());
-        tempObj->setMaterial(tempMat);
+        QVector3D specularColor = QVector3D(color.redF(), color.greenF(), color.blueF());
+        tempObj->setSpecularColor(specularColor);
 
         QString specularStyle = QString("background-color: rgb(%1,%2,%3);").arg(color.red()).arg(color.green()).arg(color.blue());
         matSpecularChooseButton->setStyleSheet(specularStyle);
@@ -652,7 +668,7 @@ void MainWindow::onLoadDiffuseTextureButtonClicked() {
 
     if (!filePath.isEmpty()) {
         qDebug() << "User selected Diffuse Texture image path:" << filePath;
-        tempObj->setDiffuseTexture(filePath);
+        tempObj->loadDiffuseTexture(filePath);
     }
 
     QString texName = UtilAlgorithms::getFileNameFromPath(filePath);
@@ -670,7 +686,7 @@ void MainWindow::onLoadSpecularTextureButtonClicked() {
 
     if (!filePath.isEmpty()) {
         qDebug() << "User selected Specular Texture image path:" << filePath;
-        tempObj->setSpecularTexture(filePath);
+        tempObj->loadSpecularTexture(filePath);
     }
 
     QString texName = UtilAlgorithms::getFileNameFromPath(filePath);
@@ -685,7 +701,7 @@ void MainWindow::onObjectItemSelect(QListWidgetItem *item) {
         Qt::CheckState displayState;
         auto temp = glManager->getTargetGameObject(id);
 
-        if(temp->display) {
+        if(temp->getVisible()) {
             displayState = Qt::Checked;
         } else {
             displayState = Qt::Unchecked;
@@ -707,6 +723,18 @@ void MainWindow::onObjectItemSelect(QListWidgetItem *item) {
 
         qDebug() << "Select Item : " << temp->displayName;
         nameLineEdit->setText(temp->displayName);
+
+        // 绘制被选择的边框
+        temp->setDrawOutline(GL_TRUE);
+    }
+}
+
+void MainWindow::handleObjectItemChanged(QListWidgetItem *current, QListWidgetItem *previous) {
+    if(previous != nullptr) {
+        int prevId = previous->data(objectDataBaseIdRole).toInt();
+        auto prevObj = glManager->getTargetGameObject(prevId);
+
+        prevObj->setDrawOutline(GL_FALSE);
     }
 }
 
@@ -816,8 +844,10 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
         if (!objectList->isAncestorOf(clickedWidget)) {
             if(clickedWidget != focusedWidget) {
                 if(currentObjectID != -1) {
+                    auto tempObj = glManager->getTargetGameObject(currentObjectID);
                     qDebug() << "Release Item : "
-                             << glManager->getTargetGameObject(currentObjectID)->displayName;
+                             << tempObj->displayName;
+                    tempObj->setDrawOutline(GL_FALSE);
                     currentObjectID = -1;
                 }
 

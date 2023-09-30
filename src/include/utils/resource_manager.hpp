@@ -25,8 +25,8 @@ class ResourceManager
     static std::map<QString, std::shared_ptr<Shader>> map_Shaders;
     static std::map<QString, std::shared_ptr<Texture2D>> map_Textures;
 
-    static void updateProjViewMatrixInShader(QMatrix4x4 proj, QMatrix4x4 vi);
-    static void updateViewPosInShader(QVector3D viewP);
+    static void updateProjViewViewPosMatrixInShader(QMatrix4x4 proj, QMatrix4x4 vi, QVector3D viewP);
+    static void updateRenderConfigure(GLboolean depthMode);
     static void updateMaterialInShader(const QString& sName, const Material& mat);
     static void updateDirectLightInShader(GLboolean enableLighting ,DirectLight dl);
     static void updatePointLightInShader(PointLight pl);

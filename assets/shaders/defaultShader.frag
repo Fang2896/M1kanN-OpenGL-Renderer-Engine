@@ -47,6 +47,8 @@ uniform vec3 viewPos;
 uniform bool useDiffuseTexture;
 uniform bool useSpecularTexture;
 uniform bool useLight;
+uniform bool enableDepthMode;
+uniform bool enableOutline;
 
 uniform Material material;
 uniform DirectLight directLight;   // 先用一个光源吧
@@ -93,11 +95,18 @@ void main()
     }
 
     vec3 result;
-    if(useLight)
+    if(useLight) {
         result = (ambient + diffuse + specular) * directLight.intensity;
-    else
+    } else {
         result = ambient * directLight.intensity;
-    
+    }
+
+    if(enableDepthMode) {
+        result = vec3(gl_FragCoord);
+    } else if(enableOutline) {
+        result = vec3(1.0,0.0,0.0); // red as outline color
+    }
+
     // for debug
 //    if(useDiffuseTexture && useSpecularTexture) {
 //        FragColor = vec4(1,0,0, 1.0);

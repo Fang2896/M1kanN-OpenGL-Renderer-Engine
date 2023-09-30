@@ -35,6 +35,11 @@ class Mesh {
 
     // 或许可以允许不同部位用不同的shader？
     void setShader(std::shared_ptr<Shader> sha);
+
+    // draw configure
+    void setDrawOutline(GLboolean drawState);
+    void setTransform(QMatrix4x4 trans);
+
     void draw();
 
    private:
@@ -45,6 +50,10 @@ class Mesh {
     GLFunctions_Core *glFunc;
 
     std::shared_ptr<Shader> shader;
+
+    // draw configure
+    GLboolean drawOutline;
+    QMatrix4x4 transform;   // for outline
 };
 
 #endif  //MESH_HPP

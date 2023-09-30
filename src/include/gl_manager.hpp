@@ -20,6 +20,7 @@
 #include "utils/camera.hpp"
 #include "utils/resource_manager.hpp"
 
+
 class GLManager : public QOpenGLWidget {
    public:
     explicit GLManager(QWidget* parent = nullptr, int width = 800,
@@ -38,6 +39,7 @@ class GLManager : public QOpenGLWidget {
     // configure setter
     void setEnableLighting(GLboolean enableLighting);
     void setLineMode(GLboolean enableLineMode);
+    void setDepthMode(GLboolean depMode);
 
    protected:
     void initializeGL() override;
@@ -80,6 +82,7 @@ class GLManager : public QOpenGLWidget {
    private:  // configure variables
     GLboolean isLineMode;
     GLboolean isLighting;
+    GLboolean depthMode;
     QVector3D backGroundColor;
 
     DirectLight directLight;

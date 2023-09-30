@@ -4,23 +4,25 @@
 
 #include "utils/resource_manager.hpp"
 
+
 // Global variables to store Shaders and Textures
 std::map<QString, std::shared_ptr<Shader>> ResourceManager::map_Shaders;
 std::map<QString, std::shared_ptr<Texture2D>> ResourceManager::map_Textures;
 
-void ResourceManager::updateProjViewMatrixInShader(QMatrix4x4 proj, QMatrix4x4 vi) {
+void ResourceManager::updateProjViewViewPosMatrixInShader(QMatrix4x4 proj, QMatrix4x4 vi, QVector3D viewP) {
     for(const auto& sha : map_Shaders) {
         sha.second->use();
         sha.second->setMatrix4f("projection", proj);
         sha.second->setMatrix4f("view", vi);
+        sha.second->setVector3f("viewPos", viewP);
         sha.second->release();
     }
 }
 
-void ResourceManager::updateViewPosInShader(QVector3D viewP) {
+void ResourceManager::updateRenderConfigure(GLboolean depthMode) {
     for(const auto& sha : map_Shaders) {
         sha.second->use();
-        sha.second->setVector3f("viewPos", viewP);
+        sha.second->setBool("enableDepthMode", depthMode);
         sha.second->release();
     }
 }

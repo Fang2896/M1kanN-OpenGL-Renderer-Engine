@@ -61,6 +61,7 @@ class MainWindow : public QWidget {
     // dash configure slot functions
     void onEnableLightingCheckBox(int state);
     void onEnableLineModeCheckBox(int state);
+    void onEnableDepthModeCheckBox(int state);
 
     // inspector:
     void onDisplayCheckBox(int state);
@@ -88,6 +89,7 @@ class MainWindow : public QWidget {
 
 
     void onObjectItemSelect(QListWidgetItem *item);
+    void handleObjectItemChanged(QListWidgetItem *current, QListWidgetItem *previous);
 
     void handleEditingFinished();
 
@@ -149,6 +151,7 @@ class MainWindow : public QWidget {
 
     QCheckBox *enableLightingCheckBox;
     QCheckBox *enableLineModeCheckBox;
+    QCheckBox *enableDepthMapCheckBox;
 
     QGroupBox *transformGroupBox;
 
