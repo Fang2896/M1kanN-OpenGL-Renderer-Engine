@@ -118,6 +118,8 @@ void Mesh::draw() {
         glFunc->glStencilFunc(GL_ALWAYS, 0, 0xFF);
         glFunc->glEnable(GL_DEPTH_TEST);
         glFunc->glDisable(GL_STENCIL_TEST);
+    } else {
+        glFunc->glStencilMask(0xFF);
     }
     /*============ outline logic ============*/
 
