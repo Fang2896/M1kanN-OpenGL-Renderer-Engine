@@ -21,6 +21,7 @@
 #include <QListWidget>
 #include <QPushButton>
 #include <QToolButton>
+#include <QColorDialog>
 
 #include <QHBoxLayout>
 #include <QVBoxLayout>
@@ -77,12 +78,22 @@ class MainWindow : public QWidget {
     void onYScaSpinBoxValueChanged(double value);
     void onZScaSpinBoxValueChanged(double value);
 
+    // material change
+    void onShininessBarChange(int value);
+    void onAmbientColorButtonClicked();
+    void onDiffuseColorButtonClicked();
+    void onSpecularColorButtonClicked();
+    void onLoadDiffuseTextureButtonClicked();
+    void onLoadSpecularTextureButtonClicked();
+
+
     void onObjectItemSelect(QListWidgetItem *item);
 
     void handleEditingFinished();
 
    private: // 辅助函数
-    void setObjectTransformToSpinBox(const std::shared_ptr<GameObject>& ptr ,QVector3D pos, QVector3D rot, QVector3D sca);
+    void setObjectTransformToSpinBox(QVector3D pos, QVector3D rot, QVector3D sca);
+    void setObjectMaterialToFrame(const Material& mat);
     QListWidgetItem* getItemById(QListWidget* listWidget, int id) const;
 
    private: // filters
@@ -131,10 +142,6 @@ class MainWindow : public QWidget {
     QAction *pointLightAddAction;
     QAction *spotLightAddAction;
 
-    QGroupBox *inspectorGroupBox;
-    QCheckBox *nameCheckBox;
-    QLineEdit *nameLineEdit;
-
     // configure dash widgets
     QTabWidget *configureDashTab;
     QWidget *envTab;
@@ -145,11 +152,16 @@ class MainWindow : public QWidget {
 
     QGroupBox *transformGroupBox;
 
+    QGroupBox *inspectorGroupBox;
+    QCheckBox *nameCheckBox;
+    QLineEdit *nameLineEdit;
+
     // 操作时增加：(需要new)
     QFrame *positionFrame;
     QFrame *rotationFrame;
     QFrame *scaleFrame;
     QFrame *directionFrame;
+    QFrame *materialFrame;
 
     QLabel *posTitleLabel;
     QLabel *rotationTitleLabel;
@@ -174,6 +186,15 @@ class MainWindow : public QWidget {
     QLabel *lightXDirLabel;  QDoubleSpinBox *lightXDirSpinBox;
     QLabel *lightYDirLabel;  QDoubleSpinBox *lightYDirSpinBox;
     QLabel *lightZDirLabel;  QDoubleSpinBox *lightZDirSpinBox;
+
+    // material
+    QCheckBox *enableMatCheckBox;
+    QLabel *matShininessLabel;      QSlider *matShininessBar;
+    QLabel *matAmbientLabel;        QPushButton *matAmbientChooseButton;
+    QLabel *matDiffuseLabel;        QPushButton *matDiffuseChooseButton;
+    QLabel *matSpecularLabel;       QPushButton *matSpecularChooseButton;
+    QLabel *matDiffuseTexLabel;     QPushButton *matDiffuseTexChooseButton;
+    QLabel *matSpecularTexLabel;    QPushButton *matSpecularTexChooseButton;
 
     // object和light改变，就改变frame显示状态即可
 

@@ -11,6 +11,7 @@
 const int OGL_WIDTH = 800;
 const int OGL_HEIGHT = 600;
 
+
 MainWindow::MainWindow(QWidget* parent)
     : QWidget(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
@@ -99,6 +100,7 @@ void MainWindow::initWidget() {
     rotationFrame = ui->rotationFrame;
     scaleFrame = ui->scaleFrame;
     directionFrame = ui->directionFrame;
+    materialFrame = ui->materialFrame;
 
     posTitleLabel = ui->posTitleLabel;
     rotationTitleLabel = ui->rotationTitleLabel;
@@ -119,11 +121,18 @@ void MainWindow::initWidget() {
     objZScaleLabel = ui->objZScaleLabel;   objZScaleSpinBox = ui->objZScaleSpinBox;
 
     // lights
-
     // direct light
     lightXDirLabel = ui->lightXDirLabel;   lightXDirSpinBox = ui->lightXDirSpinBox;
     lightYDirLabel = ui->lightYDirLabel;   lightYDirSpinBox = ui->lightYDirSpinBox;
     lightZDirLabel = ui->lightZDirLabel;   lightZDirSpinBox = ui->lightZDirSpinBox;
+
+    enableMatCheckBox   = ui->enableMatCheckBox;
+    matShininessLabel   = ui->matShininessLabel;    matShininessBar = ui->matShininessBar;
+    matAmbientLabel     = ui->matAmbientLabel;      matAmbientChooseButton = ui->matAmbientChooseButton;
+    matDiffuseLabel     = ui->matDiffuseLabel;      matDiffuseChooseButton = ui->matDiffuseChooseButton;
+    matSpecularLabel    = ui->matSpecularLabel;     matSpecularChooseButton = ui->matSpecularChooseButton;
+    matDiffuseTexLabel  = ui->matDiffuseTexLabel;   matDiffuseTexChooseButton = ui->matDiffuseTexChooseButton;
+    matSpecularTexLabel = ui->matSpecularTexLabel;  matSpecularTexChooseButton = ui->matSpecularTexChooseButton;
 
     mainMenuBar = new QMenuBar(this);
     fileMenu = new QMenu("File", this);
@@ -162,28 +171,28 @@ void MainWindow::initLayout() {
     hDisplayLayout->addWidget(nameLineEdit);
 
     auto *posLayout = new QHBoxLayout;
-    posLayout->addWidget(xPosLabel, 1);    posLayout->addWidget(xPosSpinBox,4);
-    posLayout->addWidget(yPosLabel, 1);    posLayout->addWidget(yPosSpinBox,4);
-    posLayout->addWidget(zPosLabel, 1);    posLayout->addWidget(zPosSpinBox,4);
+    posLayout->addWidget(xPosLabel);    posLayout->addWidget(xPosSpinBox,1);
+    posLayout->addWidget(yPosLabel);    posLayout->addWidget(yPosSpinBox,1);
+    posLayout->addWidget(zPosLabel);    posLayout->addWidget(zPosSpinBox,1);
 
     // for objects:
     // rotation
     auto *rotLayout = new QHBoxLayout;
-    rotLayout->addWidget(objXRotLabel, 1); rotLayout->addWidget(objXRotSpinBox, 4);
-    rotLayout->addWidget(objYRotLabel, 1); rotLayout->addWidget(objYRotSpinBox, 4);
-    rotLayout->addWidget(objZRotLabel, 1); rotLayout->addWidget(objZRotSpinBox, 4);
+    rotLayout->addWidget(objXRotLabel); rotLayout->addWidget(objXRotSpinBox, 1);
+    rotLayout->addWidget(objYRotLabel); rotLayout->addWidget(objYRotSpinBox, 1);
+    rotLayout->addWidget(objZRotLabel); rotLayout->addWidget(objZRotSpinBox, 1);
 
     // scale
     auto *scaleLayout = new QHBoxLayout;
-    scaleLayout->addWidget(objXScaleLabel, 1); scaleLayout->addWidget(objXScaleSpinBox, 4);
-    scaleLayout->addWidget(objYScaleLabel, 1); scaleLayout->addWidget(objYScaleSpinBox, 4);
-    scaleLayout->addWidget(objZScaleLabel, 1); scaleLayout->addWidget(objZScaleSpinBox, 4);
+    scaleLayout->addWidget(objXScaleLabel); scaleLayout->addWidget(objXScaleSpinBox, 1);
+    scaleLayout->addWidget(objYScaleLabel); scaleLayout->addWidget(objYScaleSpinBox, 1);
+    scaleLayout->addWidget(objZScaleLabel); scaleLayout->addWidget(objZScaleSpinBox, 1);
 
     // direct
     auto *directionLayout = new QHBoxLayout;
-    directionLayout->addWidget(lightXDirLabel, 1); directionLayout->addWidget(lightXDirSpinBox, 4);
-    directionLayout->addWidget(lightYDirLabel, 1); directionLayout->addWidget(lightYDirSpinBox, 4);
-    directionLayout->addWidget(lightZDirLabel, 1); directionLayout->addWidget(lightZDirSpinBox, 4);
+    directionLayout->addWidget(lightXDirLabel); directionLayout->addWidget(lightXDirSpinBox, 1);
+    directionLayout->addWidget(lightYDirLabel); directionLayout->addWidget(lightYDirSpinBox, 1);
+    directionLayout->addWidget(lightZDirLabel); directionLayout->addWidget(lightZDirSpinBox, 1);
 
     // position frame
     auto *posFrameLayout = new QVBoxLayout;
@@ -209,19 +218,57 @@ void MainWindow::initLayout() {
     directFrameLayout->addLayout(directionLayout);
     directionFrame->setLayout(directFrameLayout);
 
+    // material frame
+    auto *matShininessLayout = new QHBoxLayout;
+    matShininessLayout->addWidget(matShininessLabel);
+    matShininessLayout->addWidget(matShininessBar);
+
+    auto *matAmbientColorLayout = new QHBoxLayout;
+    matAmbientColorLayout->addWidget(matAmbientLabel);
+    matAmbientColorLayout->addWidget(matAmbientChooseButton);
+
+    auto *matDiffuseColorLayout = new QHBoxLayout;
+    matDiffuseColorLayout->addWidget(matDiffuseLabel);
+    matDiffuseColorLayout->addWidget(matDiffuseChooseButton);
+
+    auto *matSpecularColorLayout = new QHBoxLayout;
+    matSpecularColorLayout->addWidget(matSpecularLabel);
+    matSpecularColorLayout->addWidget(matSpecularChooseButton);
+
+    auto *matDiffuseTexLayout = new QHBoxLayout;
+    matDiffuseTexLayout->addWidget(matDiffuseTexLabel);
+    matDiffuseTexLayout->addWidget(matDiffuseTexChooseButton);
+
+    auto *matSpecularTexLayout = new QHBoxLayout;
+    matSpecularTexLayout->addWidget(matSpecularTexLabel);
+    matSpecularTexLayout->addWidget(matSpecularTexChooseButton);
+
+    auto *matFrameLayout = new QVBoxLayout;
+    matFrameLayout->addWidget(enableMatCheckBox);
+    matFrameLayout->addLayout(matShininessLayout);
+    matFrameLayout->addLayout(matAmbientColorLayout);
+    matFrameLayout->addLayout(matDiffuseColorLayout);
+    matFrameLayout->addLayout(matSpecularColorLayout);
+    matFrameLayout->addLayout(matDiffuseTexLayout);
+    matFrameLayout->addLayout(matSpecularTexLayout);
+    materialFrame->setLayout(matFrameLayout);
+
     // final transform
     auto *transformLayout = new QVBoxLayout;
     transformLayout->addWidget(positionFrame);
     transformLayout->addWidget(rotationFrame);
     transformLayout->addWidget(scaleFrame);
     transformLayout->addWidget(directionFrame);
+    transformLayout->addWidget(materialFrame);
     transformLayout->addStretch(1);
+
     // 暂时全部隐藏，按照选择的QListWidget的item来显示
 
     positionFrame->hide();
     rotationFrame->hide();
     scaleFrame->hide();
     directionFrame->hide();
+    materialFrame->hide();
 
     transformGroupBox->setLayout(transformLayout);
 
@@ -267,8 +314,6 @@ void MainWindow::connectConfigure() {
     connect(objectDeleteButton, &QPushButton::clicked,
             this, &MainWindow::onObjectDeleteButtonClicked);
 
-
-
     // QList
     connect(ui->objectList, &QListWidget::itemClicked,
             this, &MainWindow::onObjectItemSelect);
@@ -309,11 +354,24 @@ void MainWindow::connectConfigure() {
 
     // 这里还要加一个direction，等灯光系统完成后再说吧
 
+    // material
+    connect(matShininessBar, &QSlider::valueChanged, this,
+            &MainWindow::onShininessBarChange);
+
+    connect(matAmbientChooseButton, &QPushButton::clicked,
+            this, &MainWindow::onAmbientColorButtonClicked);
+    connect(matDiffuseChooseButton, &QPushButton::clicked,
+            this, &MainWindow::onDiffuseColorButtonClicked);
+    connect(matSpecularChooseButton, &QPushButton::clicked,
+            this, &MainWindow::onSpecularColorButtonClicked);
+    connect(matDiffuseTexChooseButton, &QPushButton::clicked,
+            this, &MainWindow::onLoadDiffuseTextureButtonClicked);
+    connect(matSpecularTexChooseButton, &QPushButton::clicked,
+            this, &MainWindow::onLoadSpecularTextureButtonClicked);
 
     // QLineEdit
     connect(nameLineEdit, &QLineEdit::editingFinished,
             this, &MainWindow::handleEditingFinished);
-
 
 }
 
@@ -332,7 +390,6 @@ void MainWindow::onLoadGameObjectCube() {
     item->setData(objectDataBaseIdRole, static_cast<qulonglong>(id));  // 存储ID
     objectList->addItem(item);
 }
-
 void MainWindow::onLoadGameObjectQuad() {
     int id = glManager->addObject(ObjectType::Quad);
     if(id == -1) {
@@ -512,6 +569,113 @@ void MainWindow::onZScaSpinBoxValueChanged(double value) {
     tempObj->setScale(tempScale);
 }
 
+// material
+void MainWindow::onShininessBarChange(int value) {
+    if(currentObjectID == -1) {
+        return;
+    }
+
+    auto tempObj = glManager->getTargetGameObject(currentObjectID);
+    Material tempMat = tempObj->getMaterial();
+    tempMat.shininess = static_cast<float>(value) / 128.0f;
+    tempObj->setMaterial(tempMat);
+}
+void MainWindow::onAmbientColorButtonClicked() {
+    if(currentObjectID == -1) {
+        return;
+    }
+
+    QColor color = QColorDialog::getColor(Qt::white, this, "Select a Ambient color");
+    if(color.isValid()) {
+        auto tempObj = glManager->getTargetGameObject(currentObjectID);
+        qDebug() << "User selected Ambient color:" << color;
+        Material tempMat = tempObj->getMaterial();
+        tempMat.ambientColor = QVector3D(color.redF(), color.greenF(), color.blueF());
+        tempObj->setMaterial(tempMat);
+
+        QString ambientStyle = QString("background-color: rgb(%1,%2,%3);").arg(color.red()).arg(color.green()).arg(color.blue());
+        matAmbientChooseButton->setStyleSheet(ambientStyle);
+
+        QString ambientText = QString("R:%1,G:%2,B:%3").arg(color.red()).arg(color.green()).arg(color.blue());
+        matAmbientChooseButton->setText(ambientText);
+    }
+}
+void MainWindow::onDiffuseColorButtonClicked() {
+    if(currentObjectID == -1) {
+        return;
+    }
+
+    QColor color = QColorDialog::getColor(Qt::white, this, "Select a Diffuse color");
+    if(color.isValid()) {
+        auto tempObj = glManager->getTargetGameObject(currentObjectID);
+        qDebug() << "User selected Diffuse color:" << color;
+        Material tempMat = tempObj->getMaterial();
+        tempMat.diffuseColor = QVector3D(color.redF(), color.greenF(), color.blueF());
+        tempObj->setMaterial(tempMat);
+
+        QString diffuseStyle = QString("background-color: rgb(%1,%2,%3);").arg(color.red()).arg(color.green()).arg(color.blue());
+        matDiffuseChooseButton->setStyleSheet(diffuseStyle);
+
+        QString diffuseText = QString("R:%1,G:%2,B:%3").arg(color.red()).arg(color.green()).arg(color.blue());
+        matDiffuseChooseButton->setText(diffuseText);
+    }
+}
+void MainWindow::onSpecularColorButtonClicked() {
+    if(currentObjectID == -1) {
+        return;
+    }
+
+    QColor color = QColorDialog::getColor(Qt::white, this, "Select a Specular color");
+    if(color.isValid()) {
+        auto tempObj = glManager->getTargetGameObject(currentObjectID);
+        qDebug() << "User selected Specular color:" << color;
+        Material tempMat = tempObj->getMaterial();
+        tempMat.specularColor = QVector3D(color.redF(), color.greenF(), color.blueF());
+        tempObj->setMaterial(tempMat);
+
+        QString specularStyle = QString("background-color: rgb(%1,%2,%3);").arg(color.red()).arg(color.green()).arg(color.blue());
+        matSpecularChooseButton->setStyleSheet(specularStyle);
+
+        QString specularText = QString("R:%1,G:%2,B:%3").arg(color.red()).arg(color.green()).arg(color.blue());
+        matSpecularChooseButton->setText(specularText);
+    }
+}
+void MainWindow::onLoadDiffuseTextureButtonClicked() {
+    if(currentObjectID == -1) {
+        return;
+    }
+
+    QString filters = "Image files (*.png *.jpg *.jpeg *.bmp );;All files (*.*)";
+    QString filePath = QFileDialog::getOpenFileName(this, "Select an image",
+                                                    textureDirectory, filters);
+    auto tempObj = glManager->getTargetGameObject(currentObjectID);
+
+    if (!filePath.isEmpty()) {
+        qDebug() << "User selected Diffuse Texture image path:" << filePath;
+        tempObj->setDiffuseTexture(filePath);
+    }
+
+    QString texName = UtilAlgorithms::getFileNameFromPath(filePath);
+    matDiffuseTexChooseButton->setText(texName);
+}
+void MainWindow::onLoadSpecularTextureButtonClicked() {
+    if(currentObjectID == -1) {
+        return;
+    }
+
+    QString filters = "Image files (*.png *.jpg *.jpeg *.bmp );;All files (*.*)";
+    QString filePath = QFileDialog::getOpenFileName(this, "Select an image",
+                                                    textureDirectory, filters);
+    auto tempObj = glManager->getTargetGameObject(currentObjectID);
+
+    if (!filePath.isEmpty()) {
+        qDebug() << "User selected Specular Texture image path:" << filePath;
+        tempObj->setSpecularTexture(filePath);
+    }
+
+    QString texName = UtilAlgorithms::getFileNameFromPath(filePath);
+    matSpecularTexChooseButton->setText(texName);
+}
 
 // 被点击的时候，返回相应的信息，以及显示对应的控件
 void MainWindow::onObjectItemSelect(QListWidgetItem *item) {
@@ -532,7 +696,13 @@ void MainWindow::onObjectItemSelect(QListWidgetItem *item) {
         rotationFrame->show();
         scaleFrame->show();
 
-        setObjectTransformToSpinBox(temp, temp->getPosition(),
+        // 大于2的说明可能自带texture，就不设置了
+        if(temp->getMeshCount() == 1) {
+            materialFrame->show();
+            setObjectMaterialToFrame(temp->getMaterial());
+        }
+
+        setObjectTransformToSpinBox(temp->getPosition(),
                                     temp->getRotation(), temp->getScale());
 
         qDebug() << "Select Item : " << temp->displayName;
@@ -560,7 +730,7 @@ void MainWindow::handleEditingFinished() {
 }
 
 // 辅助函数：
-void MainWindow::setObjectTransformToSpinBox(const std::shared_ptr<GameObject>& ptr ,QVector3D pos, QVector3D rot, QVector3D sca) {
+void MainWindow::setObjectTransformToSpinBox(QVector3D pos, QVector3D rot, QVector3D sca) {
     xPosSpinBox->setValue(pos.x());
     yPosSpinBox->setValue(pos.y());
     zPosSpinBox->setValue(pos.z());
@@ -574,6 +744,50 @@ void MainWindow::setObjectTransformToSpinBox(const std::shared_ptr<GameObject>& 
     objZScaleSpinBox->setValue(sca.z());
 }
 
+void MainWindow::setObjectMaterialToFrame(const Material& mat) {
+    matShininessBar->setValue((int)(mat.shininess * 255));
+    QColor ambientColor(static_cast<int>(mat.ambientColor.x() * 255),
+                 static_cast<int>(mat.ambientColor.y() * 255),
+                 static_cast<int>(mat.ambientColor.z() * 255));
+    QColor diffuseColor(static_cast<int>(mat.diffuseColor.x() * 255),
+                        static_cast<int>(mat.diffuseColor.y() * 255),
+                        static_cast<int>(mat.diffuseColor.z() * 255));
+    QColor specularColor(static_cast<int>(mat.specularColor.x() * 255),
+                        static_cast<int>(mat.specularColor.y() * 255),
+                        static_cast<int>(mat.specularColor.z() * 255));
+
+    QString ambientStyle = QString("background-color: rgb(%1,%2,%3);").arg(ambientColor.red()).arg(ambientColor.green()).arg(ambientColor.blue());
+    QString diffuseStyle = QString("background-color: rgb(%1,%2,%3);").arg(diffuseColor.red()).arg(diffuseColor.green()).arg(diffuseColor.blue());
+    QString specularStyle = QString("background-color: rgb(%1,%2,%3);").arg(specularColor.red()).arg(specularColor.green()).arg(specularColor.blue());
+
+    matAmbientChooseButton->setStyleSheet(ambientStyle);
+    matDiffuseChooseButton->setStyleSheet(diffuseStyle);
+    matSpecularChooseButton->setStyleSheet(specularStyle);
+
+    QString ambientText = QString("R:%1,G:%2,B:%3").arg(ambientColor.red()).arg(ambientColor.green()).arg(ambientColor.blue());
+    QString diffuseText = QString("R:%1,G:%2,B:%3").arg(diffuseColor.red()).arg(diffuseColor.green()).arg(diffuseColor.blue());
+    QString specularText = QString("R:%1,G:%2,B:%3").arg(specularColor.red()).arg(specularColor.green()).arg(specularColor.blue());
+
+    matAmbientChooseButton->setText(ambientText);
+    matDiffuseChooseButton->setText(diffuseText);
+    matSpecularChooseButton->setText(specularText);
+
+    // TODO: clear 逻辑，以及如何处理以及有texture的物体
+    if(mat.texture_diffuse1 != nullptr) {
+        QString speTexName = UtilAlgorithms::getFileNameFromPath(mat.texture_diffuse1->path);
+        matDiffuseTexChooseButton->setText(speTexName);
+    } else {
+        matDiffuseTexChooseButton->setText("load texture");    // 没有，或者有多个
+    }
+
+    if(mat.texture_specular1 != nullptr) {
+        QString speTexName = UtilAlgorithms::getFileNameFromPath(mat.texture_specular1->path);
+        matSpecularTexChooseButton->setText(speTexName);
+    } else {
+        matSpecularTexChooseButton->setText("load texture");    // 没有，或者有多个
+    }
+}
+
 QListWidgetItem* MainWindow::getItemById(QListWidget* listWidget, int id) const {
     for(int i = 0; i < listWidget->count(); i++) {
         QListWidgetItem* item = listWidget->item(i);
@@ -584,8 +798,6 @@ QListWidgetItem* MainWindow::getItemById(QListWidget* listWidget, int id) const 
 
     return nullptr;  // 如果找不到对应ID的item则返回nullptr
 }
-
-
 
 // filter functions
 bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
@@ -613,6 +825,7 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
                 rotationFrame->hide();
                 scaleFrame->hide();
                 directionFrame->hide();
+                materialFrame->hide();
 
                 objectList->clearSelection();
                 objectList->clearFocus();

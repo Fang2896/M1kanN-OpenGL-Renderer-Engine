@@ -209,10 +209,10 @@ void GameObject::loadSpecularTexture(const QString& tPath) {
     shader->release();
 }
 
-// only for shape, not model
+// only for shape or pure model without texture, not model
 void GameObject::setMaterial(Material mat) {
-    if(type == ObjectType::Model) {
-        qDebug("Model Type set material! Apply all meshes to one material");
+    if(meshes.size() != 1) {
+        qDebug("Multiple Model Type or Empty Shape set material");
     }
 
     QVector<std::shared_ptr<Texture2D>> texVec;
@@ -236,16 +236,35 @@ void GameObject::setMaterial(Material mat) {
     ResourceManager::updateMaterialInShader(shaderName, material);
 }
 
-void GameObject::setDiffuseTexture(std::shared_ptr<Texture2D> tex) {
-    this->material.texture_diffuse1 = std::move(tex);
+void GameObject::setDiffuseTexture(const QString& tPath) {
+    std::shared_ptr<Texture2D> tex = std::make_shared<Texture2D>();
+    tex->generate(tPath);
+    tex->type = TextureType::Diffuse;
+    tex->path = tPath;
+
+    for(auto& m : meshes) {
+        m->textures.append(tex);
+    }
+
+    this->material.texture_diffuse1 = tex;
     shader->use();
     shader->setBool("useDiffuseTexture", true);
     shader->setInteger("material.texture_diffuse1", tex->getTextureID());
     shader->release();
 }
 
-void GameObject::setSpecularTexture(std::shared_ptr<Texture2D> tex) {
-    this->material.texture_specular1 = std::move(tex);
+void GameObject::setSpecularTexture(const QString& tPath) {
+    std::shared_ptr<Texture2D> tex = std::make_shared<Texture2D>();
+    tex->generate(tPath);
+    tex->type = TextureType::Specular;
+    tex->path = tPath;
+
+    // TODO: 如果是多texture多mesh，咋办？
+    for(auto& m : meshes) {
+        m->textures.append(tex);
+    }
+
+    this->material.texture_specular1 = tex;
     shader->use();
     shader->setBool("useSpecularTexture", true);
     shader->setInteger("material.texture_specular1", tex->getTextureID());
@@ -286,6 +305,14 @@ ObjectType GameObject::getType() {
 
 QString GameObject::getShaderName() {
     return this->shaderName;
+}
+
+int GameObject::getMeshCount() {
+    return meshes.size();
+}
+
+const Material& GameObject::getMaterial() {
+    return material;
 }
 
 QMatrix4x4 GameObject::getTransform() {

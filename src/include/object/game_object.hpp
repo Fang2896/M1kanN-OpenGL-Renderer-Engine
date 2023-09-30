@@ -32,8 +32,8 @@ class GameObject {
     void loadSpecularTexture(const QString& tPath);
 
     void setMaterial(Material mat);
-    void setDiffuseTexture(std::shared_ptr<Texture2D> tex);
-    void setSpecularTexture(std::shared_ptr<Texture2D> tex);
+    void setDiffuseTexture(const QString& tPath);
+    void setSpecularTexture(const QString& tPath);
     void setAmbientColor(QVector3D col);
     void setDiffuseColor(QVector3D col);
     void setSpecularColor(QVector3D col);
@@ -41,6 +41,8 @@ class GameObject {
 
     ObjectType getType();
     QString getShaderName();
+    int getMeshCount();
+    const Material& getMaterial();
 
     QMatrix4x4 getTransform();
     QVector3D getPosition();
