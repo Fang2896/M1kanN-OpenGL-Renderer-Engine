@@ -64,6 +64,7 @@ class GameObject {
 
    public:
     QString displayName;
+    GLboolean containTransparencyTexture;
 
    private:
     void updateTransform();

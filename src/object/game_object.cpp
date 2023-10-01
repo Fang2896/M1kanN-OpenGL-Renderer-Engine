@@ -10,7 +10,8 @@
 GLuint GameObject::gameObjectCounter = 0;
 
 GameObject::GameObject()
-    : display(GL_TRUE), drawOutline(GL_FALSE), displayName("GameObject"), objectID(gameObjectCounter++),
+    : display(GL_TRUE), drawOutline(GL_FALSE), containTransparencyTexture(GL_FALSE),
+      displayName("GameObject"), objectID(gameObjectCounter++),
       type(ObjectType::Cube), modelPath(""),
       shader(), material()
 {
@@ -72,6 +73,11 @@ GameObject::GameObject(const QString& mPath, const QString& disName)
     }
     meshes.clear();
     loadModel(mPath);
+    if(meshes.size() > 1) {
+        for(auto &m : meshes) {
+            m->setMultiMesh(GL_TRUE);
+        }
+    }
 }
 
 GameObject::~GameObject() {
@@ -84,6 +90,14 @@ void GameObject::draw() {
     if(!display) {
         return;
     }
+
+    shader->use();
+    if(meshes.size() > 1) {
+        shader->setBool("isMultiMeshModel", GL_TRUE);
+    } else {
+        shader->setBool("isMultiMeshModel", GL_FALSE);
+    }
+    shader->release();
 
     for(auto & m : meshes) {
         m->draw();
@@ -141,6 +155,12 @@ void GameObject::loadModel(const QString& mPath) {
         m->setTransform(transform);
     }
 
+    if(meshes.size() > 1) {
+        for(auto & m : meshes) {
+            m->setMultiMesh(GL_TRUE);
+        }
+    }
+
     qDebug("Load Model Finished");
 }
 
@@ -178,8 +198,15 @@ void GameObject::loadDiffuseTexture(const QString& tPath) {
                                      return tex->type == TextureType::Diffuse;
                                  }), tempVec.end());
 
-    // 清除原来的diffuse然后赋值
     meshes[0]->textures.append(material.texture_diffuse1);
+
+    containTransparencyTexture = GL_FALSE;
+    for(auto &t : meshes[0]->textures) {
+        if(t->transparent) {
+            containTransparencyTexture = GL_TRUE;
+            break;
+        }
+    }
 
     shader->use();
     shader->setBool("useDiffuseTexture", true);

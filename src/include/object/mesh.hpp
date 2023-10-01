@@ -39,8 +39,11 @@ class Mesh {
     // draw configure
     void setDrawOutline(GLboolean drawState);
     void setTransform(QMatrix4x4 trans);
+    void setMultiMesh(GLboolean isMulti);
 
     void draw();
+
+
 
    private:
     void setupMesh();
@@ -54,6 +57,7 @@ class Mesh {
     // draw configure
     GLboolean drawOutline;
     QMatrix4x4 transform;   // for outline
+    GLboolean multiMesh;
 };
 
 #endif  //MESH_HPP

@@ -111,8 +111,25 @@ void GLManager::updateRenderData() {
 
 /********* Object Manager Functions *********/
 void GLManager::drawObjects() {
+    // 先绘制不透明物体
     for(auto & i : objectMap) {
-        i.second->draw();
+        if(!i.second->containTransparencyTexture)
+            i.second->draw();
+    }
+
+    // 再对透明物体排序
+    std::map<float, unsigned int> distMap;
+    for(auto & i : objectMap) {
+        if(i.second->containTransparencyTexture) {
+            // 离摄像机的距离
+            float dist = m_camera->position.distanceToPoint(i.second->getPosition());
+            distMap[dist] = i.second->getObjectID();
+        }
+    }
+
+    // 从远到近绘制透明物体
+    for(auto it = distMap.rbegin(); it != distMap.rend(); ++it) {
+        objectMap[it->second]->draw();
     }
 }
 
@@ -248,10 +265,14 @@ void GLManager::initOpenGLSettings() {
     glFunc->initializeOpenGLFunctions();
 
     glFunc->glEnable(GL_DEPTH_TEST);
-    glFunc->glDepthFunc(GL_LESS);
     glFunc->glEnable(GL_LINE_SMOOTH);
 
-    // for object outline
+    glFunc->glEnable(GL_BLEND); // 半透明
+    glFunc->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    glFunc->glEnable(GL_STENCIL_TEST);
+    glFunc->glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+    glFunc->glClearStencil(0);
 
     GLfloat lineWidthRange[2];
     glFunc->glGetFloatv(GL_ALIASED_LINE_WIDTH_RANGE, lineWidthRange);

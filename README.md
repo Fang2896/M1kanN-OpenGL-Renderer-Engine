@@ -45,6 +45,7 @@ Mikann Renderer Engine is a OpenGL based renderer engine for rendering algorithm
 ### Rendering Features
 
 * [x] Blinn-Phong lighting 
+* [x] Basic Transparency Rendering and Sort
 * [ ] Reflection and Refraction shader
 * [ ] Gamma Correction
 * [ ] Shadow
@@ -55,6 +56,14 @@ Mikann Renderer Engine is a OpenGL based renderer engine for rendering algorithm
 * [ ] Deferred shading
 * [ ] PBR
 
+
+## Bugs
+1. 透明度物体选择轮廓问题
+2. 物体轮廓的深度测试问题
+3. 部分多材质模型（nanosuit）选择后轮廓不显现问题（仅物体增大）
+4. 【已解决】部分多材质模式（nanosuit）仅显示一半的部分贴图问题
+   * 原因及其解决方法: 
+     部分模型的uv会超过1来重复利用对称材质，因此texture wrap mode应该设为repeat
 
 
 ## References

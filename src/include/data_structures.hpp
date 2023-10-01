@@ -88,28 +88,6 @@ struct SpotLight {
           intensity(1), falloff(0.001f) {}
 };
 
-struct ShapeMaterial {
-    float shininess;
-    QVector3D ambientColor;
-    QVector3D diffuseColor;
-    QVector3D specularColor;
-
-    float ambientOcclusion;
-
-    ShapeMaterial(float shi, QVector3D aCol, QVector3D dCol, QVector3D sCol,float amb)
-        : shininess(shi),
-          ambientColor(aCol),
-          diffuseColor(dCol),
-          specularColor(sCol),
-          ambientOcclusion(amb) {}
-
-    ShapeMaterial() : shininess(0.4),
-          ambientColor({1.0f, 0.5f, 0.31f}),
-          diffuseColor({ 1.0f, 0.5f, 0.31f}),
-          specularColor({0.5f, 0.5f, 0.5f}),
-          ambientOcclusion(0.25) {}
-};
-
 struct Material {
     float shininess;
     // 后面可能会加更多？
@@ -134,9 +112,9 @@ struct Material {
     Material() : shininess(0.4),
           texture_diffuse1(nullptr),
           texture_specular1(nullptr),
-          ambientColor({1.0f, 0.5f, 0.31f}),
-          diffuseColor({ 1.0f, 0.5f, 0.31f}),
-          specularColor({0.5f, 0.5f, 0.5f}),
+          ambientColor({0.0,0.1,0.06}),
+          diffuseColor({ 0.0,0.50980392,0.50980392}),
+          specularColor({0.50196078,0.50196078,0.50196078}),
           ambientOcclusion(0.25) {}
 };
 

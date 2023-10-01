@@ -21,19 +21,26 @@ class Texture2D
     void bind() const;
     GLuint getTextureID();
 
+    void setTextureFormat(QOpenGLTexture::TextureFormat format);
+    void setWrapMode(QOpenGLTexture::WrapMode s, QOpenGLTexture::WrapMode t);
+    void setFilter(QOpenGLTexture::Filter min, QOpenGLTexture::Filter max);
+
     // 方便期间，直接裸露
     GLuint id;
     TextureType type;
+    GLboolean transparent;
     QString path;
 
+   private:
     QOpenGLTexture::TextureFormat internal_format;//Format of texture object
     QOpenGLTexture::WrapMode wrap_s;
     QOpenGLTexture::WrapMode wrap_t;
     QOpenGLTexture::Filter filter_min;
     QOpenGLTexture::Filter filter_max;
 
-   private:
     std::shared_ptr<QOpenGLTexture> texture;
+
+    static GLboolean checkTransparency(const QImage& image);
 };
 
 

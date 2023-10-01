@@ -8,6 +8,7 @@
 
 
 Mesh::Mesh(std::shared_ptr<Shader> sha, QVector<Vertex> vertices, QVector<unsigned int> indices, QVector<std::shared_ptr<Texture2D>> textures) {
+    this->multiMesh = GL_FALSE;
     this->shader = std::move(sha);
     this->vertices = std::move(vertices);
     this->indices = std::move(indices);
@@ -45,22 +46,21 @@ void Mesh::setTransform(QMatrix4x4 trans) {
     this->transform = trans;
 }
 
+void Mesh::setMultiMesh(GLboolean isMulti) {
+    this->multiMesh = isMulti;
+
+    for(auto &t : textures) {
+        // 确保即使是透明的，也要是Repeat，因为多mesh，多material模型会让vt超过1.
+        t->setWrapMode(QOpenGLTexture::Repeat, QOpenGLTexture::Repeat);
+    }
+}
+
 void Mesh::draw() {
     GLuint diffuseNr = 1;
     GLuint specularNr = 1;
 
-    if(shader == nullptr) {
-        qFatal("Mesh has NO shader!");
-    }
-
     /*============ outline logic ============*/
     if(drawOutline) {
-        glFunc->glEnable(GL_STENCIL_TEST);
-        glFunc->glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-        glFunc->glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-        glFunc->glClearStencil(0);
-        glFunc->glClear(GL_STENCIL_BUFFER_BIT);
-
         glFunc->glStencilFunc(GL_ALWAYS, 1, 0xFF);
         glFunc->glStencilMask(0xFF);
     } else {
@@ -107,7 +107,7 @@ void Mesh::draw() {
         // 更新M矩阵
         shader->setBool("enableOutline", true);
         QMatrix4x4 outLineTrans = this->transform;
-        outLineTrans.scale(1.03f);
+        outLineTrans.scale(1.05f);
         shader->setMatrix4f("model", outLineTrans);   // Model 要传进来
 
         glFunc->glBindVertexArray(VAO);
@@ -117,9 +117,10 @@ void Mesh::draw() {
         glFunc->glStencilMask(0xFF);
         glFunc->glStencilFunc(GL_ALWAYS, 0, 0xFF);
         glFunc->glEnable(GL_DEPTH_TEST);
-        glFunc->glDisable(GL_STENCIL_TEST);
+        // glFunc->glDisable(GL_STENCIL_TEST);
     } else {
-        glFunc->glStencilMask(0xFF);
+        // TODO: 还是有outline深度绘制错误
+        glFunc->glStencilMask(0xFF);    // 如果不加这一行。outline会显示错误
     }
     /*============ outline logic ============*/
 
