@@ -68,8 +68,14 @@ void MainWindow::initWidget() {
     // Tool Button and Menus and Actions
     objectAddMenu = new QMenu(objectAddButton);
     objectShapeSelectMenu = new QMenu("shape select menu" ,objectAddMenu);
-    objectLoadShapeCubeAction = objectShapeSelectMenu->addAction("cube");
-    objectLoadShapeQuadAction = objectShapeSelectMenu->addAction("quad");
+
+    objectLoadShapeUnitCubeAction = objectShapeSelectMenu->addAction("Unit Cube");
+    objectLoadShapeCubeAction = objectShapeSelectMenu->addAction("Cube");
+    objectLoadShapeQuadAction = objectShapeSelectMenu->addAction("Quad");
+    objectLoadShapePlaneAction = objectShapeSelectMenu->addAction("Plane");
+    objectLoadShapeSphereAction = objectShapeSelectMenu->addAction("Sphere");
+    objectLoadShapeCapsuleAction = objectShapeSelectMenu->addAction("Capsule");
+
     objectLoadModelAction = objectAddMenu->addAction("model load");
     objectAddMenu->addMenu(objectShapeSelectMenu);
     objectAddButton->setMenu(objectAddMenu);
@@ -95,6 +101,8 @@ void MainWindow::initWidget() {
     enableLightingCheckBox = ui->enableLightingCheckBox;
     enableLineModeCheckBox = ui->enableLineModeCheckBox;
     enableDepthMapCheckBox = ui->enableDepthMapCheckBox;
+
+    cullModeComboBox = ui->cullModeComboBox;
 
     // 操作时隐藏或者显示：
     positionFrame = ui->positionFrame;
@@ -162,6 +170,7 @@ void MainWindow::initLayout() {
 
     // Dash configure layout
     auto *vDashLayout = new QVBoxLayout;
+    vDashLayout->addWidget(cullModeComboBox);
     vDashLayout->addWidget(enableLineModeCheckBox);
     vDashLayout->addWidget(enableLightingCheckBox);
     envTab->setLayout(vDashLayout);
@@ -306,10 +315,19 @@ void MainWindow::initLayout() {
 
 void MainWindow::connectConfigure() {
     // QToolButton and Actions
+    connect(objectLoadShapeUnitCubeAction, &QAction::triggered,
+            this, &MainWindow::onLoadGameObjectUnitCube);
     connect(objectLoadShapeCubeAction, &QAction::triggered,
             this, &MainWindow::onLoadGameObjectCube);
     connect(objectLoadShapeQuadAction, &QAction::triggered,
             this, &MainWindow::onLoadGameObjectQuad);
+    connect(objectLoadShapePlaneAction, &QAction::triggered,
+            this, &MainWindow::onLoadGameObjectPlane);
+    connect(objectLoadShapeSphereAction, &QAction::triggered,
+            this, &MainWindow::onLoadGameObjectSphere);
+    connect(objectLoadShapeCapsuleAction, &QAction::triggered,
+            this, &MainWindow::onLoadGameObjectCapsule);
+
     connect(objectLoadModelAction, &QAction::triggered,
             this, &MainWindow::onLoadModel);
     connect(objectDeleteButton, &QPushButton::clicked,
@@ -328,6 +346,10 @@ void MainWindow::connectConfigure() {
             this, &MainWindow::onEnableLineModeCheckBox);
     connect(enableDepthMapCheckBox, &QCheckBox::stateChanged,
             this, &MainWindow::onEnableDepthModeCheckBox);
+
+    connect(cullModeComboBox, qOverload<int>(&QComboBox::currentIndexChanged),
+            this, &MainWindow::onCullModeComboBoxChanged);
+
 
     // Inspector:
     connect(nameCheckBox, &QCheckBox::stateChanged,
@@ -385,25 +407,111 @@ void MainWindow::updateGLManager() {
     glManager->update();
 }
 
-void MainWindow::onLoadGameObjectCube() {
-    int id = glManager->addObject(ObjectType::Cube);
+void MainWindow::onLoadGameObjectUnitCube() {
+    int id = glManager->addObject(ObjectType::UnitCube);
     if(id == -1) {
         return;
     }
-
-    auto *item = new QListWidgetItem("Cube " + QString::number(id), objectList);
+    qDebug() << "Load Shape : Unit Cube";
+    auto *item = new QListWidgetItem("Unit Cube - id:" + QString::number(id), objectList);
     item->setData(objectDataBaseIdRole, static_cast<qulonglong>(id));  // 存储ID
     objectList->addItem(item);
 }
+
+void MainWindow::onLoadGameObjectCube() {
+    bool ok;
+    int width = QInputDialog::getInt(this, tr("Enter Width"), tr("Width:"), 1, 1, 1500, 1, &ok);
+
+    if (ok) {
+        qDebug() << "Load Shape : Cube : " << "Width:" << width;
+        int id = glManager->addObject(ObjectType::Cube, static_cast<float>(width));
+        if(id == -1) {
+            return;
+        }
+
+        auto *item = new QListWidgetItem("Cube " + QString::number(width) + " - id:" + QString::number(id), objectList);
+        item->setData(objectDataBaseIdRole, static_cast<qulonglong>(id));  // 存储ID
+        objectList->addItem(item);
+    }
+}
+
 void MainWindow::onLoadGameObjectQuad() {
     int id = glManager->addObject(ObjectType::Quad);
     if(id == -1) {
         return;
     }
-
+    qDebug() << "Load Shape : Quad";
     auto *item = new QListWidgetItem("Quad " + QString::number(id), objectList);
     item->setData(objectDataBaseIdRole, static_cast<qulonglong>(id));  // 存储ID
     objectList->addItem(item);
+}
+
+void MainWindow::onLoadGameObjectPlane() {
+    bool ok;
+    int width = QInputDialog::getInt(this, tr("Enter Width"), tr("Width:"),
+                                     1, 1, 1500, 1, &ok);
+
+    if (ok) {
+        int height = QInputDialog::getInt(this, tr("Enter Height"), tr("Height:"),
+                                          1, 1, 1500, 1, &ok);
+        if (ok) {
+            qDebug() << "Load Shape : Plane : " << "Width:" << width << "Height:" << height;
+
+            int id = glManager->addObject(ObjectType::Plane, static_cast<float>(width), static_cast<float>(height));
+            if(id == -1) {
+                return;
+            }
+
+            auto *item = new QListWidgetItem("Plane " + QString::number(width) + "x" + QString::number(height) + " - id:" + QString::number(id), objectList);
+            item->setData(objectDataBaseIdRole, static_cast<qulonglong>(id));  // 存储ID
+            objectList->addItem(item);
+        }
+    }
+}
+
+void MainWindow::onLoadGameObjectSphere() {
+    bool ok;
+    double radius = QInputDialog::getDouble(this, tr("Enter Radius"), tr("Radius:"),
+                                     1, 0.00001, 1000.00000, 5, &ok);
+
+    if (ok) {
+        int resolution = QInputDialog::getInt(this, tr("Enter Resolution"), tr("Resolution:"),
+                                          1, 1, 1000, 1, &ok);
+        if (ok) {
+            qDebug() << "Load Shape : Sphere : " << "Radius:" << radius << "Resolution:" << resolution;
+
+            int id = glManager->addObject(ObjectType::Sphere, static_cast<float>(radius), static_cast<float>(resolution));
+            if(id == -1) {
+                return;
+            }
+
+            auto *item = new QListWidgetItem("Sphere " + QString::number(radius) + "x" + QString::number(resolution) + " - id:" + QString::number(id), objectList);
+            item->setData(objectDataBaseIdRole, static_cast<qulonglong>(id));  // 存储ID
+            objectList->addItem(item);
+        }
+    }
+}
+
+// TODO: Capsule Shape
+void MainWindow::onLoadGameObjectCapsule() {
+//    bool ok;
+//    double radius = QInputDialog::getDouble(this, tr("Enter Radius"), tr("Radius:"), 1, 0.00001, 150, 5, &ok);
+//
+//    if (ok) {
+//        double height = QInputDialog::getDouble(this, tr("Enter Height"), tr("Height:"), 1, 0.00001, 150, 5, &ok);
+//        if (ok) {
+//            qDebug() << "Load Shape : Capsule : " << "Radius:" << radius << "Height:" << height;
+//
+//            int id = glManager->addObject(ObjectType::Capsule, static_cast<float>(radius), static_cast<float>(height));
+//            if(id == -1) {
+//                return;
+//            }
+//
+//            auto *item = new QListWidgetItem("Capsule " + QString::number(radius) + "x" + QString::number(height), objectList);
+//            item->setData(objectDataBaseIdRole, static_cast<qulonglong>(id));  // 存储ID
+//            objectList->addItem(item);
+//        }
+//    }
 }
 
 void MainWindow::onLoadModel() {
@@ -473,6 +581,18 @@ void MainWindow::onEnableDepthModeCheckBox(int state) {
     }
 
     glManager->setDepthMode(depthMode);
+}
+
+void MainWindow::onCullModeComboBoxChanged(int index) {
+    if(index == 0) {    // back
+        glManager->setCullMode(CullModeType::Disable);
+    } else if (index == 1) {    // disable
+        glManager->setCullMode(CullModeType::Back);
+    } else if (index == 2) {    // front
+        glManager->setCullMode(CullModeType::Front);
+    } else if (index == 3) {
+        glManager->setCullMode(CullModeType::Front_Back);
+    }
 }
 
 void MainWindow::onDisplayCheckBox(int state) {

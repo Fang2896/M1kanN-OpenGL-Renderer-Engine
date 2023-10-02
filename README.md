@@ -26,12 +26,12 @@ Mikann Renderer Engine is a OpenGL based renderer engine for rendering algorithm
 
 ### Functions
 
-* [ ] Basic shapes
+* [x] Basic shapes
   (Cube, Sphere, Capsule, Plane, Quad and so on.)
-* [ ] Lightings and Objects transform configure system
-* [ ] Visualizing **Depth Buffer**
-* [ ] Using **Stencil Testing** to draw objects’ outlining
-* [ ] Transparent Object Rendering : Clipping and Blending 
+* [x] Lightings and Objects transform configure system
+* [x] Visualizing **Depth Buffer**
+* [x] Using **Stencil Testing** to draw objects’ outlining
+* [x] Transparent Object Rendering : Clipping and Blending 
   (draw a plane of grass and half transparent glass)
 * [ ] Using Frame Buffer to renderer scene to a texture
   Then Post Processing
@@ -64,6 +64,9 @@ Mikann Renderer Engine is a OpenGL based renderer engine for rendering algorithm
 4. 【已解决】部分多材质模式（nanosuit）仅显示一半的部分贴图问题
    * 原因及其解决方法: 
      部分模型的uv会超过1来重复利用对称材质，因此texture wrap mode应该设为repeat
+5. 【已解决】改变剔除模式后，模型会变成全黑
+   * 原因及其解决方法:
+     原因未知。解决方法：每次绘制的时候重新传入Material。
 
 
 ## References

@@ -30,7 +30,7 @@ class GLManager : public QOpenGLWidget {
    public:  // api for MainWindow
     void clearObjects();
     int addObject(const QString& mPath = "");
-    int addObject(ObjectType objType);
+    int addObject(ObjectType objType, float width = 0.0f, float height = 0.0f);
 
     void deleteObject(GLuint id);
     [[nodiscard]] const std::map<GLuint, std::shared_ptr<GameObject>>& getAllGameObjectMap() const;
@@ -40,6 +40,7 @@ class GLManager : public QOpenGLWidget {
     void setEnableLighting(GLboolean enableLighting);
     void setLineMode(GLboolean enableLineMode);
     void setDepthMode(GLboolean depMode);
+    void setCullMode(CullModeType type);
 
    protected:
     void initializeGL() override;
@@ -84,6 +85,7 @@ class GLManager : public QOpenGLWidget {
     GLboolean isLighting;
     GLboolean depthMode;
     QVector3D backGroundColor;
+    CullModeType cullType;
 
     DirectLight directLight;
 

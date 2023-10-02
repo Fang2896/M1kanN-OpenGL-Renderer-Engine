@@ -16,13 +16,13 @@
 class GameObject {
    public:
     GameObject();
-    explicit GameObject(ObjectType type, const QString& disName = "GameObject");
+    explicit GameObject(ObjectType type, float length = 0.0f, float width = 0.0f, const QString& disName = "GameObject");
     explicit GameObject(const QString& mPath, const QString& disName = "GameObject");
     ~GameObject();
 
     void draw();
 
-    void loadShape(ObjectType t, float width=1.0f, float height=2.0f);   // only for non-model shape
+    void loadShape(ObjectType t, float width=0.0f, float height=0.0f);   // only for non-model shape
     void loadModel(const QString& mPath); // only for model
     void loadShader(const QString& vertPath,
                     const QString& fragPath,

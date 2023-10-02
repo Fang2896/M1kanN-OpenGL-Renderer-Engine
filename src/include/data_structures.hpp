@@ -17,6 +17,10 @@ struct Vertex {
     QVector3D position;
     QVector3D normal;
     QVector2D texCoord;
+
+    Vertex() = default;
+    Vertex(QVector3D pos, QVector3D nor, QVector2D tex)
+        : position(pos), normal(nor), texCoord(tex) {}
 };
 
 struct DirectLight {

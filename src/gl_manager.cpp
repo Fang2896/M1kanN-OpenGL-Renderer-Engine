@@ -105,6 +105,9 @@ void GLManager::updateRenderData() {
     for(auto & i : objectMap) {
         auto& tempShader = ResourceManager::getShader(i.second->getShaderName())->use();
         tempShader.setMatrix4f("model", i.second->getTransform());
+
+        // 为了cullMode change的一个bug
+        ResourceManager::updateMaterialInShader(i.second->getShaderName(), i.second->getMaterial());
         tempShader.release();
     }
 }
@@ -157,22 +160,20 @@ int GLManager::addObject(const QString& mPath) {
     return (int)tempID;
 }
 
-int GLManager::addObject(ObjectType objType) {
+int GLManager::addObject(ObjectType objType, float width, float height) {
     this->makeCurrent();
     if(objType == ObjectType::Model) {
         qDebug() << "If you want to add a model, please directly give the model path!";
         return -1;
     }
 
-    std::shared_ptr<GameObject> tempPtr = std::make_shared<GameObject>(objType);
+    std::shared_ptr<GameObject> tempPtr = std::make_shared<GameObject>(objType, width, height);
     GLuint tempID = tempPtr->getObjectID();
 
-    tempPtr->displayName = objectTypeToString(objType) + " " + QString::number(tempID);
+    tempPtr->displayName = objectTypeToString(objType) + " - " + QString::number(tempID);
     objectMap[tempID] = tempPtr;
-    qDebug() << "Add Shape Object, Shader: " << tempPtr->displayName;
 
     this->doneCurrent();
-
     return (int)tempID;
 }
 
@@ -215,6 +216,23 @@ void GLManager::setLineMode(GLboolean enableLineMode) {
 
 void GLManager::setDepthMode(GLboolean depMode) {
     this->depthMode = depMode;
+}
+
+void GLManager::setCullMode(CullModeType type) {
+    makeCurrent();
+    if(type == CullModeType::Disable) {
+        glFunc->glDisable(GL_CULL_FACE);
+    } else if (type == CullModeType::Front) {
+        glFunc->glEnable(GL_CULL_FACE);
+        glFunc->glCullFace(GL_FRONT);
+    } else if (type == CullModeType::Back) {
+        glFunc->glEnable(GL_CULL_FACE);
+        glFunc->glCullFace(GL_BACK);
+    } else if (type == CullModeType::Front_Back) {
+        glFunc->glEnable(GL_CULL_FACE);
+        glFunc->glCullFace(GL_FRONT_AND_BACK);
+    }
+    doneCurrent();
 }
 
 void GLManager::checkGLVersion() {
@@ -273,6 +291,8 @@ void GLManager::initOpenGLSettings() {
     glFunc->glEnable(GL_STENCIL_TEST);
     glFunc->glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
     glFunc->glClearStencil(0);
+
+    glFunc->glDisable(GL_CULL_FACE);
 
     GLfloat lineWidthRange[2];
     glFunc->glGetFloatv(GL_ALIASED_LINE_WIDTH_RANGE, lineWidthRange);

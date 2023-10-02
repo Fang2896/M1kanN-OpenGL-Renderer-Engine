@@ -22,6 +22,7 @@
 #include <QPushButton>
 #include <QToolButton>
 #include <QColorDialog>
+#include <QInputDialog>
 
 #include <QHBoxLayout>
 #include <QVBoxLayout>
@@ -53,8 +54,13 @@ class MainWindow : public QWidget {
    private slots: // slots
     void updateGLManager();
 
+    void onLoadGameObjectUnitCube();
     void onLoadGameObjectCube();
     void onLoadGameObjectQuad();
+    void onLoadGameObjectPlane();
+    void onLoadGameObjectSphere();
+    void onLoadGameObjectCapsule();
+
     void onLoadModel();
     void onObjectDeleteButtonClicked();
 
@@ -62,6 +68,7 @@ class MainWindow : public QWidget {
     void onEnableLightingCheckBox(int state);
     void onEnableLineModeCheckBox(int state);
     void onEnableDepthModeCheckBox(int state);
+    void onCullModeComboBoxChanged(int index);
 
     // inspector:
     void onDisplayCheckBox(int state);
@@ -134,9 +141,12 @@ class MainWindow : public QWidget {
     QMenu *objectAddMenu;
     QMenu *objectShapeSelectMenu;
 
-    // TODO: 后面会增加更多
+    QAction *objectLoadShapeUnitCubeAction;
     QAction *objectLoadShapeCubeAction;
     QAction *objectLoadShapeQuadAction;
+    QAction *objectLoadShapePlaneAction;
+    QAction *objectLoadShapeSphereAction;
+    QAction *objectLoadShapeCapsuleAction;
 
     QAction *objectLoadModelAction;
 
@@ -152,6 +162,8 @@ class MainWindow : public QWidget {
     QCheckBox *enableLightingCheckBox;
     QCheckBox *enableLineModeCheckBox;
     QCheckBox *enableDepthMapCheckBox;
+
+    QComboBox *cullModeComboBox;
 
     QGroupBox *transformGroupBox;
 

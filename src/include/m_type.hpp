@@ -8,7 +8,12 @@
 #include <QString>
 
 
+enum class Direction {
+    UP, DOWN, LEFT, RIGHT, FRONT, BACK
+};
+
 enum class ObjectType {
+    UnitCube,
     Cube,
     Plane,
     Quad,
@@ -25,6 +30,13 @@ enum class TextureType {
     Displacement,
     Occlusion,
     UNKNOWN
+};
+
+enum class CullModeType {
+    Disable,
+    Front,
+    Back,
+    Front_Back
 };
 
 static QString objectTypeToString(ObjectType objType) {

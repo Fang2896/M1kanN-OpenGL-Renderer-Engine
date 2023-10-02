@@ -25,8 +25,8 @@ GameObject::GameObject()
     QVector<std::shared_ptr<Texture2D>> vecTextures{};
     std::shared_ptr<Mesh> cubeMesh = std::make_shared<Mesh>(
         shader,
-        ShapeData::getCubeVertices(),
-        ShapeData::getCubeIndices(),
+        ShapeData::getUnitCubeVertices(),
+        ShapeData::getUnitCubeIndices(),
         vecTextures);
 
     meshes = QVector<std::shared_ptr<Mesh>>{cubeMesh};
@@ -48,7 +48,7 @@ GameObject::GameObject()
     shader->release();
 }
 
-GameObject::GameObject(ObjectType type, const QString& disName)
+GameObject::GameObject(ObjectType type, float width, float height, const QString& disName)
     : GameObject()
 {
     this->displayName = disName;
@@ -58,7 +58,7 @@ GameObject::GameObject(ObjectType type, const QString& disName)
         qDebug("==>Type is Model, Please give model path using loadModel<==");
     }
 
-    loadShape(type);
+    loadShape(type, width, height);
 }
 
 GameObject::GameObject(const QString& mPath, const QString& disName)
@@ -111,14 +111,19 @@ void GameObject::loadShape(ObjectType t, float width, float height) {
     QVector<std::shared_ptr<Texture2D>> vecTextures{};
 
     switch (t) {
-        case ObjectType::Cube:
-            meshes.append(std::make_shared<Mesh>(shader, ShapeData::getCubeVertices(),
-                                              ShapeData::getCubeIndices(),
+        case ObjectType::UnitCube:
+            meshes.append(std::make_shared<Mesh>(shader, ShapeData::getUnitCubeVertices(),
+                                              ShapeData::getUnitCubeIndices(),
                                               vecTextures));
             break;
+        case ObjectType::Cube:
+            meshes.append(std::make_shared<Mesh>(shader, ShapeData::getCubeVertices(static_cast<int>(width)),
+                                                 ShapeData::getCubeIndices(static_cast<int>(width)),
+                                                 vecTextures));
+            break;
         case ObjectType::Plane:
-            meshes.append(std::make_shared<Mesh>(shader, ShapeData::getPlaneVertices(width, height),
-                                                 ShapeData::getPlaneIndices(width, height),
+            meshes.append(std::make_shared<Mesh>(shader, ShapeData::getPlaneVertices(static_cast<int>(width), static_cast<int>(height)),
+                                                 ShapeData::getPlaneIndices(static_cast<int>(width), static_cast<int>(height)),
                                                  vecTextures));
             break;
         case ObjectType::Quad:
@@ -127,13 +132,13 @@ void GameObject::loadShape(ObjectType t, float width, float height) {
                                                  vecTextures));
             break;
         case ObjectType::Capsule:
-            meshes.append(std::make_shared<Mesh>(shader, ShapeData::getCapsuleVertices(width / 2.0f, height),
-                                                 ShapeData::getCapsuleIndices(width / 2.0f, height),
+            meshes.append(std::make_shared<Mesh>(shader, ShapeData::getCapsuleVertices(static_cast<float>(width), static_cast<float>(height)),
+                                                 ShapeData::getCapsuleIndices(static_cast<float>(width), static_cast<float>(height)),
                                                  vecTextures));
             break;
         case ObjectType::Sphere:
-            meshes.append(std::make_shared<Mesh>(shader, ShapeData::getSphereVertices(width / 2.0f),
-                                                 ShapeData::getSphereIndices(width / 2.0f),
+            meshes.append(std::make_shared<Mesh>(shader, ShapeData::getSphereVertices(width, static_cast<int>(height)),
+                                                 ShapeData::getSphereIndices(width, static_cast<int>(height)),
                                                  vecTextures));
             break;
         case ObjectType::Model:

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1100</width>
-    <height>559</height>
+    <width>1104</width>
+    <height>569</height>
    </rect>
   </property>
   <property name="font">
@@ -304,7 +304,7 @@
     <enum>QTabWidget::Rounded</enum>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>0</number>
    </property>
    <property name="elideMode">
     <enum>Qt::ElideLeft</enum>
@@ -329,7 +329,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>0</y>
+       <y>30</y>
        <width>141</width>
        <height>31</height>
       </rect>
@@ -352,7 +352,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>30</y>
+       <y>60</y>
        <width>151</width>
        <height>21</height>
       </rect>
@@ -360,6 +360,36 @@
      <property name="text">
       <string>Enable Line Mode</string>
      </property>
+    </widget>
+    <widget class="QComboBox" name="cullModeComboBox">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>121</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <item>
+      <property name="text">
+       <string>Cull Disable</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Cull Back</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Cull Front</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Cull Front_Back</string>
+      </property>
+     </item>
     </widget>
    </widget>
    <widget class="QWidget" name="postProcessingTab">
