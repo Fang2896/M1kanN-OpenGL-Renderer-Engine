@@ -7,6 +7,13 @@
 
 #include <QString>
 
+enum class SkyboxType {
+    Disable = 0,
+    Mountain,
+    Earth,
+    Sunset
+};
+
 enum class PostProcessingType {
     NORMAL = 0,
     INVERSION,

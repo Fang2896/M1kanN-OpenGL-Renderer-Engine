@@ -21,6 +21,7 @@ void GLManager::initializeGL() {
     initOpenGLSettings();
     initFrameBufferSettings();
     initShaders();    // shader
+    initSkyBoxSettings();
 
     // TODO: 这里可以从coordinate改成各种绘制精灵？
     initShaderValue();
@@ -117,9 +118,20 @@ void GLManager::updateRenderData() {
     // TODO：灯光管理太烂了。等后面来优化。光没准可以定义成全局变量
     ResourceManager::updateDirectLightInShader(isLighting, directLight);
 
+    // coordinate
     QMatrix4x4 tempM;
     tempM.setToIdentity();
     ResourceManager::getShader("coordShader")->use().setMatrix4f("model", tempM);
+
+    // skybox (这个要单独设置)
+    QMatrix4x4 skyboxView;
+    skyboxView.setRow(0, QVector4D(view(0, 0), view(0, 1), view(0, 2), 0.0f));
+    skyboxView.setRow(1, QVector4D(view(1, 0), view(1, 1), view(1, 2), 0.0f));
+    skyboxView.setRow(2, QVector4D(view(2, 0), view(2, 1), view(2, 2), 0.0f));
+    skyboxView.setRow(3, QVector4D(0.0f,0.0f, .0f, .0f)); //这个去掉位移的4x4矩阵，使天空盒vertices的尺寸的改变，不再影响渲染效果
+    ResourceManager::getShader("skybox")->use().setMatrix4f("view", skyboxView);
+    ResourceManager::getShader("skybox")->use().setMatrix4f("projection", projection);
+
     // 为管理的objects设置model
     for(auto & i : objectMap) {
         auto& tempShader = ResourceManager::getShader(i.second->getShaderName())->use();
@@ -138,6 +150,13 @@ void GLManager::drawObjects() {
     ResourceManager::getShader("coordShader")->release();
 
     // 先绘制不透明物体
+    if(enableSkybox == GL_TRUE) {
+        glFunc->glDepthFunc(GL_LEQUAL);
+        ResourceManager::getShader("skybox")->use();
+        skybox->draw();
+        glFunc->glDepthFunc(GL_LESS);
+    }
+
     for(auto & i : objectMap) {
         if(!i.second->containTransparencyTexture)
             i.second->draw();
@@ -313,6 +332,36 @@ void GLManager::setPostProcessingType(PostProcessingType type) {
     this->postProcessingType = type;
 }
 
+void GLManager::setSkyboxPath(SkyboxType type) {
+    if(type == SkyboxType::Disable) {
+        enableSkybox = GL_FALSE;
+    } else if(type == SkyboxType::Mountain){    //山水
+        enableSkybox = GL_TRUE;
+        skybox->setCubePath(":/textures/assets/textures/skybox/1/right.jpg",
+                            ":/textures/assets/textures/skybox/1/top.jpg",
+                            ":/textures/assets/textures/skybox/1/front.jpg",
+                            ":/textures/assets/textures/skybox/1/left.jpg",
+                            ":/textures/assets/textures/skybox/1/bottom.jpg",
+                            ":/textures/assets/textures/skybox/1/back.jpg");
+    }else if(type == SkyboxType::Earth){
+        enableSkybox = GL_TRUE;
+        skybox->setCubePath(":/textures/assets/textures/skybox/2/right.jpg",
+                            ":/textures/assets/textures/skybox/2/top.jpg",
+                            ":/textures/assets/textures/skybox/2/front.jpg",
+                            ":/textures/assets/textures/skybox/2/left.jpg",
+                            ":/textures/assets/textures/skybox/2/bottom.jpg",
+                            ":/textures/assets/textures/skybox/2/back.jpg");
+    }else if(type == SkyboxType::Sunset){
+        enableSkybox = GL_TRUE;
+        skybox->setCubePath(":/textures/assets/textures/skybox/3/right.jpg",
+                            ":/textures/assets/textures/skybox/3/top.jpg",
+                            ":/textures/assets/textures/skybox/3/front.jpg",
+                            ":/textures/assets/textures/skybox/3/left.jpg",
+                            ":/textures/assets/textures/skybox/3/bottom.jpg",
+                            ":/textures/assets/textures/skybox/3/back.jpg");
+    }
+}
+
 void GLManager::checkGLVersion() {
     QOpenGLContext* context = QOpenGLContext::currentContext();
     if (context) {
@@ -388,48 +437,33 @@ void GLManager::initOpenGLSettings() {
 }
 
 void GLManager::initFrameBufferSettings() {
-//    glFunc->glClearColor(0.8f, 0.8f, 0.8f, 1.0f);
-//
-//    // FrameBuffer， textureBuffer， RenderBuffer Init
-//    glFunc->glGenFramebuffers(1, &frameBuffer);
-//    glFunc->glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
-//
-//    glFunc->glGenTextures(1, &textureBuffer);
-//    glFunc->glBindTexture(GL_TEXTURE_2D, textureBuffer);
-//    glFunc->glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
-//                         PostProcessingScreenWidth, PostProcessingScreenHeight,
-//                         0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
-//    glFunc->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-//    glFunc->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-//    glFunc->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-//    glFunc->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-//    glFunc->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
-//                                   GL_TEXTURE_2D, textureBuffer, 0);
-//
-//    glFunc->glGenRenderbuffers(1, &renderBuffer);
-//    glFunc->glBindRenderbuffer(GL_RENDERBUFFER, renderBuffer);
-//    glFunc->glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8,
-//                                  PostProcessingScreenWidth, PostProcessingScreenHeight);
-//    glFunc->glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT,
-//                                      GL_RENDERBUFFER, renderBuffer);
-//
-//
-//    if(glFunc->glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-//        qDebug() << "ERROR::FRAMEBUFFER:: Framebuffer is not complete";
-//    glFunc->glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
     fbo = new QOpenGLFramebufferObject(QSize(width(), height()),
                                        QOpenGLFramebufferObject::CombinedDepthStencil, GL_TEXTURE_2D, GL_RGB);
 
     postProcessingScreen = std::make_shared<PostProcessScreen>();
     postProcessingScreen->init();
 
-//    testGameObject = std::make_shared<GameObject>(ObjectType::UnitCube);
-//    objectMap[100] = testGameObject;
     maxNumOfTextureUnits = 0;
     glFunc->glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &maxNumOfTextureUnits);
     qDebug() << "Max Texture Unit Support Number : " << maxNumOfTextureUnits;
     qDebug() << "======= Done Init Frame Buffer Settings ========";
+}
+
+void GLManager::initSkyBoxSettings() {
+    enableSkybox = GL_FALSE;
+
+    skybox = std::make_shared<SkyBox>();
+
+    skybox->setPosXPath(":/textures/assets/textures/skybox/1/right.jpg");
+    skybox->setPosYPath(":/textures/assets/textures/skybox/1/top.jpg");
+    skybox->setPosZPath(":/textures/assets/textures/skybox/1/front.jpg");
+    skybox->setNegXPath(":/textures/assets/textures/skybox/1/left.jpg");
+    skybox->setNegYPath(":/textures/assets/textures/skybox/1/bottom.jpg");
+    skybox->setNegZPath(":/textures/assets/textures/skybox/1/back.jpg");
+    skybox->init();
+
+    ResourceManager::loadShader("skybox", ":/shaders/assets/shaders/skybox/skybox.vert",
+                                ":/shaders/assets/shaders/skybox/skybox.frag");
 }
 
 /********* Event Functions *********/

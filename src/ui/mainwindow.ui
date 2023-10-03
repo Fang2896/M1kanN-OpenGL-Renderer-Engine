@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1104</width>
-    <height>569</height>
+    <width>1100</width>
+    <height>559</height>
    </rect>
   </property>
   <property name="font">
@@ -304,7 +304,7 @@
     <enum>QTabWidget::Rounded</enum>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>0</number>
    </property>
    <property name="elideMode">
     <enum>Qt::ElideLeft</enum>
@@ -391,6 +391,36 @@
       </property>
      </item>
     </widget>
+    <widget class="QComboBox" name="skyboxComboBox">
+     <property name="geometry">
+      <rect>
+       <x>140</x>
+       <y>10</y>
+       <width>141</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <item>
+      <property name="text">
+       <string>Disable Skybox</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Skybox: Mountain</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Skybox: Earth</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Skybox: Sunset</string>
+      </property>
+     </item>
+    </widget>
    </widget>
    <widget class="QWidget" name="postProcessingTab">
     <attribute name="title">
@@ -399,8 +429,8 @@
     <widget class="QCheckBox" name="enableDepthMapCheckBox">
      <property name="geometry">
       <rect>
-       <x>0</x>
-       <y>30</y>
+       <x>10</x>
+       <y>60</y>
        <width>161</width>
        <height>31</height>
       </rect>

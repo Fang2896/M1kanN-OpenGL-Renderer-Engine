@@ -20,6 +20,7 @@
 #include "utils/resource_manager.hpp"
 
 #include "post_processing/post_process_screen.hpp"
+#include "skybox/sky_box.hpp"
 
 
 class GLManager : public QOpenGLWidget {
@@ -43,6 +44,8 @@ class GLManager : public QOpenGLWidget {
     void setDepthMode(GLboolean depMode);
     void setCullMode(CullModeType type);
     void setPostProcessingType(PostProcessingType type);
+
+    void setSkyboxPath(SkyboxType type);
 
    protected:
     void initializeGL() override;
@@ -68,6 +71,7 @@ class GLManager : public QOpenGLWidget {
     void initLightInfo();
     void initOpenGLSettings();
     void initFrameBufferSettings();
+    void initSkyBoxSettings();
 
    private: // object manager functions
     void drawObjects();
@@ -84,11 +88,12 @@ class GLManager : public QOpenGLWidget {
 
     // frameBuffer variables
     QOpenGLFramebufferObject *fbo;
-//    GLuint frameBuffer;
-//    GLuint textureBuffer;
-//    GLuint renderBuffer;
     std::shared_ptr<PostProcessScreen> postProcessingScreen;
     GLint maxNumOfTextureUnits;
+
+    // skybox
+    std::shared_ptr<SkyBox> skybox;
+    GLboolean enableSkybox;
 
     QElapsedTimer eTimer;
 

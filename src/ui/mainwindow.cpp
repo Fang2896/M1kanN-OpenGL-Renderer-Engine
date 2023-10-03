@@ -97,6 +97,7 @@ void MainWindow::initWidget() {
     configureDashTab = ui->configureDashTab;
     envTab = ui->envTab;
     postProcessingTab = ui->postProcessingTab;
+    skyboxComboBox = ui->skyboxComboBox;
 
     enableLightingCheckBox = ui->enableLightingCheckBox;
     enableLineModeCheckBox = ui->enableLineModeCheckBox;
@@ -170,8 +171,12 @@ void MainWindow::initLayout() {
     sceneGroupBox->setLayout(vSceneLayout);
 
     // Dash configure layout
+    auto *comboEnvLayout = new QHBoxLayout;
+    comboEnvLayout->addWidget(cullModeComboBox);
+    comboEnvLayout->addWidget(skyboxComboBox);
+
     auto *vDashLayout = new QVBoxLayout;
-    vDashLayout->addWidget(cullModeComboBox);
+    vDashLayout->addLayout(comboEnvLayout);
     vDashLayout->addWidget(enableLineModeCheckBox);
     vDashLayout->addWidget(enableLightingCheckBox);
     envTab->setLayout(vDashLayout);
@@ -356,6 +361,8 @@ void MainWindow::connectConfigure() {
             this, &MainWindow::onCullModeComboBoxChanged);
     connect(postProcessingComboBox, qOverload<int>(&QComboBox::currentIndexChanged),
             this, &MainWindow::onPostProcessingModeComboBoxChanged);
+    connect(skyboxComboBox, qOverload<int>(&QComboBox::currentIndexChanged),
+            this, &MainWindow::onSkyboxComboBoxChanged);
 
     // Inspector:
     connect(nameCheckBox, &QCheckBox::stateChanged,
@@ -498,7 +505,6 @@ void MainWindow::onLoadGameObjectSphere() {
     }
 }
 
-// TODO: Capsule Shape
 void MainWindow::onLoadGameObjectCapsule() {
 //    bool ok;
 //    double radius = QInputDialog::getDouble(this, tr("Enter Radius"), tr("Radius:"), 1, 0.00001, 150, 5, &ok);
@@ -553,6 +559,8 @@ void MainWindow::onObjectDeleteButtonClicked() {
     delete tempItem;
     tempItem = nullptr;
     glManager->deleteObject(currentObjectID);
+
+    currentObjectID = -1;
 }
 
 // dash configure slot functions
@@ -604,6 +612,11 @@ void MainWindow::onCullModeComboBoxChanged(int index) {
 void MainWindow::onPostProcessingModeComboBoxChanged(int index) {
     auto type = static_cast<PostProcessingType>(index);
     glManager->setPostProcessingType(type);
+}
+
+void MainWindow::onSkyboxComboBoxChanged(int index) {
+    auto type = static_cast<SkyboxType>(index);
+    glManager->setSkyboxPath(type);
 }
 
 void MainWindow::onDisplayCheckBox(int state) {

@@ -6,6 +6,8 @@ Author : [LIU Fang]([Fang2896 (Fang LIU) (github.com)](https://github.com/Fang28
 
 ## Introduction
 
+![image-20231004022850748](./assets/sample_image/sample_image_1.png)
+
 Mikann Renderer Engine is a OpenGL based renderer engine for rendering algorithm showcases.
 
 
@@ -16,11 +18,9 @@ Mikann Renderer Engine is a OpenGL based renderer engine for rendering algorithm
 
 * [x] Camera Movement
 * [x] Using `Assimp` load model
-* [ ] Skybox loading
+* [x] Skybox loading
 * [ ] Scene Manger (using scene tree)
-
 * [ ] Text Rendering
-
 
 
 
@@ -28,13 +28,13 @@ Mikann Renderer Engine is a OpenGL based renderer engine for rendering algorithm
 
 * [x] Basic shapes
   (Cube, Sphere, Capsule, Plane, Quad and so on.)
-* [x] Lightings and Objects transform configure system
+* [x] Lighting and Objects transform configure system
 * [x] Visualizing **Depth Buffer**
 * [x] Using **Stencil Testing** to draw objects’ outlining
 * [x] Transparent Object Rendering : Clipping and Blending 
   (draw a plane of grass and half transparent glass)
-* [ ] Using Frame Buffer to renderer scene to a texture
-  Then Post Processing
+  * [x] Using Frame Buffer to renderer scene to a texture
+    Then Post Processing: Inversion, Gray, Edging, Blur, Sharpen
 * [ ] High level GLSL (half-side rendering etc.)
 * [ ] Using Geometry shader to visualize normal
 * [ ] Anti Aliasing
@@ -81,7 +81,7 @@ Mikann Renderer Engine is a OpenGL based renderer engine for rendering algorithm
 9. 从后处理操作切换到正常的时候，物体会出现透视错误（UnitCube）
 
 
-    
+​    
 
 
 ## References

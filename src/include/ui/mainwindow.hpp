@@ -70,6 +70,7 @@ class MainWindow : public QWidget {
     void onEnableDepthModeCheckBox(int state);
     void onCullModeComboBoxChanged(int index);
     void onPostProcessingModeComboBoxChanged(int index);
+    void onSkyboxComboBoxChanged(int index);
 
     // inspector:
     void onDisplayCheckBox(int state);
@@ -164,6 +165,7 @@ class MainWindow : public QWidget {
     QCheckBox *enableLineModeCheckBox;
     QCheckBox *enableDepthMapCheckBox;
     QComboBox *postProcessingComboBox;
+    QComboBox *skyboxComboBox;
 
     QComboBox *cullModeComboBox;
 
