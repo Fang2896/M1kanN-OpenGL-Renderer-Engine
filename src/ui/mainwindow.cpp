@@ -101,6 +101,7 @@ void MainWindow::initWidget() {
     enableLightingCheckBox = ui->enableLightingCheckBox;
     enableLineModeCheckBox = ui->enableLineModeCheckBox;
     enableDepthMapCheckBox = ui->enableDepthMapCheckBox;
+    postProcessingComboBox = ui->postProcessingComboBox;
 
     cullModeComboBox = ui->cullModeComboBox;
 
@@ -174,6 +175,11 @@ void MainWindow::initLayout() {
     vDashLayout->addWidget(enableLineModeCheckBox);
     vDashLayout->addWidget(enableLightingCheckBox);
     envTab->setLayout(vDashLayout);
+
+    auto *vPostProcessingLayout = new QVBoxLayout;
+    vPostProcessingLayout->addWidget(postProcessingComboBox);
+    vPostProcessingLayout->addWidget(enableDepthMapCheckBox);
+    postProcessingTab->setLayout(vPostProcessingLayout);
 
     // name and display Layout
     auto *hDisplayLayout = new QHBoxLayout;
@@ -273,7 +279,6 @@ void MainWindow::initLayout() {
     transformLayout->addStretch(1);
 
     // 暂时全部隐藏，按照选择的QListWidget的item来显示
-
     positionFrame->hide();
     rotationFrame->hide();
     scaleFrame->hide();
@@ -349,7 +354,8 @@ void MainWindow::connectConfigure() {
 
     connect(cullModeComboBox, qOverload<int>(&QComboBox::currentIndexChanged),
             this, &MainWindow::onCullModeComboBoxChanged);
-
+    connect(postProcessingComboBox, qOverload<int>(&QComboBox::currentIndexChanged),
+            this, &MainWindow::onPostProcessingModeComboBoxChanged);
 
     // Inspector:
     connect(nameCheckBox, &QCheckBox::stateChanged,
@@ -593,6 +599,11 @@ void MainWindow::onCullModeComboBoxChanged(int index) {
     } else if (index == 3) {
         glManager->setCullMode(CullModeType::Front_Back);
     }
+}
+
+void MainWindow::onPostProcessingModeComboBoxChanged(int index) {
+    auto type = static_cast<PostProcessingType>(index);
+    glManager->setPostProcessingType(type);
 }
 
 void MainWindow::onDisplayCheckBox(int state) {

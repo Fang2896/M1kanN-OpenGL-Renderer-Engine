@@ -13,6 +13,10 @@
 #include "texture2d.hpp"
 
 
+const static int PostProcessingScreenWidth = 800;
+const static int PostProcessingScreenHeight = 600;
+
+
 struct Vertex {
     QVector3D position;
     QVector3D normal;

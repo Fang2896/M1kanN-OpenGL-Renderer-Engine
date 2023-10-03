@@ -7,6 +7,15 @@
 
 #include <QString>
 
+enum class PostProcessingType {
+    NORMAL = 0,
+    INVERSION,
+    GRAY,
+    SHARPEN,
+    BLUR,
+    EDGE,
+    SCAN
+};
 
 enum class Direction {
     UP, DOWN, LEFT, RIGHT, FRONT, BACK

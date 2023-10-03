@@ -5,11 +5,10 @@
 #ifndef GL_MANAGER_HPP
 #define GL_MANAGER_HPP
 
-
-
-#include <QVector3D>
-#include <QOpenGLWidget>
 #include <QElapsedTimer>
+#include <QOpenGLFramebufferObject>
+#include <QOpenGLWidget>
+#include <QVector3D>
 
 #include "data_structures.hpp"
 #include "gl_configure.hpp"
@@ -20,10 +19,12 @@
 #include "utils/camera.hpp"
 #include "utils/resource_manager.hpp"
 
+#include "post_processing/post_process_screen.hpp"
+
 
 class GLManager : public QOpenGLWidget {
    public:
-    explicit GLManager(QWidget* parent = nullptr, int width = 800,
+    explicit GLManager(QWidget* parent = nullptr, int width = 500,
                        int height = 400);
     ~GLManager() override;
 
@@ -41,6 +42,7 @@ class GLManager : public QOpenGLWidget {
     void setLineMode(GLboolean enableLineMode);
     void setDepthMode(GLboolean depMode);
     void setCullMode(CullModeType type);
+    void setPostProcessingType(PostProcessingType type);
 
    protected:
     void initializeGL() override;
@@ -65,9 +67,11 @@ class GLManager : public QOpenGLWidget {
     void initConfigureVariables();
     void initLightInfo();
     void initOpenGLSettings();
+    void initFrameBufferSettings();
 
    private: // object manager functions
     void drawObjects();
+    void drawObjectsWithPostProcessing();
 
    private: // objects member variables
     const QString modelDirectory = "../assets/models";
@@ -78,6 +82,14 @@ class GLManager : public QOpenGLWidget {
     std::unique_ptr<Camera> m_camera;
     std::unique_ptr<Coordinate> coordinate;
 
+    // frameBuffer variables
+    QOpenGLFramebufferObject *fbo;
+//    GLuint frameBuffer;
+//    GLuint textureBuffer;
+//    GLuint renderBuffer;
+    std::shared_ptr<PostProcessScreen> postProcessingScreen;
+    GLint maxNumOfTextureUnits;
+
     QElapsedTimer eTimer;
 
    private:  // configure variables
@@ -86,6 +98,9 @@ class GLManager : public QOpenGLWidget {
     GLboolean depthMode;
     QVector3D backGroundColor;
     CullModeType cullType;
+
+    // post-processing configure
+    PostProcessingType postProcessingType;
 
     DirectLight directLight;
 
@@ -106,8 +121,7 @@ class GLManager : public QOpenGLWidget {
     QMatrix4x4 view;
 
    private: // for test
-    // std::unique_ptr<Model> m_testModel;
-    // std::unique_ptr<Shape> m_testCube;
+    // std::shared_ptr<GameObject> testGameObject;
 };
 
 #endif  //GL_MANAGER_HPP

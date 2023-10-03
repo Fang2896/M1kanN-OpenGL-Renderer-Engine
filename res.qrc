@@ -7,6 +7,9 @@
 
         <file>assets/shaders/defaultShader.vert</file>
         <file>assets/shaders/defaultShader.frag</file>
+
+        <file>assets/shaders/post_processing/postProcessing.vert</file>
+        <file>assets/shaders/post_processing/postProcessing.frag</file>
     </qresource>
 
     <qresource prefix="/textures">

@@ -19,6 +19,7 @@ GLManager::~GLManager() = default;
 void GLManager::initializeGL() {
     initConfigureVariables();
     initOpenGLSettings();
+    initFrameBufferSettings();
     initShaders();    // shader
 
     // TODO: 这里可以从coordinate改成各种绘制精灵？
@@ -36,6 +37,15 @@ void GLManager::initializeGL() {
 
 void GLManager::resizeGL(int w, int h) {
     glFunc->glViewport(0, 0, w, h);
+
+    // postProcessing的texture也需要重新生成
+    fbo->release();
+    delete fbo;
+    fbo = nullptr;
+
+    fbo = new QOpenGLFramebufferObject(QSize(w, h),
+                                       QOpenGLFramebufferObject::CombinedDepthStencil,
+                                       GL_TEXTURE_2D, GL_RGB);
 }
 
 void GLManager::paintGL() {
@@ -47,21 +57,30 @@ void GLManager::paintGL() {
     this->handleInput(deltaTime);
     this->updateRenderData();
 
-    ResourceManager::getShader("coordShader")->use();
-    coordinate->drawCoordinate();
-    ResourceManager::getShader("coordShader")->release();
-
-    drawObjects();
+    if(postProcessingType == PostProcessingType::NORMAL) {
+        drawObjects();
+    } else {
+        drawObjectsWithPostProcessing();
+    }
 }
 
 // for coordinate and stencil testing
 void GLManager::initShaders() {
+    // coordinate
     ResourceManager::loadShader("coordShader",
                                 ":/shaders/assets/shaders/baseShader.vert",
                                 ":/shaders/assets/shaders/coordShader.frag");
+
+    // outline
     ResourceManager::loadShader("outlineShader",
                                 ":/shaders/assets/shaders/baseShader.vert",
                                 ":/shaders/assets/shaders/outlineShader.frag");
+
+    // post processing
+    ResourceManager::loadShader("postProcessingShader",
+                                ":/shaders/assets/shaders/post_processing/postProcessing.vert",
+                                ":/shaders/assets/shaders/post_processing/postProcessing.frag");
+    ResourceManager::getShader("postProcessingShader")->use().setInteger("screenTexture", 0);
 
     qDebug() << "======= Done Init Coordinate Shaders ========";
 }
@@ -83,11 +102,10 @@ void GLManager::updateRenderData() {
     else
         glFunc->glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-    // 这个是可有可无？
-    glFunc->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     glFunc->glClearColor(backGroundColor.x(),
                          backGroundColor.y(),
-                         backGroundColor.z(), 1.0f);  // 例如：清除为黑色
+                         backGroundColor.z(), 1.0f);
+    glFunc->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
     projection.setToIdentity();
     projection.perspective(m_camera->zoom, (GLfloat)width() / (GLfloat)height(), 0.1f, 200.f);
@@ -95,6 +113,7 @@ void GLManager::updateRenderData() {
 
     ResourceManager::updateProjViewViewPosMatrixInShader(projection, view, m_camera->position);
     ResourceManager::updateRenderConfigure(depthMode);
+
     // TODO：灯光管理太烂了。等后面来优化。光没准可以定义成全局变量
     ResourceManager::updateDirectLightInShader(isLighting, directLight);
 
@@ -114,26 +133,81 @@ void GLManager::updateRenderData() {
 
 /********* Object Manager Functions *********/
 void GLManager::drawObjects() {
+    ResourceManager::getShader("coordShader")->use();
+    coordinate->drawCoordinate();
+    ResourceManager::getShader("coordShader")->release();
+
     // 先绘制不透明物体
     for(auto & i : objectMap) {
         if(!i.second->containTransparencyTexture)
             i.second->draw();
     }
 
-    // 再对透明物体排序
-    std::map<float, unsigned int> distMap;
-    for(auto & i : objectMap) {
+    std::vector<std::pair<float, unsigned int>> distVec;
+    distVec.clear();
+    for(auto &i : objectMap) {
         if(i.second->containTransparencyTexture) {
-            // 离摄像机的距离
             float dist = m_camera->position.distanceToPoint(i.second->getPosition());
-            distMap[dist] = i.second->getObjectID();
+            distVec.emplace_back(dist, i.first);
         }
     }
 
+    // 从远到近排序
+    std::sort(distVec.begin(), distVec.end(),
+              [](const auto& lhs, const auto& rhs) {
+                  return lhs.first > rhs.first;
+              });
+
     // 从远到近绘制透明物体
-    for(auto it = distMap.rbegin(); it != distMap.rend(); ++it) {
-        objectMap[it->second]->draw();
+    for(auto & it : distVec) {
+        objectMap[it.second]->draw();
     }
+}
+
+void GLManager::drawObjectsWithPostProcessing() {
+    // 1st pass
+    fbo->bind();
+    glFunc->glEnable(GL_DEPTH_TEST);
+    glFunc->glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
+    glFunc->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    drawObjects();
+
+    fbo->release();
+
+    // 2nd pass
+    glFunc->glDisable(GL_DEPTH_TEST);
+    glFunc->glClearColor(0.8f, 0.8f, 0.8f, 1.0f);
+    glFunc->glClear(GL_COLOR_BUFFER_BIT);
+
+    const Shader &tempShader = ResourceManager::getShader("postProcessingShader")->use();
+    switch (postProcessingType) {
+        case PostProcessingType::NORMAL:
+            tempShader.setInteger("postProcessingType", (int)PostProcessingType::NORMAL);
+            break;
+        case PostProcessingType::INVERSION :
+            tempShader.setInteger("postProcessingType", (int)PostProcessingType::INVERSION);
+            break;
+        case PostProcessingType::GRAY:
+            tempShader.setInteger("postProcessingType", (int)PostProcessingType::GRAY);
+            break;
+        case PostProcessingType::SHARPEN:
+            tempShader.setInteger("postProcessingType", (int)PostProcessingType::SHARPEN);
+            break;
+        case PostProcessingType::BLUR:
+            tempShader.setInteger("postProcessingType", (int)PostProcessingType::BLUR);
+            break;
+        case PostProcessingType::EDGE:
+            tempShader.setInteger("postProcessingType", (int)PostProcessingType::EDGE);
+            break;
+        case PostProcessingType::SCAN:
+            tempShader.setInteger("postProcessingType", (int)PostProcessingType::SCAN);
+            break;
+    }
+
+    glFunc->glBindTexture(GL_TEXTURE_2D, fbo->texture()); //绑定fbo缓冲所生成的纹理ID
+    postProcessingScreen->draw();
+    glFunc->glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void GLManager::clearObjects() {
@@ -235,6 +309,10 @@ void GLManager::setCullMode(CullModeType type) {
     doneCurrent();
 }
 
+void GLManager::setPostProcessingType(PostProcessingType type) {
+    this->postProcessingType = type;
+}
+
 void GLManager::checkGLVersion() {
     QOpenGLContext* context = QOpenGLContext::currentContext();
     if (context) {
@@ -251,8 +329,11 @@ void GLManager::initConfigureVariables() {
     isLineMode = GL_FALSE;
     isLighting = GL_TRUE;
     depthMode = GL_FALSE;
+    cullType = CullModeType::Disable;
+    backGroundColor = QVector3D(0.6f, 0.6f, 0.6f);
 
-    backGroundColor = QVector3D(0.15f, 0.15f, 0.15f);
+    // post processing
+    postProcessingType = PostProcessingType::NORMAL;
 
     defaultCameraMoveSpeed = 0.2f;
     shiftDown = GL_FALSE;
@@ -304,6 +385,51 @@ void GLManager::initOpenGLSettings() {
                          backGroundColor.z(), 1.0f);
 
     qDebug() << "======= Done Init OpenGL Settings ========";
+}
+
+void GLManager::initFrameBufferSettings() {
+//    glFunc->glClearColor(0.8f, 0.8f, 0.8f, 1.0f);
+//
+//    // FrameBuffer， textureBuffer， RenderBuffer Init
+//    glFunc->glGenFramebuffers(1, &frameBuffer);
+//    glFunc->glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
+//
+//    glFunc->glGenTextures(1, &textureBuffer);
+//    glFunc->glBindTexture(GL_TEXTURE_2D, textureBuffer);
+//    glFunc->glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
+//                         PostProcessingScreenWidth, PostProcessingScreenHeight,
+//                         0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+//    glFunc->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+//    glFunc->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+//    glFunc->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+//    glFunc->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+//    glFunc->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+//                                   GL_TEXTURE_2D, textureBuffer, 0);
+//
+//    glFunc->glGenRenderbuffers(1, &renderBuffer);
+//    glFunc->glBindRenderbuffer(GL_RENDERBUFFER, renderBuffer);
+//    glFunc->glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8,
+//                                  PostProcessingScreenWidth, PostProcessingScreenHeight);
+//    glFunc->glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT,
+//                                      GL_RENDERBUFFER, renderBuffer);
+//
+//
+//    if(glFunc->glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+//        qDebug() << "ERROR::FRAMEBUFFER:: Framebuffer is not complete";
+//    glFunc->glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    fbo = new QOpenGLFramebufferObject(QSize(width(), height()),
+                                       QOpenGLFramebufferObject::CombinedDepthStencil, GL_TEXTURE_2D, GL_RGB);
+
+    postProcessingScreen = std::make_shared<PostProcessScreen>();
+    postProcessingScreen->init();
+
+//    testGameObject = std::make_shared<GameObject>(ObjectType::UnitCube);
+//    objectMap[100] = testGameObject;
+    maxNumOfTextureUnits = 0;
+    glFunc->glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &maxNumOfTextureUnits);
+    qDebug() << "Max Texture Unit Support Number : " << maxNumOfTextureUnits;
+    qDebug() << "======= Done Init Frame Buffer Settings ========";
 }
 
 /********* Event Functions *********/

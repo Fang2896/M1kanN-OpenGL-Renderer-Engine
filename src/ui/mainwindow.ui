@@ -304,7 +304,7 @@
     <enum>QTabWidget::Rounded</enum>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>1</number>
    </property>
    <property name="elideMode">
     <enum>Qt::ElideLeft</enum>
@@ -400,7 +400,7 @@
      <property name="geometry">
       <rect>
        <x>0</x>
-       <y>0</y>
+       <y>30</y>
        <width>161</width>
        <height>31</height>
       </rect>
@@ -418,6 +418,51 @@
      <property name="checked">
       <bool>false</bool>
      </property>
+    </widget>
+    <widget class="QComboBox" name="postProcessingComboBox">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>0</y>
+       <width>211</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <item>
+      <property name="text">
+       <string>Disable PostProcessing</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Inversion</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Gray</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Sharpen</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Blur</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Edge</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Scan</string>
+      </property>
+     </item>
     </widget>
    </widget>
   </widget>
