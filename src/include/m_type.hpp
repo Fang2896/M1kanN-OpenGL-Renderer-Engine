@@ -7,6 +7,13 @@
 
 #include <QString>
 
+
+enum class ShaderType {
+    Default = 0,
+    Reflection,
+    Refraction
+};
+
 enum class SkyboxType {
     Disable = 0,
     Mountain,

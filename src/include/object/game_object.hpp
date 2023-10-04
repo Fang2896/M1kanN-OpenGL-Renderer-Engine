@@ -24,9 +24,12 @@ class GameObject {
 
     void loadShape(ObjectType t, float width=0.0f, float height=0.0f);   // only for non-model shape
     void loadModel(const QString& mPath); // only for model
-    void loadShader(const QString& vertPath,
-                    const QString& fragPath,
-                    const QString& geoPath = nullptr);
+
+//    void loadShader(const QString& vertPath,
+//                    const QString& fragPath,
+//                    const QString& geoPath = nullptr);
+//    void loadShader(const QString& sName);
+//    void loadShader(ShaderType type);
 
     void loadDiffuseTexture(const QString& tPath);
     void loadSpecularTexture(const QString& tPath);
@@ -36,6 +39,9 @@ class GameObject {
     void setDiffuseColor(QVector3D col);
     void setSpecularColor(QVector3D col);
     void setAmbientOcclusion(float ab);
+
+    void setReflection(GLboolean isReflec);
+    void setRefraction(GLboolean isRefrac);
 
     ObjectType getType();
     QString getShaderName();

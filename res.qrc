@@ -9,6 +9,8 @@
         <file>assets/shaders/post_processing/postProcessing.frag</file>
         <file>assets/shaders/skybox/skybox.vert</file>
         <file>assets/shaders/skybox/skybox.frag</file>
+        <file>assets/shaders/reflectionShader.frag</file>
+        <file>assets/shaders/refractionShader.frag</file>
     </qresource>
 
     <qresource prefix="/textures">

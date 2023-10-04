@@ -122,7 +122,8 @@ std::shared_ptr<Shader> ResourceManager::getShader(const QString& name){
         return map_Shaders[name];
     else {
         QString temp("No Shader : " + name + " Exist!");
-        qFatal(temp.toStdString().c_str());
+        qDebug(temp.toStdString().c_str());
+        return nullptr;
     }
 }
 

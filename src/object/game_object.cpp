@@ -169,18 +169,76 @@ void GameObject::loadModel(const QString& mPath) {
     qDebug("Load Model Finished");
 }
 
-void GameObject::loadShader(const QString& vertPath, const QString& fragPath, const QString& geoPath) {
-    ResourceManager::loadShader(shaderName, vertPath, fragPath, geoPath);
-    shader = ResourceManager::getShader(shaderName);
-    ResourceManager::updateMaterialInShader(shaderName, material);
-    shader->use();
-    shader->setMatrix4f("model", transform);
-    shader->release();
-
-    for(auto & m : meshes) {
-        m->setShader(shader);
-    }
-}
+//void GameObject::loadShader(const QString& vertPath, const QString& fragPath, const QString& geoPath) {
+//    ResourceManager::loadShader(shaderName, vertPath, fragPath, geoPath);
+//    shader = ResourceManager::getShader(shaderName);
+//    ResourceManager::updateMaterialInShader(shaderName, material);
+//    shader->use();
+//    shader->setMatrix4f("model", transform);
+//    shader->release();
+//
+//    for(auto & m : meshes) {
+//        m->setShader(shader);
+//    }
+//}
+//
+//void GameObject::loadShader(const QString& sName) {
+//    auto tempShader = ResourceManager::getShader(sName);
+//    if(tempShader == nullptr) {
+//        return;
+//    }
+//
+//    ResourceManager::updateMaterialInShader(shaderName, material);
+//    shader->use();
+//    shader->setMatrix4f("model", transform);
+//    shader->release();
+//
+//    for(auto & m : meshes) {
+//        m->setShader(shader);
+//    }
+//}
+//
+//void GameObject::loadShader(ShaderType sType) {
+//    std::shared_ptr<Shader> tempShader;
+//    switch (sType) {
+//        case (ShaderType::Default):
+//            tempShader = ResourceManager::getShader("defaultShader");
+//            shaderName = "defaultShader";
+//            break;
+//        case (ShaderType::Reflection):
+//            if (meshes.count() != 1) {
+//                qDebug(
+//                    "The Number of Meshes is not equal to 1. Can't Load Reflection shader");
+//                return;
+//            }
+//            tempShader = ResourceManager::getShader("reflectionShader");
+//            shaderName = "reflectionShader";
+//            break;
+//        case (ShaderType::Refraction):
+//            if (meshes.count() != 1) {
+//                qDebug(
+//                    "The Number of Meshes is not equal to 1. Can't Load Refraction shader");
+//                return;
+//            }
+//            shaderName = "refractionShader";
+//            tempShader = ResourceManager::getShader("refractionShader");
+//            break;
+//    }
+//
+//    if(tempShader == nullptr) {
+//        return;
+//    }
+//
+//    ResourceManager::updateMaterialInShader(shaderName, material);
+//    shader->use();
+//    shader->setMatrix4f("model", transform);
+//    shader->release();
+//
+//    for(auto & m : meshes) {
+//        m->setShader(shader);
+//    }
+//
+//}
 
 void GameObject::loadDiffuseTexture(const QString& tPath) {
     if(meshes.size() > 1) {
@@ -215,7 +273,7 @@ void GameObject::loadDiffuseTexture(const QString& tPath) {
 
     shader->use();
     shader->setBool("useDiffuseTexture", true);
-    shader->setBool("material.texture_diffuse1", material.texture_diffuse1->getTextureID());
+    shader->setInteger("material.texture_diffuse1", material.texture_diffuse1->getTextureID());
     shader->release();
 }
 
@@ -299,6 +357,22 @@ void GameObject::setAmbientOcclusion(float ab) {
     this->material.ambientOcclusion = ab;
     shader->use();
     shader->setFloat("material.ambientOcclusion", ab);
+    shader->release();
+}
+
+void GameObject::setReflection(GLboolean isReflec) {
+    shader->use();
+    shader->setBool("isReflection", isReflec);
+    shader->setBool("isRefraction", false);
+    shader->setInteger("skybox", 31);    // 31作为默认的天空盒参数？
+    shader->release();
+}
+
+void GameObject::setRefraction(GLboolean isRefrac) {
+    shader->use();
+    shader->setBool("isRefraction", isRefrac);
+    shader->setBool("isReflection", false);
+    shader->setInteger("skybox", 31);    // 31作为默认的天空盒参数？
     shader->release();
 }
 

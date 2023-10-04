@@ -128,6 +128,13 @@ void SkyBox::init(){
         1.0f, -1.0f,  1.0f
     };
 
+    if(VAO != 0) {
+        glFunc->glDeleteVertexArrays(1, &VAO);
+    }
+    if(VBO != 0) {
+        glFunc->glDeleteBuffers(1, &VBO);
+    }
+
     glFunc->glGenBuffers(1, &VBO);
 
     glFunc->glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -148,11 +155,17 @@ void SkyBox::init(){
 void SkyBox::draw(){
     glFunc->glBindVertexArray(VAO);
 
-    glFunc->glActiveTexture(GL_TEXTURE0);
+    glFunc->glActiveTexture(GL_TEXTURE0 + 31);  // 31作为默认的天空盒纹理单元
     texture->bind();
 
     glFunc->glDrawArrays(GL_TRIANGLES, 0, 36);
 
     glFunc->glBindVertexArray(0);
-    texture->release();
+    //texture->release();
+}
+
+int SkyBox::getTextureID() {
+    if(texture != nullptr)
+        return (int)texture->textureId();
+    return -1;
 }

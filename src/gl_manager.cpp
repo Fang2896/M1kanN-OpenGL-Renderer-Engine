@@ -20,8 +20,8 @@ void GLManager::initializeGL() {
     initConfigureVariables();
     initOpenGLSettings();
     initFrameBufferSettings();
+    initSkyBoxSettings();   // must init before initShader
     initShaders();    // shader
-    initSkyBoxSettings();
 
     // TODO: 这里可以从coordinate改成各种绘制精灵？
     initShaderValue();
@@ -67,6 +67,10 @@ void GLManager::paintGL() {
 
 // for coordinate and stencil testing
 void GLManager::initShaders() {
+    ResourceManager::loadShader("defaultShader",
+                                ":/shaders/assets/shaders/defaultShader.vert",
+                                ":/shaders/assets/shaders/defaultShader.frag");
+
     // coordinate
     ResourceManager::loadShader("coordShader",
                                 ":/shaders/assets/shaders/baseShader.vert",
@@ -82,6 +86,16 @@ void GLManager::initShaders() {
                                 ":/shaders/assets/shaders/post_processing/postProcessing.vert",
                                 ":/shaders/assets/shaders/post_processing/postProcessing.frag");
     ResourceManager::getShader("postProcessingShader")->use().setInteger("screenTexture", 0);
+
+    // reflection & refraction
+//    ResourceManager::loadShader("reflectionShader",
+//                                ":/shaders/assets/shaders/defaultShader.vert",
+//                                ":/shaders/assets/shaders/reflectionShader.frag");
+//    ResourceManager::loadShader("refractionShader",
+//                                ":/shaders/assets/shaders/defaultShader.vert",
+//                                ":/shaders/assets/shaders/refractionShader.frag");
+//    ResourceManager::getShader("reflectionShader")->use().setInteger("skybox", 0);
+//    ResourceManager::getShader("refractionShader")->use().setInteger("skybox", 0);
 
     qDebug() << "======= Done Init Coordinate Shaders ========";
 }
@@ -464,6 +478,7 @@ void GLManager::initSkyBoxSettings() {
 
     ResourceManager::loadShader("skybox", ":/shaders/assets/shaders/skybox/skybox.vert",
                                 ":/shaders/assets/shaders/skybox/skybox.frag");
+    ResourceManager::getShader("skybox")->use().setInteger("skybox", 31);
 }
 
 /********* Event Functions *********/

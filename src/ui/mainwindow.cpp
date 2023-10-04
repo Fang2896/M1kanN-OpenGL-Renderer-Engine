@@ -138,6 +138,7 @@ void MainWindow::initWidget() {
     lightZDirLabel = ui->lightZDirLabel;   lightZDirSpinBox = ui->lightZDirSpinBox;
 
     enableMatCheckBox   = ui->enableMatCheckBox;
+    shaderComboBox      = ui->shaderComboBox;
     matShininessLabel   = ui->matShininessLabel;    matShininessBar = ui->matShininessBar;
     matAmbientLabel     = ui->matAmbientLabel;      matAmbientChooseButton = ui->matAmbientChooseButton;
     matDiffuseLabel     = ui->matDiffuseLabel;      matDiffuseChooseButton = ui->matDiffuseChooseButton;
@@ -264,8 +265,13 @@ void MainWindow::initLayout() {
     matSpecularTexLayout->addWidget(matSpecularTexLabel);
     matSpecularTexLayout->addWidget(matSpecularTexChooseButton);
 
+    // enable and shader changed
+    auto *topMaterialLayout = new QHBoxLayout;
+    topMaterialLayout->addWidget(enableMatCheckBox);
+    topMaterialLayout->addWidget(shaderComboBox);
+
     auto *matFrameLayout = new QVBoxLayout;
-    matFrameLayout->addWidget(enableMatCheckBox);
+    matFrameLayout->addLayout(topMaterialLayout);
     matFrameLayout->addLayout(matShininessLayout);
     matFrameLayout->addLayout(matAmbientColorLayout);
     matFrameLayout->addLayout(matDiffuseColorLayout);
@@ -397,6 +403,9 @@ void MainWindow::connectConfigure() {
     // material
     connect(matShininessBar, &QSlider::valueChanged, this,
             &MainWindow::onShininessBarChange);
+
+    connect(shaderComboBox, qOverload<int>(&QComboBox::currentIndexChanged),
+            this, &MainWindow::onShaderComboBoxChanged);
 
     connect(matAmbientChooseButton, &QPushButton::clicked,
             this, &MainWindow::onAmbientColorButtonClicked);
@@ -835,6 +844,26 @@ void MainWindow::onLoadSpecularTextureButtonClicked() {
 
     QString texName = UtilAlgorithms::getFileNameFromPath(filePath);
     matSpecularTexChooseButton->setText(texName);
+}
+
+// 控制折射和反射
+void MainWindow::onShaderComboBoxChanged(int index) {
+    auto type = static_cast<ShaderType>(index);
+    if(currentObjectID == -1)
+        return;
+    auto tempObj = glManager->getTargetGameObject(currentObjectID);
+
+    if(type == ShaderType::Default) {
+        tempObj->setReflection(false);
+        tempObj->setRefraction(false);
+        qDebug() << "Shader Change to " << "Default";
+    } else if (type == ShaderType::Reflection) {
+        tempObj->setReflection(true);
+        qDebug() << "Shader Change to " << "Reflection";
+    } else if (type == ShaderType::Refraction) {
+        tempObj->setRefraction(true);
+        qDebug() << "Shader Change to " << "Refraction";
+    }
 }
 
 // 被点击的时候，返回相应的信息，以及显示对应的控件

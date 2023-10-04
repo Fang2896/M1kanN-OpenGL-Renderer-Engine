@@ -28,6 +28,8 @@ class SkyBox {
 
     void init();
     void draw();
+
+    int getTextureID();
    private:
     GLFunctions_Core *glFunc;
     QOpenGLTexture *texture;

@@ -59,6 +59,8 @@ void Mesh::draw() {
     GLuint diffuseNr = 1;
     GLuint specularNr = 1;
 
+    shader->use();
+
     /*============ outline logic ============*/
     if(drawOutline) {
         glFunc->glStencilFunc(GL_ALWAYS, 1, 0xFF);
@@ -69,7 +71,6 @@ void Mesh::draw() {
     }
     /*============ outline logic ============*/
 
-    shader->use();
     for(int i = 0; i < textures.size(); i++) {
         // 在绑定之前激活相应的纹理单元
         glFunc->glActiveTexture(GL_TEXTURE0 + i);

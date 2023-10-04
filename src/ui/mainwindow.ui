@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1100</width>
-    <height>559</height>
+    <width>1104</width>
+    <height>608</height>
    </rect>
   </property>
   <property name="font">
@@ -502,7 +502,7 @@
      <x>830</x>
      <y>20</y>
      <width>281</width>
-     <height>531</height>
+     <height>571</height>
     </rect>
    </property>
    <property name="font">
@@ -600,7 +600,7 @@
       <x>0</x>
       <y>60</y>
       <width>261</width>
-      <height>471</height>
+      <height>501</height>
      </rect>
     </property>
     <property name="font">
@@ -1522,7 +1522,7 @@
        <x>0</x>
        <y>290</y>
        <width>261</width>
-       <height>171</height>
+       <height>211</height>
       </rect>
      </property>
      <property name="sizePolicy">
@@ -1540,7 +1540,7 @@
      <widget class="QCheckBox" name="enableMatCheckBox">
       <property name="geometry">
        <rect>
-        <x>0</x>
+        <x>10</x>
         <y>10</y>
         <width>91</width>
         <height>16</height>
@@ -1569,8 +1569,8 @@
      <widget class="QSlider" name="matShininessBar">
       <property name="geometry">
        <rect>
-        <x>120</x>
-        <y>30</y>
+        <x>110</x>
+        <y>40</y>
         <width>131</width>
         <height>10</height>
        </rect>
@@ -1861,6 +1861,41 @@
       <property name="text">
        <string>Load</string>
       </property>
+     </widget>
+     <widget class="QComboBox" name="shaderComboBox">
+      <property name="geometry">
+       <rect>
+        <x>120</x>
+        <y>10</y>
+        <width>121</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Arial</family>
+        <pointsize>11</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+        <underline>false</underline>
+       </font>
+      </property>
+      <item>
+       <property name="text">
+        <string>default shader</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>reflection shader</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>refraction shader</string>
+       </property>
+      </item>
      </widget>
     </widget>
    </widget>

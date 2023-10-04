@@ -95,7 +95,7 @@ class MainWindow : public QWidget {
     void onSpecularColorButtonClicked();
     void onLoadDiffuseTextureButtonClicked();
     void onLoadSpecularTextureButtonClicked();
-
+    void onShaderComboBoxChanged(int index);
 
     void onObjectItemSelect(QListWidgetItem *item);
     void handleObjectItemChanged(QListWidgetItem *current, QListWidgetItem *previous);
@@ -208,12 +208,14 @@ class MainWindow : public QWidget {
 
     // material
     QCheckBox *enableMatCheckBox;
+    QComboBox *shaderComboBox;
     QLabel *matShininessLabel;      QSlider *matShininessBar;
     QLabel *matAmbientLabel;        QPushButton *matAmbientChooseButton;
     QLabel *matDiffuseLabel;        QPushButton *matDiffuseChooseButton;
     QLabel *matSpecularLabel;       QPushButton *matSpecularChooseButton;
     QLabel *matDiffuseTexLabel;     QPushButton *matDiffuseTexChooseButton;
     QLabel *matSpecularTexLabel;    QPushButton *matSpecularTexChooseButton;
+
 
     // object和light改变，就改变frame显示状态即可
 

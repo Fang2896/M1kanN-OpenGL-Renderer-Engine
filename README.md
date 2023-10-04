@@ -79,6 +79,9 @@ Mikann Renderer Engine is a OpenGL based renderer engine for rendering algorithm
 8. 【已解决】后处理的材质与自己赋的材质有冲突。导致如果用了材质，后处理屏幕Quad只会用刚刚自己赋的材质， 而不是绑定的TextureBuffer
      * 解决方法: 绑定后处理Quad材质，draw完后需要解绑材质
 9. 从后处理操作切换到正常的时候，物体会出现透视错误（UnitCube）
+10.【已解决】切换天空盒错误
+     * 解决方法及其原因:
+       切换天空盒一定要删除旧的VAO和VBO。而不是直接Generation 新的VAO和VBO
 
 
 ​    
