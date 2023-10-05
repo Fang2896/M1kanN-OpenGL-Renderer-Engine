@@ -364,6 +364,7 @@ void GameObject::setReflection(GLboolean isReflec) {
     shader->use();
     shader->setBool("isReflection", isReflec);
     shader->setBool("isRefraction", false);
+    shader->setBool("isFresnel", false);
     shader->setInteger("skybox", 31);    // 31作为默认的天空盒参数？
     shader->release();
 }
@@ -372,6 +373,16 @@ void GameObject::setRefraction(GLboolean isRefrac) {
     shader->use();
     shader->setBool("isRefraction", isRefrac);
     shader->setBool("isReflection", false);
+    shader->setBool("isFresnel", false);
+    shader->setInteger("skybox", 31);    // 31作为默认的天空盒参数？
+    shader->release();
+}
+
+void GameObject::setFresnel(GLboolean isFre) {
+    shader->use();
+    shader->setBool("isRefraction", false);
+    shader->setBool("isReflection", false);
+    shader->setBool("isFresnel", isFre);
     shader->setInteger("skybox", 31);    // 31作为默认的天空盒参数？
     shader->release();
 }

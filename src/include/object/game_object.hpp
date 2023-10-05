@@ -42,6 +42,7 @@ class GameObject {
 
     void setReflection(GLboolean isReflec);
     void setRefraction(GLboolean isRefrac);
+    void setFresnel(GLboolean isFre);
 
     ObjectType getType();
     QString getShaderName();

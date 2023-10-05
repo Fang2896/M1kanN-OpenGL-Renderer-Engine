@@ -11,7 +11,8 @@
 enum class ShaderType {
     Default = 0,
     Reflection,
-    Refraction
+    Refraction,
+    Fresnel
 };
 
 enum class SkyboxType {

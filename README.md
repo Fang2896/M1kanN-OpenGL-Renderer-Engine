@@ -33,8 +33,8 @@ Mikann Renderer Engine is a OpenGL based renderer engine for rendering algorithm
 * [x] Using **Stencil Testing** to draw objects’ outlining
 * [x] Transparent Object Rendering : Clipping and Blending 
   (draw a plane of grass and half transparent glass)
-  * [x] Using Frame Buffer to renderer scene to a texture
-    Then Post Processing: Inversion, Gray, Edging, Blur, Sharpen
+* [x] Using Frame Buffer to renderer scene to a texture : 
+  * Then Post Processing: Inversion, Gray, Edging, Blur, Sharpen
 * [ ] High level GLSL (half-side rendering etc.)
 * [ ] Using Geometry shader to visualize normal
 * [ ] Anti Aliasing
@@ -82,6 +82,9 @@ Mikann Renderer Engine is a OpenGL based renderer engine for rendering algorithm
 10.【已解决】切换天空盒错误
      * 解决方法及其原因:
        切换天空盒一定要删除旧的VAO和VBO。而不是直接Generation 新的VAO和VBO
+11.【已解决】fresnel和refraction明显错误
+     * 解决方法及其原因：
+       ratio要小于1.也就是参考值的倒数！
 
 
 ​    
@@ -91,7 +94,7 @@ Mikann Renderer Engine is a OpenGL based renderer engine for rendering algorithm
 
 [1] [Learn OpenGL, extensive tutorial resource for learning Modern OpenGL](https://learnopengl.com/)
 
-[2] [Fundamentals of Computer Graphics, Fourth Edition (darmajaya.ac.id)](http://repo.darmajaya.ac.id/4242/1/Fundamentals of Computer Graphics%2C Fourth Edition ( PDFDrive ).pdf)
+[2] Fundamentals of Computer Graphics, Fourth Edition
 
 [3] [Real-Time Rendering Resources (realtimerendering.com)](https://www.realtimerendering.com/)
 

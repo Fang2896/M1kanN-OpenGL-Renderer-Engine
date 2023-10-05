@@ -863,6 +863,9 @@ void MainWindow::onShaderComboBoxChanged(int index) {
     } else if (type == ShaderType::Refraction) {
         tempObj->setRefraction(true);
         qDebug() << "Shader Change to " << "Refraction";
+    } else if (type == ShaderType::Fresnel) {
+        tempObj->setFresnel(true);
+        qDebug() << "Shader Change to " << "Fresnel";
     }
 }
 

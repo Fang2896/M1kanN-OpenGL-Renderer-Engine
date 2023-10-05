@@ -53,6 +53,7 @@ uniform bool isMultiMeshModel;
 
 uniform bool isReflection;
 uniform bool isRefraction;
+uniform bool isFresnel;
 uniform samplerCube skybox;
 
 uniform Material material;
@@ -65,6 +66,36 @@ out vec4 FragColor;
 in vec3 Normal;
 in vec3 FragPos;
 in vec2 TexCoord;
+
+
+// Compute Fresnel using Schlick's approximation
+float fresnelSchlick(float cosTheta, float IOR) {
+    float R0 = (1.0 - IOR) / (1.0 + IOR);
+    R0 = R0 * R0;
+    return R0 + (1.0 - R0) * pow(1.0 - cosTheta, 5.0);
+}
+
+vec3 getFresnel() {
+    // Constants
+    const float IOR = 1.5;  // Index of Refraction for glass
+    vec3 glassColor = material.diffuseColor;  // Assuming white clear glass
+    vec3 viewDir = normalize(viewPos - FragPos);
+
+    float cosTheta = dot(normalize(viewDir), normalize(Normal));
+    float fresnel = fresnelSchlick(cosTheta, IOR);
+
+    // Compute reflection and refraction
+    vec3 reflected = reflect(viewDir, Normal);
+    vec3 refracted = refract(viewDir, Normal, 1.0 / IOR);  // Assuming air to glass transition
+
+    // Sample environment
+    vec3 envReflection = texture(skybox, reflected).rgb;
+    vec3 envRefraction = texture(skybox, refracted).rgb;
+
+    // Combine reflection and refraction with Fresnel factor
+    vec3 combined = mix(envRefraction * glassColor, envReflection, fresnel);
+    return combined;
+}
 
 
 void main()
@@ -124,29 +155,39 @@ void main()
         resultAlpha = 1.0f;
     }
 
-    FragColor = vec4(result, resultAlpha);
-
     // reflection and refraction
     if(isReflection) {
         vec3 I = normalize(FragPos - viewPos);
         vec3 R = reflect(I, normalize(Normal));
 
-        FragColor = vec4(texture(skybox, R).rgb, 1.0);
-    }
-
-    ///*
-    //   * 折射率：
-    //   * 空气      1.00
-    //   * 水        1.33
-    //   * 冰        1.309
-    //   * 玻璃      1.52
-    //   * 钻石      2.42
-    //  */
-    if(isRefraction) {
+        resultAlpha = 1.0f;
+        result = texture(skybox, R).rgb;
+    } else if(isRefraction) {
+        ///*
+        //   * 折射率：
+        //   * 空气      1.00
+        //   * 水        1.33
+        //   * 冰        1.309
+        //   * 玻璃      1.52
+        //   * 钻石      2.42
+        //  */
         vec3 I = normalize(FragPos - viewPos);
-        vec3 R = refract(I, normalize(Normal), 1.309);  // here to change ratio
-        FragColor = vec4(texture(skybox, R).rgb, 1.0);
+        vec3 R = refract(I, normalize(Normal), 1.0 / 1.33);  // here to change ratio
+        resultAlpha = 1.0f;
+        result = texture(skybox, R).rgb;
+    } else if (isFresnel) {
+        resultAlpha = 1.0f;
+        result = getFresnel();
     }
 
-    // FragColor = texture(material.texture_diffuse1, TexCoord);
+    // outline and depth mode
+    if(enableDepthMode) {
+        result = vec3(gl_FragCoord);
+        resultAlpha = 1.0f;
+    } else if(enableOutline) {
+        result = vec3(1.0,1.0,0.0); // red as outline color
+        resultAlpha = 1.0f;
+    }
+
+    FragColor = vec4(result, resultAlpha);
 }

@@ -1896,6 +1896,11 @@
         <string>refraction shader</string>
        </property>
       </item>
+      <item>
+       <property name="text">
+        <string>fresnel shader</string>
+       </property>
+      </item>
      </widget>
     </widget>
    </widget>
