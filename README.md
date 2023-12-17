@@ -1,4 +1,4 @@
-# Mikann Renderer Engine
+# Mikann OpenGL Renderer Engine
 
 Author : [LIU Fang]([Fang2896 (Fang LIU) (github.com)](https://github.com/Fang2896))
 
