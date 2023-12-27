@@ -1,5 +1,5 @@
 ﻿cmake_minimum_required(VERSION 3.21)
-project(Mikann_Renderer_Engine)
+project(M1kanN_OpenGL_Renderer_Engine)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_AUTOMOC ON)
