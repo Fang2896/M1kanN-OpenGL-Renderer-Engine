@@ -34,6 +34,9 @@ Mikann Renderer Engine is a OpenGL based renderer engine for rendering algorithm
 
   ![process](./assets/sample_image/postprocessing.png)
 
+- material load or change:
+
+  ![mat](./assets/sample_image/materials.png)
 
 ### Basic Features
 
