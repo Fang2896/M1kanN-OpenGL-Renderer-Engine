@@ -16,7 +16,7 @@ if(APPLE)
     set(ASSIMP_DLL_DST "${CMAKE_CURRENT_BINARY_DIR}/libassimpd.5.dylib")
 
 elseif(WIN32)
-    set(CMAKE_PREFIX_PATH "C:/Qt/Qt5.15.2/5.15.2/mingw81_64")
+    set(CMAKE_PREFIX_PATH "C:/Applications/Qt/5.15.2/mingw81_64")
     set(ASSIMP_LIBRARIES "${CMAKE_SOURCE_DIR}/3rdParty/lib/mingw64/libassimp.dll.a")
     set(ASSIMP_DLL_SRC "${CMAKE_SOURCE_DIR}/3rdParty/lib/mingw64/libassimp-5.dll")
     set(ASSIMP_DLL_DST "${CMAKE_CURRENT_BINARY_DIR}/libassimp-5.dll")

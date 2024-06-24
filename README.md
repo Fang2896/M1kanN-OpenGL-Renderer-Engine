@@ -14,6 +14,27 @@ Mikann Renderer Engine is a OpenGL based renderer engine for rendering algorithm
 
 ## Features
 
+### Show:
+- overview:
+  ![overview](./assets/sample_image/overview.png)
+
+- model load:
+
+  ![model_load](./assets/sample_image/model_load.png)
+
+- line mode:
+
+  ![line_mode](./assets/sample_image/line_mode.png)
+
+- model selection:
+
+  ![selection](./assets/sample_image/model_selection.png)
+
+- post processing:
+
+  ![process](./assets/sample_image/postprocessing.png)
+
+
 ### Basic Features
 
 * [x] Camera Movement

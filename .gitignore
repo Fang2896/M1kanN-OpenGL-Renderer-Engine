@@ -2,3 +2,4 @@
 /.vscode/
 /CMakeLists.txt.user
 /debug-*/
+/cmake-build-*/
